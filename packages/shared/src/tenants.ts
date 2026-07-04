@@ -1,5 +1,9 @@
-import * as z_ from "zod";
-const z = z_;
+// Namespace import is required: under the vitest transform (SWC and Oxc
+// alike) zod v4's named `import { z } from "zod"` resolves to an object
+// whose `.object`/`.string` are undefined at runtime. `import * as z`
+// binds the module namespace, whose top-level builders work correctly.
+// Do not "simplify" this to a named import — it will break the tests.
+import * as z from "zod";
 
 export const TENANT_TYPES = ["agent", "ppiu"] as const;
 export type TenantType = (typeof TENANT_TYPES)[number];
@@ -41,7 +45,7 @@ export const tenantInputSchema = z
     path: ["plan"],
     message: "Only the 'subscription' plan is supported in Phase 1",
   });
-export type TenantInput = z_.infer<typeof tenantInputSchema>;
+export type TenantInput = z.infer<typeof tenantInputSchema>;
 
 /** The resolved active tenant carried in request context. */
 export interface TenantContext {
