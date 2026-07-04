@@ -25,6 +25,7 @@ const user: AuthUser = {
   email: "demo@cometkit.dev",
   name: null,
   role: "user",
+  tenantId: "01JX0000000000000000000001",
 };
 
 describe("RolesGuard", () => {

@@ -8,10 +8,12 @@ import type { UsersService } from "../users/users.service";
 
 const demoUser: User = {
   id: "01JX0000000000000000000000",
+  tenantId: "01HTENANTAAAAAAAAAAAAAAAAA",
   email: "demo@cometkit.dev",
   passwordHash: bcrypt.hashSync("password123", 10),
   name: "Demo User",
   role: "user",
+  isPlatformOwner: false,
   createdAt: new Date(),
   updatedAt: new Date(),
 };
@@ -48,6 +50,7 @@ describe("AuthService", () => {
     });
 
     expect(result.user.email).toBe("demo@cometkit.dev");
+    expect(result.user.tenantId).toBe(demoUser.tenantId);
     expect(result.tokens.accessToken).toBeTruthy();
     expect(usersMock.create).toHaveBeenCalledOnce();
   });
@@ -69,6 +72,7 @@ describe("AuthService", () => {
     });
 
     expect(result.user.id).toBe(demoUser.id);
+    expect(result.user.tenantId).toBe(demoUser.tenantId);
     expect(result.tokens.accessToken).toBeTruthy();
   });
 

@@ -1,13 +1,16 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { PassportStrategy } from "@nestjs/passport";
+import { ClsService } from "nestjs-cls";
 import { ExtractJwt, Strategy } from "passport-jwt";
 import type { AuthUser } from "@cometkit/shared";
 import { UsersService } from "../users/users.service";
+import { TENANT_ID_KEY } from "../tenancy/tenant-context";
 
 export interface JwtPayload {
   sub: string;
   email: string;
+  tenantId: string;
 }
 
 @Injectable()
@@ -15,6 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     config: ConfigService,
     private readonly users: UsersService,
+    private readonly cls: ClsService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -24,12 +28,20 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload): Promise<AuthUser> {
+    // Establish tenant context BEFORE any tenant-owned read.
+    this.cls.set(TENANT_ID_KEY, payload.tenantId);
+    // Scoped by the active tenant: a user whose tenant changed resolves to
+    // undefined -> 401 (same spirit as the existing role-freshness behavior).
     const user = await this.users.findById(payload.sub);
     if (!user) {
       throw new UnauthorizedException();
     }
-    // Role is read fresh from the DB, so demotions apply immediately
-    // even to tokens issued before the role change.
-    return { id: user.id, email: user.email, name: user.name, role: user.role };
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      tenantId: user.tenantId,
+    };
   }
 }

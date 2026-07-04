@@ -58,8 +58,13 @@ export class AuthService {
       email: user.email,
       name: user.name,
       role: user.role,
+      tenantId: user.tenantId,
     };
-    const payload: JwtPayload = { sub: user.id, email: user.email };
+    const payload: JwtPayload = {
+      sub: user.id,
+      email: user.email,
+      tenantId: user.tenantId,
+    };
     return {
       user: authUser,
       tokens: { accessToken: this.jwt.sign(payload) },
