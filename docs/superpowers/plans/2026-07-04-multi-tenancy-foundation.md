@@ -362,12 +362,12 @@ git commit -m "feat(db): users is tenant-owned with per-tenant email uniqueness 
 
 Requires a running local Postgres and repo-root `.env` with `DATABASE_URL`.
 
-- [ ] **Step 1: Generate the migration**
+- [x] **Step 1: Generate the migration**
 
 Run: `cd packages/db && bun run db:generate`
 This emits a new file under `packages/db/drizzle/` creating `tenants`, its enums, adding `tenant_id`/`is_platform_owner` to `users`, dropping the old `users_email_unique`, and adding `users_tenant_email_unique`. Note the generated filename.
 
-- [ ] **Step 2: Hand-edit the generated SQL for safe backfill**
+- [x] **Step 2: Hand-edit the generated SQL for safe backfill**
 
 Drizzle's generated `ALTER TABLE "users" ADD COLUMN "tenant_id" ... NOT NULL` will fail on a DB that already has seeded users, and it inserts no default tenant. Edit the generated file so its body runs in this order (keep the enum/table CREATE statements drizzle generated; adjust the users ALTERs). The default tenant uses a fixed sentinel id so the backfill has a target; application code still resolves by slug.
 
@@ -397,7 +397,7 @@ CREATE UNIQUE INDEX "users_tenant_email_unique" ON "users" ("tenant_id","email")
 
 > Note: the exact name of the dropped constraint/index may differ (`users_email_unique` vs `users_email_key`). Check `packages/db/drizzle/0000_*.sql` for the original name and match it. Data statements (INSERT/UPDATE) do not affect the drizzle snapshot, so leaving `meta/` untouched is correct.
 
-- [ ] **Step 3: Rewrite the seed to seed the default tenant first**
+- [x] **Step 3: Rewrite the seed to seed the default tenant first**
 
 ```ts
 // packages/db/src/seed.ts
@@ -472,7 +472,7 @@ main().catch((err) => {
 });
 ```
 
-- [ ] **Step 4: Apply and verify idempotency**
+- [x] **Step 4: Apply and verify idempotency**
 
 Run:
 ```bash
@@ -486,7 +486,7 @@ Expected: tenant count `1`; null-tenant user count `0`.
 
 > If migrate fails, load the `systematic-debugging` skill before editing — do not guess-patch the SQL.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add packages/db/drizzle packages/db/src/seed.ts

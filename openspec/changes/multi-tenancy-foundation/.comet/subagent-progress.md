@@ -27,16 +27,25 @@ namespace zod imports to named form. See memory zod-namespace-import-under-vites
 - T12 → 4.1, 4.2 | T14 → 4.3, 4.4
 
 ## Current task
-- task: Task 4 — Migration + seed (needs live Postgres; resolves the seed.ts coupling)
-- plan-task-text: "## Task 4: Migration + seed"
-- openspec-task-text: checks off BOTH "1.3 Add non-null `tenantId` FK to `users` ..." AND "1.4 Generate migration ... update `db:seed` ..." after this task
+- task: Task 5 — CLS tenant context (first apps/api task; adds nestjs-cls)
+- plan-task-text: "## Task 5: CLS tenant context"
+- openspec-task-text: (contributes to 2.2; checkoff 2.2 deferred to Task 9 when middleware+module wired)
 - stage: implementing
-- base: (HEAD after Task 3 closeout — set at dispatch)
+- base: (HEAD after Task 4 closeout — set at dispatch)
 - impl-commit: (pending)
+- gate: adds apps/api/src/tenancy/tenant-context.ts (TENANT_ID_KEY + TenantContextMissingError), nestjs-cls dep (bun add, resolve version from npm), ClsModule.forRoot in app.module.ts. Verify: apps/api typecheck introduces NO new errors beyond the 10-error baseline above; tenant-context.ts + app.module.ts error-free. No unit test (loud-failure tested in T6).
 - env: Postgres live at localhost:5432/e-tawafsai-db; `bun run db:migrate` works (exit 0). ALWAYS db:migrate before db:seed.
 - gate: db:generate → hand-edit backfill SQL (nullable→backfill default tenant→NOT NULL; swap global email unique for composite) → rewrite seed.ts (seed default tenant by slug via tenantInputSchema, attach users) → migrate + seed + seed (idempotent) → assert exactly 1 default tenant, 0 null-tenant users. This restores full db typecheck (seed.ts now provides tenantId).
 - reviews-passed: none
 - review-fix-round: 0
+
+## apps/api typecheck BASELINE (known cross-task breakage from Task 1's AuthUser/User shape change)
+As of HEAD after Task 4, `cd apps/api && bunx tsc --noEmit` has 10 known errors, all "Property 'tenantId'/'isPlatformOwner' is missing", in:
+- auth.service.ts (×2), jwt.strategy.ts → fixed by Task 10
+- auth.service.spec.ts → fixed by Task 10
+- users.service.ts, users.service.int.spec.ts → fixed by Task 11
+- roles.guard.spec.ts, users.policy.spec.ts (×2) → ORPHANED (no task owns these specs' mocks). PLAN GAP: fold into Task 10/11 scope or fix at Task 14 verify. Add tenantId/isPlatformOwner to their AuthUser/User mocks.
+For apps/api tasks 5-9: the verification gate is "MY changed files are error-free AND no NEW error beyond this baseline set" — NOT a clean package typecheck (impossible until T10/T11).
 
 ## Minor findings (defer to final whole-branch review triage)
 - T3: `packages/db/src/schema/users.ts:1` imports `boolean` from `drizzle-orm/pg-core` instead of the `./tenants` re-export Task 2 added for this consumer. Functionally identical; matches the brief's (internally inconsistent) example. Consequence: the `boolean` re-export in `schema/tenants.ts:~30` is currently unused. Final review: either route users.ts import through ./tenants, or drop the unused re-export.

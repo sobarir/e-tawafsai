@@ -4,8 +4,8 @@
 
 - [x] 1.1 Add `TENANT_TYPES`, `TENANT_PLANS`, `TENANT_PLAN_STATUSES` constants + tenant Zod schemas/DTO types to `packages/shared`
 - [x] 1.2 Add `tenants` table to `packages/db` (slug unique, enum columns deriving from shared tuples) and a `tenantOwned()` column helper in `columns.ts`
-- [ ] 1.3 Add non-null `tenantId` FK to `users` (migration: add nullable → backfill to default tenant → NOT NULL)
-- [ ] 1.4 Generate migration (`db:generate`) and update `db:seed` to idempotently seed the default tenant and attach seeded users
+- [x] 1.3 Add non-null `tenantId` FK to `users` (migration: add nullable → backfill to default tenant → NOT NULL)
+- [x] 1.4 Generate migration (`db:generate`) and update `db:seed` to idempotently seed the default tenant and attach seeded users
 
 ## 2. Scoping mechanism (per design-phase decision)
 
