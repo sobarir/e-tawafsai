@@ -1282,7 +1282,7 @@ git commit -m "test(api): two-tenant isolation, composite email, loud failure, d
 **Interfaces:**
 - Produces: `tenantSlugFromHost(host: string | null): string` (mirrors the API parser); a Next middleware that reads the request host and sets an `x-tenant-slug` request header (no behavior change for the apex admin); the `api` ky instance forwards the browser host as `X-Forwarded-Host` so public API calls resolve to the right tenant.
 
-- [ ] **Step 1: Add the host parser**
+- [x] **Step 1: Add the host parser**
 
 ```ts
 // apps/web/src/lib/tenant.ts
@@ -1302,7 +1302,7 @@ export function tenantSlugFromHost(host: string | null): string {
 }
 ```
 
-- [ ] **Step 2: Add the Next middleware seam**
+- [x] **Step 2: Add the Next middleware seam**
 
 ```ts
 // apps/web/middleware.ts
@@ -1324,7 +1324,7 @@ export function middleware(req: NextRequest) {
 export const config = { matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"] };
 ```
 
-- [ ] **Step 3: Forward the host from the ky client**
+- [x] **Step 3: Forward the host from the ky client**
 
 In `apps/web/src/lib/api.ts`, add a `beforeRequest` hook (alongside the existing bearer hook) that forwards the browser host so the API can resolve the tenant for public routes:
 
@@ -1336,12 +1336,12 @@ In `apps/web/src/lib/api.ts`, add a `beforeRequest` hook (alongside the existing
       },
 ```
 
-- [ ] **Step 4: Verify web typecheck/build**
+- [x] **Step 4: Verify web typecheck/build**
 
 Run: `cd apps/web && bun run typecheck`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/web/middleware.ts apps/web/src/lib/tenant.ts apps/web/src/lib/api.ts

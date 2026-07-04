@@ -27,13 +27,16 @@ namespace zod imports to named form. See memory zod-namespace-import-under-vites
 - T12 → 4.1, 4.2 | T14 → 4.3, 4.4
 
 ## Current task
-- task: Task 13 — Web subdomain seam (apps/web)
-- plan-task-text: "## Task 13: Web subdomain seam"
-- openspec-task-text: "3.3 Web: subdomain-aware tenant resolution seam in `apps/web` (middleware), single-tenant UX unchanged" (checkoff after this task)
+- task: Task 14 — Stale-token int check + resolver edge tests + full gate (FINAL)
+- plan-task-text: "## Task 14: Stale-tenant token integration check + full gate"
+- openspec-task-text: checks off "4.3 Unit tests for resolver edge cases (apex, known/unknown subdomain, host-override attempt)" AND "4.4 bun run verify and bun run test:int pass" after this task
 - stage: implementing
-- base: (HEAD after Task 12 closeout — set at dispatch)
+- base: (HEAD after Task 13 closeout — set at dispatch)
 - impl-commit: (pending)
-- gate: create apps/web/src/lib/tenant.ts (tenantSlugFromHost mirror of API parser) + apps/web/middleware.ts (sets x-tenant-slug header, admin UX unchanged); modify apps/web/src/lib/api.ts (forward X-Forwarded-Host from window.location.host). Verify: `bun run verify` (web typecheck+lint) passes. Note the web parser is a deliberate cross-package mirror of API slugFromHost (can't share — web can't import api).
+- gate: (1) add stale-tenant-token scenario to tenancy.int.spec.ts (user reassigned A→B; scoped findById under A returns 0 rows). (2) EXPAND to fully cover 4.3: add tenant-resolution.middleware.spec.ts tests for middleware.use() — unknown slug (registry→null) → next(NotFoundException); auth-header present → next() with NO cls.set (host can't override authenticated tenant). (3) FULL gate: `bun run verify` (typecheck+lint+test) AND `bun run test:int` both green. Run test:int twice (idempotent).
+- reviews-passed: none
+- review-fix-round: 0
+- AFTER T14: coordinator does app-boot DI smoke (VERIFY-PHASE GAP), then final whole-branch review, then build→verify guard.
 
 ## PROCESS LESSON (apply to T13, T14, and any spec task)
 vitest (test:int / test) does NOT typecheck or lint. A spec can pass tests while failing `bun run verify` (tsc + eslint). ALWAYS run `bun run verify` (typecheck+lint+unit) AND `bun run test:int` as the real gate for any task touching apps/api — not just the narrower command the plan step names. Task 12 shipped a TS2532 (`rows[0].tenantId` under noUncheckedIndexedAccess) + 3 unused-import lint errors that test:int never caught; fixed in the T12 fix commit. Full project lint baseline was 3 errors (now 0).
