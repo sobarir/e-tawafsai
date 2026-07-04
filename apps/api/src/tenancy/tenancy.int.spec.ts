@@ -3,7 +3,7 @@ import { config } from "dotenv";
 import { resolve } from "node:path";
 import { ulid } from "ulid";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { eq, inArray } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { createDb, tenants, users, type Database } from "@cometkit/db";
 import { tenantInputSchema } from "@cometkit/shared";
 import { TenantScopedDb } from "./tenant-scoped-db";
@@ -67,5 +67,20 @@ describe("tenant isolation (integration)", () => {
   it("has exactly one default tenant seeded", async () => {
     const def = await db.select().from(tenants).where(eq(tenants.slug, "default"));
     expect(def).toHaveLength(1);
+  });
+
+  it("rejects a token whose tenantId no longer matches the user's tenant", async () => {
+    const staleEmail = `stale-${suffix}@cometkit.dev`;
+    const scopedA = new TenantScopedDb(db, clsStub(tenantIds[0]));
+    await scopedA.insertValues(users, {
+      email: staleEmail, passwordHash: "x", name: "stale", role: "user",
+    });
+    const [created] = await db.select().from(users)
+      .where(and(eq(users.tenantId, tenantIds[0]!), eq(users.email, staleEmail)));
+    expect(created).toBeDefined();
+    // User reassigned to tenant B; a token still claiming tenant A must not resolve them.
+    await db.update(users).set({ tenantId: tenantIds[1]! }).where(eq(users.id, created!.id));
+    const stillInA = await scopedA.select(users, eq(users.id, created!.id));
+    expect(stillInA).toHaveLength(0);
   });
 });
