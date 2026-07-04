@@ -305,7 +305,7 @@ git commit -m "feat(db): tenants table and tenantOwned() column helper"
 - Consumes: `tenantOwned` from `./tenants`.
 - Produces: `users` with non-null `tenantId`, `isPlatformOwner` boolean, composite unique `(tenant_id, email)` (the global email unique is removed). `User`/`NewUser` types now include `tenantId` and `isPlatformOwner`.
 
-- [ ] **Step 1: Rewrite the users schema**
+- [x] **Step 1: Rewrite the users schema**
 
 ```ts
 // packages/db/src/schema/users.ts
@@ -336,12 +336,12 @@ export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 ```
 
-- [ ] **Step 2: Typecheck**
+- [x] **Step 2: Typecheck**
 
 Run: `cd packages/db && bunx tsc --noEmit`
 Expected: PASS.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add packages/db/src/schema/users.ts

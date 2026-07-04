@@ -27,15 +27,21 @@ namespace zod imports to named form. See memory zod-namespace-import-under-vites
 - T12 → 4.1, 4.2 | T14 → 4.3, 4.4
 
 ## Current task
-- task: Task 3 — `users` becomes tenant-owned
-- plan-task-text: "## Task 3: `users` becomes tenant-owned"
-- openspec-task-text: (sub-step of 1.3; checkoff 1.3 deferred to after Task 4 migration)
+- task: Task 4 — Migration + seed (needs live Postgres; resolves the seed.ts coupling)
+- plan-task-text: "## Task 4: Migration + seed"
+- openspec-task-text: checks off BOTH "1.3 Add non-null `tenantId` FK to `users` ..." AND "1.4 Generate migration ... update `db:seed` ..." after this task
 - stage: implementing
-- base: (HEAD after Task 2 checkoff — set at dispatch)
+- base: (HEAD after Task 3 closeout — set at dispatch)
 - impl-commit: (pending)
-- note: declarative schema task — users.ts adds tenantOwned(), isPlatformOwner, composite unique (tenant_id,email), drops global email unique. GREEN gate = tsc --noEmit. Imports `boolean` from ./tenants (re-export). No unit test per plan.
+- env: Postgres live at localhost:5432/e-tawafsai-db; `bun run db:migrate` works (exit 0). ALWAYS db:migrate before db:seed.
+- gate: db:generate → hand-edit backfill SQL (nullable→backfill default tenant→NOT NULL; swap global email unique for composite) → rewrite seed.ts (seed default tenant by slug via tenantInputSchema, attach users) → migrate + seed + seed (idempotent) → assert exactly 1 default tenant, 0 null-tenant users. This restores full db typecheck (seed.ts now provides tenantId).
 - reviews-passed: none
 - review-fix-round: 0
 
+## Minor findings (defer to final whole-branch review triage)
+- T3: `packages/db/src/schema/users.ts:1` imports `boolean` from `drizzle-orm/pg-core` instead of the `./tenants` re-export Task 2 added for this consumer. Functionally identical; matches the brief's (internally inconsistent) example. Consequence: the `boolean` re-export in `schema/tenants.ts:~30` is currently unused. Final review: either route users.ts import through ./tenants, or drop the unused re-export.
+
 ## Completed tasks
-(none yet)
+- Task 1 — shared tenant contracts (974baa1..3885865; 1 fix round: tsconfig gate + zod namespace import)
+- Task 2 — tenants table + tenantOwned() (e99c451; clean)
+- Task 3 — users tenant-owned (c6c3206; scope-creep seed.ts reverted; clean after)
