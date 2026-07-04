@@ -99,7 +99,10 @@
         "zod": "^4.4.3",
       },
       "devDependencies": {
+        "@swc/core": "^1.15.43",
         "typescript": "^6.0.3",
+        "unplugin-swc": "^1.5.9",
+        "vitest": "^4.1.9",
       },
     },
   },
