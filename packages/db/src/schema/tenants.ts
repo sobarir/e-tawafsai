@@ -1,4 +1,4 @@
-import { boolean, pgEnum, pgTable, varchar } from "drizzle-orm/pg-core";
+import { pgEnum, pgTable, varchar } from "drizzle-orm/pg-core";
 import {
   TENANT_PLAN_STATUSES,
   TENANT_PLANS,
@@ -26,9 +26,6 @@ export const tenants = pgTable("tenants", {
 
 export type Tenant = typeof tenants.$inferSelect;
 export type NewTenant = typeof tenants.$inferInsert;
-
-// `boolean` re-exported here so the users schema keeps one import site.
-export { boolean };
 
 /**
  * Column group every tenant-owned table spreads. Lives in the schema layer
