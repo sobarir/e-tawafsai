@@ -225,7 +225,7 @@ git commit -m "feat(shared): tenant enums, contracts, and tenantInputSchema seam
 - Consumes: shared `TENANT_TYPES`/`TENANT_PLANS`/`TENANT_PLAN_STATUSES`; `ulidPk`/`ulidRef`/`timestamps` from `../columns`.
 - Produces: `tenants` table, `Tenant`/`NewTenant` row types, `tenantTypeEnum`/`tenantPlanEnum`/`tenantPlanStatusEnum`, and `tenantOwned()` returning `{ tenantId }` (not-null FK → `tenants.id`).
 
-- [ ] **Step 1: Create the tenants schema**
+- [x] **Step 1: Create the tenants schema**
 
 ```ts
 // packages/db/src/schema/tenants.ts
@@ -273,7 +273,7 @@ export const tenantOwned = () => ({
 });
 ```
 
-- [ ] **Step 2: Export from the schema barrel (order matters — tenants before users)**
+- [x] **Step 2: Export from the schema barrel (order matters — tenants before users)**
 
 Replace `packages/db/src/schema/index.ts` with:
 
@@ -282,12 +282,12 @@ export * from "./tenants";
 export * from "./users";
 ```
 
-- [ ] **Step 3: Typecheck**
+- [x] **Step 3: Typecheck**
 
 Run: `cd packages/db && bunx tsc --noEmit`
 Expected: PASS (no references to `users` tenant column yet).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add packages/db/src/schema/tenants.ts packages/db/src/schema/index.ts

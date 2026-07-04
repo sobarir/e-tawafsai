@@ -21,19 +21,19 @@ transform (both unplugin-swc AND vitest4 Oxc). Verified empirically. Do not "cle
 namespace zod imports to named form. See memory zod-namespace-import-under-vitest.
 
 ## Plan→OpenSpec checkoff map
-- T1 → 1.1 | T2 → 1.2 | T3 → 1.3 | T4 → 1.4
+- T1 → 1.1 ✔ | T2 → 1.2 ✔ | T3 → (sub-step of 1.3, no checkoff) | T4 → 1.3 + 1.4
 - T6 → 2.3 | T9 → 2.2 | T11 → 2.1
 - T8 → 3.1 | T10 → 3.2 | T13 → 3.3
 - T12 → 4.1, 4.2 | T14 → 4.3, 4.4
 
 ## Current task
-- task: Task 2 — `tenants` table + `tenantOwned()` helper
-- plan-task-text: "## Task 2: `tenants` table + `tenantOwned()` helper"
-- openspec-task-text: "1.2 Add `tenants` table to `packages/db` (slug unique, enum columns deriving from shared tuples) and a `tenantOwned()` column helper in `columns.ts`"
+- task: Task 3 — `users` becomes tenant-owned
+- plan-task-text: "## Task 3: `users` becomes tenant-owned"
+- openspec-task-text: (sub-step of 1.3; checkoff 1.3 deferred to after Task 4 migration)
 - stage: implementing
-- base: 3885865 (HEAD after Task 1)
+- base: (HEAD after Task 2 checkoff — set at dispatch)
 - impl-commit: (pending)
-- note: declarative schema task — verification is `tsc --noEmit` (no unit test per plan; runtime covered by T12 integration). db imports @cometkit/shared → shared dist must be rebuilt first.
+- note: declarative schema task — users.ts adds tenantOwned(), isPlatformOwner, composite unique (tenant_id,email), drops global email unique. GREEN gate = tsc --noEmit. Imports `boolean` from ./tenants (re-export). No unit test per plan.
 - reviews-passed: none
 - review-fix-round: 0
 
