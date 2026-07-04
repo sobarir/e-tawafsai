@@ -3,11 +3,11 @@ import { config } from "dotenv";
 import { resolve } from "node:path";
 import { ulid } from "ulid";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { and, eq, inArray } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { createDb, tenants, users, type Database } from "@cometkit/db";
 import { tenantInputSchema } from "@cometkit/shared";
 import { TenantScopedDb } from "./tenant-scoped-db";
-import { TENANT_ID_KEY, TenantContextMissingError } from "./tenant-context";
+import { TenantContextMissingError } from "./tenant-context";
 
 config({ path: resolve(__dirname, "../../../../.env") });
 
@@ -50,7 +50,7 @@ describe("tenant isolation (integration)", () => {
     const scopedA = new TenantScopedDb(db, clsStub(tenantIds[0]));
     const rows = await scopedA.select(users, eq(users.email, email));
     expect(rows).toHaveLength(1);
-    expect(rows[0].tenantId).toBe(tenantIds[0]);
+    expect(rows[0]!.tenantId).toBe(tenantIds[0]);
     expect(rows.some((r) => r.tenantId === tenantIds[1])).toBe(false);
   });
 

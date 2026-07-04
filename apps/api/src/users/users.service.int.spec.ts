@@ -12,7 +12,6 @@ import { createDb, tenants, users, type Database } from "@cometkit/db";
 import { eq, inArray } from "drizzle-orm";
 import { DEFAULT_TENANT_SLUG, type AuthUser } from "@cometkit/shared";
 import { TenantScopedDb } from "../tenancy/tenant-scoped-db";
-import { TENANT_ID_KEY } from "../tenancy/tenant-context";
 import { UsersService } from "./users.service";
 
 config({ path: resolve(__dirname, "../../../../.env") });
