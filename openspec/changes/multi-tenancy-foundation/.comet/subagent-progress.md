@@ -30,9 +30,10 @@ namespace zod imports to named form. See memory zod-namespace-import-under-vites
 - task: Task 14 — Stale-token int check + resolver edge tests + full gate (FINAL)
 - plan-task-text: "## Task 14: Stale-tenant token integration check + full gate"
 - openspec-task-text: checks off "4.3 Unit tests for resolver edge cases (apex, known/unknown subdomain, host-override attempt)" AND "4.4 bun run verify and bun run test:int pass" after this task
-- stage: implementing
-- base: (HEAD after Task 13 closeout — set at dispatch)
-- impl-commit: (pending)
+- stage: task-review (spec + quality)
+- base: 2e0a53f (HEAD after Task 13 closeout)
+- impl-commit: 8011d2d (tenancy.int.spec +stale-token; tenant-resolution.middleware.spec +3 edge tests; diff review-2e0a53f..8011d2d.diff)
+- gate MET (FINAL): bun run verify green (typecheck 0 + lint 0 + unit 12/12); bun run test:int 2 files/6 tests pass, both runs idempotent. noUncheckedIndexedAccess `!` guards applied.
 - gate: (1) add stale-tenant-token scenario to tenancy.int.spec.ts (user reassigned A→B; scoped findById under A returns 0 rows). (2) EXPAND to fully cover 4.3: add tenant-resolution.middleware.spec.ts tests for middleware.use() — unknown slug (registry→null) → next(NotFoundException); auth-header present → next() with NO cls.set (host can't override authenticated tenant). (3) FULL gate: `bun run verify` (typecheck+lint+test) AND `bun run test:int` both green. Run test:int twice (idempotent).
 - reviews-passed: none
 - review-fix-round: 0
@@ -41,8 +42,8 @@ namespace zod imports to named form. See memory zod-namespace-import-under-vites
 ## PROCESS LESSON (apply to T13, T14, and any spec task)
 vitest (test:int / test) does NOT typecheck or lint. A spec can pass tests while failing `bun run verify` (tsc + eslint). ALWAYS run `bun run verify` (typecheck+lint+unit) AND `bun run test:int` as the real gate for any task touching apps/api — not just the narrower command the plan step names. Task 12 shipped a TS2532 (`rows[0].tenantId` under noUncheckedIndexedAccess) + 3 unused-import lint errors that test:int never caught; fixed in the T12 fix commit. Full project lint baseline was 3 errors (now 0).
 
-## VERIFY-PHASE GAP (address at Task 14 / verify)
-The Nest DI wiring — ClsModule (T5), TenancyModule providers/exports + middleware mount (T9), TenantScopedDb injectability — is NOT exercised by any test. Task 12's int spec constructs `new TenantScopedDb(db, clsStub)` directly, bypassing Nest DI. `bun run verify`/`test:int` never boot the full app. ACTION at T14/verify: actually boot the API (`bun run dev` or a bootstrap smoke) and hit /health + an authed route to prove the DI graph resolves (DB provider reachable by TenancyModule, middleware mounts, CLS context set by JwtStrategy visible to TenantScopedDb under Fastify).
+## VERIFY-PHASE GAP — RESOLVED (app-boot DI smoke done after T14 impl)
+`bunx nest build` exit 0 → `bun dist/main.js` boots. Probes: /health → 200 (middleware-excluded); GET /users no-auth → 401 (NOT 500 — TenantResolutionMiddleware ran, resolved host→default→CLS, then JwtAuthGuard rejected); POST /auth/login bad body → 400 (Zod validation). No DI/resolve errors in boot log. Proves the full Nest graph (ClsModule, TenancyModule providers/exports, middleware mount, TenantScopedDb injectability) resolves + executes at runtime under Fastify. Process cleaned up (killed :3001).
 
 ## apps/api typecheck BASELINE (known cross-task breakage from Task 1's AuthUser/User shape change)
 As of HEAD after Task 4, `cd apps/api && bunx tsc --noEmit` has 9 known errors, all "Property 'tenantId'/'isPlatformOwner' is missing", in:

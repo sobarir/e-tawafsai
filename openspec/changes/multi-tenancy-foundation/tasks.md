@@ -23,5 +23,5 @@
 
 - [x] 4.1 Integration test: two-tenant fixture with identical slugs — each context returns only its own rows, zero foreign `tenantId` in responses
 - [x] 4.2 Integration test: unscoped repository call fails loudly
-- [ ] 4.3 Unit tests for resolver edge cases (apex, known/unknown subdomain, host-override attempt)
-- [ ] 4.4 `bun run verify` and `bun run test:int` pass
+- [x] 4.3 Unit tests for resolver edge cases (apex, known/unknown subdomain, host-override attempt)
+- [x] 4.4 `bun run verify` and `bun run test:int` pass

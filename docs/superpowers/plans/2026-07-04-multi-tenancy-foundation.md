@@ -1358,7 +1358,7 @@ git commit -m "feat(web): subdomain tenant seam and host forwarding (admin UX un
 **Interfaces:**
 - Consumes: existing fixture from Task 12.
 
-- [ ] **Step 1: Add the stale-tenant scenario**
+- [x] **Step 1: Add the stale-tenant scenario**
 
 Append to `tenancy.int.spec.ts`: create a user in tenant A, then simulate a token that claims tenant A while the user's row is moved to tenant B (`update users set tenant_id = B`). A scoped `findById` under tenant A's context (as `JwtStrategy` would set from the token's `tenantId`) must return no row — proving the fresh scoped re-read rejects a stale-tenant token.
 
@@ -1378,7 +1378,7 @@ Append to `tenancy.int.spec.ts`: create a user in tenant A, then simulate a toke
   });
 ```
 
-- [ ] **Step 2: Run the full quality gate**
+- [x] **Step 2: Run the full quality gate**
 
 Run:
 ```bash
@@ -1389,7 +1389,7 @@ Expected: `verify` (typecheck + lint + all unit tests) PASS; `test:int` PASS.
 
 > If lint flags a raw `DB` injection on a tenant-owned table outside the escape-hatch list (tenant-registry, migrations/seed), that is the drift guard doing its job — route it through `TenantScopedDb`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add apps/api/src/tenancy/tenancy.int.spec.ts
