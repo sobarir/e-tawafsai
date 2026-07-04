@@ -6,6 +6,7 @@ import { ClsModule } from "nestjs-cls";
 import { AllExceptionsFilter } from "./common/http-exception.filter";
 import { validateEnv } from "./config/env";
 import { DatabaseModule } from "./database/database.module";
+import { TenancyModule } from "./tenancy/tenancy.module";
 import { AuthModule } from "./auth/auth.module";
 import { UsersModule } from "./users/users.module";
 import { HealthModule } from "./health/health.module";
@@ -34,6 +35,7 @@ import { HealthModule } from "./health/health.module";
       middleware: { mount: true },
     }),
     DatabaseModule,
+    TenancyModule,
     UsersModule,
     AuthModule,
     HealthModule,
