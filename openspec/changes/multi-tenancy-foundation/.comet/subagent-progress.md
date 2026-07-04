@@ -27,13 +27,14 @@ namespace zod imports to named form. See memory zod-namespace-import-under-vites
 - T12 → 4.1, 4.2 | T14 → 4.3, 4.4
 
 ## Current task
-- task: Task 9 — Wire the tenancy module (completes OpenSpec 2.2)
-- plan-task-text: "## Task 9: Wire the tenancy module"
-- openspec-task-text: "2.2 Request-scoped tenant context (nestjs-cls/AsyncLocalStorage) populated by middleware; explicit-tenant API for jobs/scripts with no ambient context" (checkoff after this task)
+- task: Task 10 — Auth carries the tenant (fixes baseline auth errors; REAL test change)
+- plan-task-text: "## Task 10: Auth carries the tenant"
+- openspec-task-text: "3.2 Authenticated resolution: JWT carries `tenantId`; guards re-read user+tenant fresh per request; client host/params can never override" (checkoff after this task)
 - stage: implementing
-- base: (HEAD after Task 8 closeout — set at dispatch)
+- base: (HEAD after Task 9 closeout — set at dispatch)
 - impl-commit: (pending)
-- gate: create tenancy.module.ts (@Global providers/exports TenantScopedDb + TenantRegistryService; applies TenantResolutionMiddleware to all routes except health); register in app.module.ts after DatabaseModule. typecheck: no new errors beyond baseline. NOTE: DI graph correctness (DB reachable by TenancyModule) is NOT proven by typecheck — validated at verify-phase boot (see VERIFY-PHASE GAP above). No unit test per plan.
+- SCOPE (plan + orphan-spec fold-in): jwt.strategy.ts (JwtPayload+tenantId; validate sets CLS + returns tenantId), auth.service.ts (toAuthResponse issues+returns tenantId), auth.service.spec.ts (assert tenant propagation), AND roles.guard.spec.ts (add tenantId to its AuthUser mock — orphaned baseline error).
+- gate: TDD — update auth.service.spec to assert result.user.tenantId (RED against old service) → implement (GREEN). Fixes baseline errors in jwt.strategy/auth.service(×2)/auth.service.spec/roles.guard.spec → remaining apps/api errors should drop to just users.* (T11's). Run auth unit tests GREEN.
 - reviews-passed: none
 - review-fix-round: 0
 

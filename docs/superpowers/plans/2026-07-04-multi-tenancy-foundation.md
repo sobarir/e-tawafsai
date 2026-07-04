@@ -898,7 +898,7 @@ git commit -m "feat(api): public host -> tenant resolution middleware"
 **Interfaces:**
 - Produces: `TenancyModule` (global) providing/exporting `TenantScopedDb` and `TenantRegistryService`, and applying `TenantResolutionMiddleware` to all routes except `health`.
 
-- [ ] **Step 1: Create the module**
+- [x] **Step 1: Create the module**
 
 ```ts
 // apps/api/src/tenancy/tenancy.module.ts
@@ -928,7 +928,7 @@ export class TenancyModule implements NestModule {
 }
 ```
 
-- [ ] **Step 2: Register in AppModule (after ClsModule, DatabaseModule)**
+- [x] **Step 2: Register in AppModule (after ClsModule, DatabaseModule)**
 
 In `apps/api/src/app.module.ts` import and add `TenancyModule` to `imports` immediately after `DatabaseModule`:
 
@@ -939,12 +939,12 @@ import { TenancyModule } from "./tenancy/tenancy.module";
     TenancyModule,
 ```
 
-- [ ] **Step 3: Typecheck**
+- [x] **Step 3: Typecheck**
 
 Run: `cd apps/api && bun run typecheck`
 Expected: PASS.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add apps/api/src/tenancy/tenancy.module.ts apps/api/src/app.module.ts
