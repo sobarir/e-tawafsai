@@ -27,7 +27,13 @@ namespace zod imports to named form. See memory zod-namespace-import-under-vites
 - T12 → 4.1, 4.2 | T14 → 4.3, 4.4
 
 ## Current task
-- task: Task 14 — Stale-token int check + resolver edge tests + full gate (FINAL)
+- task: WRAP-UP after final review — STOPPING AT PHASE-GUARD per user (do NOT run comet-guard build --apply)
+- stage: final-fix (dead re-export cleanup), then STOP before guard
+- FINAL REVIEW (opus) verdict: READY TO MERGE. No Critical. No isolation hole (TenantScopedDb is sole accessor to only tenant-owned table `users`; registry+migration/seed are sanctioned escape hatches). No client-controlled authed tenant path. Migration/seed consistent.
+  - Important (CLS propagation on public path unexercised) → CLOSED by real login smoke: POST /auth/login admin → 200 + tenantId=default sentinel + JWT carries tenantId; authed GET /users → 200, default-tenant rows only. No TenantContextMissing. Middleware-CLS→TenantScopedDb link proven on public+authed paths.
+  - Minor triage: T3 unused boolean re-export → FIX-BEFORE-MERGE (fix-dead-reexport agent running). T6 and(...) cast comment → ACCEPT. T6/T11 Record<string,unknown>/as User casts → ACCEPT as typed-generics follow-up. T13 web parser dup → ACCEPT.
+  - Prod-hardening notes (not merge-blocking, for backlog): edge proxy must OVERWRITE client X-Forwarded-Host (public-route tenant is header-selectable by design); slugFromHost assumes single-label TLD (.com) — a .co.id apex would 404; duplicated in web parser.
+- (prior) Task 14 — Stale-token int check + resolver edge tests + full gate
 - plan-task-text: "## Task 14: Stale-tenant token integration check + full gate"
 - openspec-task-text: checks off "4.3 Unit tests for resolver edge cases (apex, known/unknown subdomain, host-override attempt)" AND "4.4 bun run verify and bun run test:int pass" after this task
 - stage: task-review (spec + quality)
