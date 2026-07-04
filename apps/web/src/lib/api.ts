@@ -16,6 +16,11 @@ export const api = ky.create({
           request.headers.set("Authorization", `Bearer ${token}`);
         }
       },
+      ({ request }) => {
+        if (typeof window !== "undefined") {
+          request.headers.set("X-Forwarded-Host", window.location.host);
+        }
+      },
     ],
   },
 });
