@@ -8,6 +8,7 @@ const admin: AuthUser = {
   email: "admin@cometkit.dev",
   name: "Admin",
   role: "admin",
+  tenantId: "01HTENANTAAAAAAAAAAAAAAAAA",
 };
 
 describe("canDeleteUser", () => {
@@ -28,6 +29,8 @@ describe("toUserDto", () => {
       passwordHash: "hash",
       name: "Admin",
       role: "admin",
+      tenantId: "01HTENANTAAAAAAAAAAAAAAAAA",
+      isPlatformOwner: false,
       createdAt: new Date("2026-01-01T00:00:00Z"),
       updatedAt: new Date("2026-01-01T00:00:00Z"),
     };

@@ -1,13 +1,12 @@
 import {
   ConflictException,
   ForbiddenException,
-  Inject,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
 import { InjectPinoLogger, PinoLogger } from "nestjs-pino";
 import { desc, eq } from "drizzle-orm";
-import { users, type Database, type NewUser, type User } from "@cometkit/db";
+import { users, type NewUser, type User } from "@cometkit/db";
 import type {
   AuthUser,
   CreateUserInput,
@@ -17,46 +16,43 @@ import type {
   UpdateUserInput,
   UserDto,
 } from "@cometkit/shared";
-import { DB } from "../database/database.module";
 import { hashPassword } from "../common/password";
+import { TenantScopedDb } from "../tenancy/tenant-scoped-db";
 import { buildPageMeta, canDeleteUser, toUserDto } from "./users.policy";
 
 @Injectable()
 export class UsersService {
   constructor(
-    @Inject(DB) private readonly db: Database,
+    private readonly db: TenantScopedDb,
     @InjectPinoLogger(UsersService.name)
     private readonly logger: PinoLogger,
   ) {}
 
-  findByEmail(email: string): Promise<User | undefined> {
-    return this.db.query.users.findFirst({ where: eq(users.email, email) });
+  async findByEmail(email: string): Promise<User | undefined> {
+    const [row] = await this.db.select(users, eq(users.email, email));
+    return row as User | undefined;
   }
 
-  findById(id: string): Promise<User | undefined> {
-    return this.db.query.users.findFirst({ where: eq(users.id, id) });
+  async findById(id: string): Promise<User | undefined> {
+    const [row] = await this.db.select(users, eq(users.id, id));
+    return row as User | undefined;
   }
 
-  async create(data: NewUser): Promise<User> {
-    const [row] = await this.db.insert(users).values(data).returning();
+  async create(data: Omit<NewUser, "tenantId">): Promise<User> {
+    const [row] = await this.db.insertValues(users, data);
     if (!row) throw new Error("Insert returned no row");
-    this.logger.info({ userId: row.id, role: row.role }, "user.created");
-    return row;
+    this.logger.info({ userId: (row as User).id, role: (row as User).role }, "user.created");
+    return row as User;
   }
 
   /** Admin: paginated list, newest first (ULIDs sort by creation time). */
   async list(query: ListUsersQuery): Promise<Paginated<UserDto>> {
     const { page, limit } = query;
     const [rows, total] = await Promise.all([
-      this.db
-        .select()
-        .from(users)
-        .orderBy(desc(users.id))
-        .limit(limit)
-        .offset((page - 1) * limit),
-      this.db.$count(users),
+      this.db.select(users).orderBy(desc(users.id)).limit(limit).offset((page - 1) * limit),
+      this.db.count(users),
     ]);
-    return { data: rows.map(toUserDto), meta: buildPageMeta(page, limit, total) };
+    return { data: (rows as User[]).map(toUserDto), meta: buildPageMeta(page, limit, total) };
   }
 
   /** Admin: create a user with an explicit role. */
@@ -76,16 +72,12 @@ export class UsersService {
 
   /** Admin: update name and/or role. */
   async updateUser(id: string, input: UpdateUserInput): Promise<UserDto> {
-    const [row] = await this.db
-      .update(users)
-      .set(input)
-      .where(eq(users.id, id))
-      .returning();
+    const [row] = await this.db.update(users, input, eq(users.id, id));
     if (!row) throw new NotFoundException("User not found");
     if (input.role) {
       this.logger.info({ userId: id, role: input.role }, "user.role_changed");
     }
-    return toUserDto(row);
+    return toUserDto(row as User);
   }
 
   /** Admin: delete any user except yourself. */
@@ -93,10 +85,7 @@ export class UsersService {
     if (!canDeleteUser(actor, id)) {
       throw new ForbiddenException("You cannot delete your own account");
     }
-    const [row] = await this.db
-      .delete(users)
-      .where(eq(users.id, id))
-      .returning({ id: users.id });
+    const [row] = await this.db.deleteFrom(users, eq(users.id, id));
     if (!row) throw new NotFoundException("User not found");
     this.logger.info({ userId: id, actorId: actor.id }, "user.deleted");
   }
@@ -106,12 +95,8 @@ export class UsersService {
     actorId: string,
     input: UpdateProfileInput,
   ): Promise<UserDto> {
-    const [row] = await this.db
-      .update(users)
-      .set({ name: input.name })
-      .where(eq(users.id, actorId))
-      .returning();
+    const [row] = await this.db.update(users, { name: input.name }, eq(users.id, actorId));
     if (!row) throw new NotFoundException("User not found");
-    return toUserDto(row);
+    return toUserDto(row as User);
   }
 }
