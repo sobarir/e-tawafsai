@@ -27,13 +27,13 @@ namespace zod imports to named form. See memory zod-namespace-import-under-vites
 - T12 → 4.1, 4.2 | T14 → 4.3, 4.4
 
 ## Current task
-- task: Task 7 — Tenant registry service (unscoped lookups by slug/id)
-- plan-task-text: "## Task 7: Tenant registry service"
-- openspec-task-text: (infra for 3.1 resolution; no dedicated checkoff)
+- task: Task 8 — Public host → tenant resolution middleware (REAL TDD)
+- plan-task-text: "## Task 8: Public host → tenant resolution"
+- openspec-task-text: "3.1 Public host → tenant resolver (apex/localhost → default tenant; unknown subdomain → 404)" (checkoff after this task)
 - stage: implementing
-- base: (HEAD after Task 6 closeout — set at dispatch)
+- base: (HEAD after Task 7 closeout — set at dispatch)
 - impl-commit: (pending)
-- gate: create tenant-registry.service.ts — findBySlug/findById returning TenantContext|null, reads via RAW unscoped DB (documented escape hatch: tenants table is NOT tenant-owned). typecheck: no new errors beyond baseline. No unit test per plan.
+- gate: TDD — spec tests pure slugFromHost (6 cases: apex→default, localhost(:port)→default, sub.host→slug, {slug}.localhost→slug, www→default, undefined→default). RED→GREEN(6). Middleware: no auth header → resolve host tenant into CLS or 404 on unknown; auth header → leave for JwtStrategy. Fastify raw req headers. typecheck: no new errors beyond baseline.
 - reviews-passed: none
 - review-fix-round: 0
 

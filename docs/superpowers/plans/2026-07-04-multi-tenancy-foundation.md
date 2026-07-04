@@ -712,7 +712,7 @@ git commit -m "feat(api): TenantScopedDb - sole tenant-owned accessor with loud 
 - Consumes: `DB`; `tenants` table; `TenantContext` type.
 - Produces: `class TenantRegistryService` with `findBySlug(slug): Promise<TenantContext | null>` and `findById(id): Promise<TenantContext | null>`. Reads the tenants registry with the raw unscoped `DB` (documented escape hatch — tenants is not tenant-owned).
 
-- [ ] **Step 1: Implement the registry (unscoped by design)**
+- [x] **Step 1: Implement the registry (unscoped by design)**
 
 ```ts
 // apps/api/src/tenancy/tenant-registry.service.ts
@@ -758,12 +758,12 @@ export class TenantRegistryService {
 }
 ```
 
-- [ ] **Step 2: Typecheck**
+- [x] **Step 2: Typecheck**
 
 Run: `cd apps/api && bun run typecheck`
 Expected: PASS.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add apps/api/src/tenancy/tenant-registry.service.ts
