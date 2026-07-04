@@ -27,14 +27,14 @@ namespace zod imports to named form. See memory zod-namespace-import-under-vites
 - T12 → 4.1, 4.2 | T14 → 4.3, 4.4
 
 ## Current task
-- task: Task 10 — Auth carries the tenant (fixes baseline auth errors; REAL test change)
-- plan-task-text: "## Task 10: Auth carries the tenant"
-- openspec-task-text: "3.2 Authenticated resolution: JWT carries `tenantId`; guards re-read user+tenant fresh per request; client host/params can never override" (checkoff after this task)
+- task: Task 11 — Refactor UsersService onto TenantScopedDb (clears final 5 errors → 0)
+- plan-task-text: "## Task 11: Refactor UsersService onto TenantScopedDb"
+- openspec-task-text: "2.1 Spike outcome applied: implement the chosen enforcement (... `TenantScopedDb` accessor) in `apps/api/src/database`" (checkoff after this task)
 - stage: implementing
-- base: (HEAD after Task 9 closeout — set at dispatch)
+- base: (HEAD after Task 10 closeout — set at dispatch)
 - impl-commit: (pending)
-- SCOPE (plan + orphan-spec fold-in): jwt.strategy.ts (JwtPayload+tenantId; validate sets CLS + returns tenantId), auth.service.ts (toAuthResponse issues+returns tenantId), auth.service.spec.ts (assert tenant propagation), AND roles.guard.spec.ts (add tenantId to its AuthUser mock — orphaned baseline error).
-- gate: TDD — update auth.service.spec to assert result.user.tenantId (RED against old service) → implement (GREEN). Fixes baseline errors in jwt.strategy/auth.service(×2)/auth.service.spec/roles.guard.spec → remaining apps/api errors should drop to just users.* (T11's). Run auth unit tests GREEN.
+- SCOPE (plan + orphan-spec fold-in): users.service.ts (inject TenantScopedDb instead of DB; route all reads/writes through scoped helpers; create() takes Omit<NewUser,"tenantId">), users.service.int.spec.ts (establish tenant context via scoped-db stub — RUN in T12 not here), AND users.policy.spec.ts (add tenantId/isPlatformOwner to its User/AuthUser mocks — orphaned baseline error).
+- gate: after this task, apps/api `tsc --noEmit` = 0 ERRORS (clears users.service.ts, users.service.int.spec.ts, users.policy.spec.ts ×2, AND auth.service.ts:31 via create() signature). Unit tests (users.policy, auth, roles.guard) GREEN. int spec runs in T12.
 - reviews-passed: none
 - review-fix-round: 0
 
@@ -47,7 +47,7 @@ As of HEAD after Task 4, `cd apps/api && bunx tsc --noEmit` has 9 known errors, 
 - auth.service.spec.ts → fixed by Task 10
 - users.service.ts, users.service.int.spec.ts → fixed by Task 11
 - roles.guard.spec.ts, users.policy.spec.ts (×2) → ORPHANED (no task owns these specs' mocks). PLAN GAP: fold into Task 10/11 scope or fix at Task 14 verify. Add tenantId/isPlatformOwner to their AuthUser/User mocks.
-For apps/api tasks 5-9: the verification gate is "MY changed files are error-free AND no NEW error beyond this baseline set" — NOT a clean package typecheck (impossible until T10/T11).
+After Task 10: 5 errors remain, ALL Task 11 scope: users.service.ts, users.service.int.spec.ts, users.policy.spec.ts (x2), AND auth.service.ts:31 (register->create needs create() to drop tenantId requirement). Task 11 must clear all 5.
 
 ## Minor findings (defer to final whole-branch review triage)
 - T6: `tenant-scoped-db.ts:~79` `and(tenantPredicate, extra) as SQL` — add a source comment (not just report) explaining the cast is safe because and() has ≥1 condition here; a future zero-arg refactor wouldn't be compiler-caught.

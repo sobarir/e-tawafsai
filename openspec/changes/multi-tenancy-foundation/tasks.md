@@ -16,7 +16,7 @@
 ## 3. Tenant resolution
 
 - [x] 3.1 Public host → tenant resolver (apex/localhost → default tenant; unknown subdomain → 404)
-- [ ] 3.2 Authenticated resolution: JWT carries `tenantId`; guards re-read user+tenant fresh per request; client host/params can never override
+- [x] 3.2 Authenticated resolution: JWT carries `tenantId`; guards re-read user+tenant fresh per request; client host/params can never override
 - [ ] 3.3 Web: subdomain-aware tenant resolution seam in `apps/web` (middleware), single-tenant UX unchanged
 
 ## 4. Verification

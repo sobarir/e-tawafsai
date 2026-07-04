@@ -962,7 +962,7 @@ git commit -m "feat(api): TenancyModule wires scoped db, registry, and host reso
 - Consumes: `ClsService`, `TENANT_ID_KEY`, `UsersService.findById`/`findByEmail` (now tenant-scoped).
 - Produces: `JwtPayload` gains `tenantId: string`; `JwtStrategy.validate` sets CLS tenant from the payload before reading the user and returns `AuthUser` with `tenantId`; login/register issue tokens carrying `tenantId` and return it.
 
-- [ ] **Step 1: Update JwtStrategy — set CLS tenant, return tenantId**
+- [x] **Step 1: Update JwtStrategy — set CLS tenant, return tenantId**
 
 ```ts
 // apps/api/src/auth/jwt.strategy.ts
@@ -1015,7 +1015,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 }
 ```
 
-- [ ] **Step 2: Update AuthService — issue and return tenantId**
+- [x] **Step 2: Update AuthService — issue and return tenantId**
 
 Edit `apps/api/src/auth/auth.service.ts`: in `toAuthResponse`, include `tenantId` on both the `AuthUser` and the `JwtPayload`:
 
@@ -1042,16 +1042,16 @@ Edit `apps/api/src/auth/auth.service.ts`: in `toAuthResponse`, include `tenantId
 
 (`login`/`register` are unchanged in flow — they call `findByEmail`/`create`, which are now tenant-scoped by the host-resolved context established by the resolution middleware.)
 
-- [ ] **Step 3: Update the auth spec to assert tenant propagation**
+- [x] **Step 3: Update the auth spec to assert tenant propagation**
 
 In `apps/api/src/auth/auth.service.spec.ts`, ensure the mocked user includes `tenantId` and assert the response/token carry it. Add a mock user field `tenantId: "01HTENANTAAAAAAAAAAAAAAAAA"` wherever a `User` is stubbed, and assert `result.user.tenantId` equals it. (Match the file's existing mocking style — mock `UsersService` at its boundary; no DB.)
 
-- [ ] **Step 4: Run auth unit tests**
+- [x] **Step 4: Run auth unit tests**
 
 Run: `cd apps/api && bunx vitest run src/auth/auth.service.spec.ts`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/api/src/auth/jwt.strategy.ts apps/api/src/auth/auth.service.ts apps/api/src/auth/auth.service.spec.ts
