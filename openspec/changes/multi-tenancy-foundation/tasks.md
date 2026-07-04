@@ -9,7 +9,7 @@
 
 ## 2. Scoping mechanism (per design-phase decision)
 
-- [ ] 2.1 Spike outcome applied: implement the chosen enforcement (RLS policies + session variable, and/or `TenantScopedDb` accessor) in `apps/api/src/database`
+- [x] 2.1 Spike outcome applied: implement the chosen enforcement (RLS policies + session variable, and/or `TenantScopedDb` accessor) in `apps/api/src/database`
 - [x] 2.2 Request-scoped tenant context (nestjs-cls/AsyncLocalStorage) populated by middleware; explicit-tenant API for jobs/scripts with no ambient context
 - [x] 2.3 Loud-failure guard: accessing tenant-owned tables without tenant context throws; unit test proves it
 

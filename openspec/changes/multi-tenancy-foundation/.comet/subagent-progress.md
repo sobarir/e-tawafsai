@@ -27,14 +27,13 @@ namespace zod imports to named form. See memory zod-namespace-import-under-vites
 - T12 → 4.1, 4.2 | T14 → 4.3, 4.4
 
 ## Current task
-- task: Task 11 — Refactor UsersService onto TenantScopedDb (clears final 5 errors → 0)
-- plan-task-text: "## Task 11: Refactor UsersService onto TenantScopedDb"
-- openspec-task-text: "2.1 Spike outcome applied: implement the chosen enforcement (... `TenantScopedDb` accessor) in `apps/api/src/database`" (checkoff after this task)
+- task: Task 12 — Isolation integration tests (the C15 acceptance; live Postgres)
+- plan-task-text: "## Task 12: Isolation integration tests (the C15 acceptance)"
+- openspec-task-text: checks off BOTH "4.1 Integration test: two-tenant fixture..." AND "4.2 Integration test: unscoped repository call fails loudly" after this task
 - stage: implementing
-- base: (HEAD after Task 10 closeout — set at dispatch)
+- base: (HEAD after Task 11 closeout — set at dispatch)
 - impl-commit: (pending)
-- SCOPE (plan + orphan-spec fold-in): users.service.ts (inject TenantScopedDb instead of DB; route all reads/writes through scoped helpers; create() takes Omit<NewUser,"tenantId">), users.service.int.spec.ts (establish tenant context via scoped-db stub — RUN in T12 not here), AND users.policy.spec.ts (add tenantId/isPlatformOwner to its User/AuthUser mocks — orphaned baseline error).
-- gate: after this task, apps/api `tsc --noEmit` = 0 ERRORS (clears users.service.ts, users.service.int.spec.ts, users.policy.spec.ts ×2, AND auth.service.ts:31 via create() signature). Unit tests (users.policy, auth, roles.guard) GREEN. int spec runs in T12.
+- gate: create tenancy.int.spec.ts — 2-tenant fixture (identical emails across tenants), scoped read returns only own rows (zero foreign tenantId), composite email uniqueness permits identical emails across tenants, unscoped (no CLS) call throws TenantContextMissingError, exactly 1 default tenant seeded. Run `bun run test:int` → this spec + the T11-updated users.service.int.spec PASS against live Postgres (already migrated+seeded).
 - reviews-passed: none
 - review-fix-round: 0
 
@@ -52,6 +51,7 @@ After Task 10: 5 errors remain, ALL Task 11 scope: users.service.ts, users.servi
 ## Minor findings (defer to final whole-branch review triage)
 - T6: `tenant-scoped-db.ts:~79` `and(tenantPredicate, extra) as SQL` — add a source comment (not just report) explaining the cast is safe because and() has ≥1 condition here; a future zero-arg refactor wouldn't be compiler-caught.
 - T6: `insertValues`/`update` take `Record<string, unknown>` — widest trust boundary (mistyped columns slip through `as never`). Brief allows it; final review may tighten.
+- T11: `users.service.ts` has repeated `as User`/`as User[]` casts because `TenantScopedDb`'s scoped helpers return loosely-typed rows. Related to the T6 generics-tightening item — a potential polish task: add proper table-row generics to TenantScopedDb so callers get typed rows without casts.
 - T3: `packages/db/src/schema/users.ts:1` imports `boolean` from `drizzle-orm/pg-core` instead of the `./tenants` re-export Task 2 added for this consumer. Functionally identical; matches the brief's (internally inconsistent) example. Consequence: the `boolean` re-export in `schema/tenants.ts:~30` is currently unused. Final review: either route users.ts import through ./tenants, or drop the unused re-export.
 
 ## Completed tasks

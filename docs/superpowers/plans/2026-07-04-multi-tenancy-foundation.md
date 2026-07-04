@@ -1069,7 +1069,7 @@ git commit -m "feat(api): JWT and auth responses carry tenantId; validate sets t
 - Consumes: `TenantScopedDb` (replaces the raw `DB` injection).
 - Produces: all `users` reads/writes are tenant-scoped; behavior otherwise unchanged. `create` no longer needs a caller-supplied `tenantId` — the scoped db stamps it.
 
-- [ ] **Step 1: Swap the injection and route queries through the scoped db**
+- [x] **Step 1: Swap the injection and route queries through the scoped db**
 
 Rewrite `apps/api/src/users/users.service.ts` so the constructor injects `TenantScopedDb` instead of `@Inject(DB)`, and each method uses the scoped helpers. Key changes (keep method signatures and logging identical):
 
@@ -1155,16 +1155,16 @@ export class UsersService {
 
 > `this.db.select(users)` returns a Drizzle builder, so `.orderBy/.limit/.offset` still chain. Keep the exact DTO import list the file already had.
 
-- [ ] **Step 2: Update the users integration spec to establish tenant context**
+- [x] **Step 2: Update the users integration spec to establish tenant context**
 
 `apps/api/src/users/users.service.int.spec.ts` constructs `UsersService` directly. Provide a stub `TenantScopedDb` wired to the real `createDb(url)` and a fixed tenant id (the seeded default tenant, looked up by slug `default`). Concretely: in `beforeAll`, create the raw db, resolve the default tenant id, and build a `ClsService`-like stub whose `get(TENANT_ID_KEY)` returns that id; construct `new TenantScopedDb(rawDb, clsStub)` and pass it to `new UsersService(scoped, noopLogger)`. Clean up created rows as today.
 
-- [ ] **Step 3: Run unit tests (int spec runs in Task 12)**
+- [x] **Step 3: Run unit tests (int spec runs in Task 12)**
 
 Run: `cd apps/api && bun run test`
 Expected: PASS (users.policy, roles.guard, auth specs green; no DB).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add apps/api/src/users/users.service.ts apps/api/src/users/users.service.int.spec.ts
