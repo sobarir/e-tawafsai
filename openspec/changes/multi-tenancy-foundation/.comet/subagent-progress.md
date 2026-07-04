@@ -27,20 +27,18 @@ namespace zod imports to named form. See memory zod-namespace-import-under-vites
 - T12 → 4.1, 4.2 | T14 → 4.3, 4.4
 
 ## Current task
-- task: Task 5 — CLS tenant context (first apps/api task; adds nestjs-cls)
-- plan-task-text: "## Task 5: CLS tenant context"
-- openspec-task-text: (contributes to 2.2; checkoff 2.2 deferred to Task 9 when middleware+module wired)
+- task: Task 6 — TenantScopedDb (loud-failure accessor; REAL TDD task)
+- plan-task-text: "## Task 6: `TenantScopedDb`"
+- openspec-task-text: "2.3 Loud-failure guard: accessing tenant-owned tables without tenant context throws; unit test proves it" (checkoff after this task; 2.1 deferred to T11)
 - stage: implementing
-- base: (HEAD after Task 4 closeout — set at dispatch)
+- base: (HEAD after Task 5 closeout — set at dispatch)
 - impl-commit: (pending)
-- gate: adds apps/api/src/tenancy/tenant-context.ts (TENANT_ID_KEY + TenantContextMissingError), nestjs-cls dep (bun add, resolve version from npm), ClsModule.forRoot in app.module.ts. Verify: apps/api typecheck introduces NO new errors beyond the 10-error baseline above; tenant-context.ts + app.module.ts error-free. No unit test (loud-failure tested in T6).
-- env: Postgres live at localhost:5432/e-tawafsai-db; `bun run db:migrate` works (exit 0). ALWAYS db:migrate before db:seed.
-- gate: db:generate → hand-edit backfill SQL (nullable→backfill default tenant→NOT NULL; swap global email unique for composite) → rewrite seed.ts (seed default tenant by slug via tenantInputSchema, attach users) → migrate + seed + seed (idempotent) → assert exactly 1 default tenant, 0 null-tenant users. This restores full db typecheck (seed.ts now provides tenantId).
+- gate: TDD — spec tests loud failure (throws TenantContextMissingError when no CLS tenant) + returns id when present. RED (module not found) → GREEN (2 pass). tenant-scoped-db.ts uses Drizzle generics w/ internal casts (plan permits narrowing casts; public method names stable: tenantId getter, select, insertValues, update, deleteFrom, count). typecheck: no NEW errors beyond 9 baseline; tenant-scoped-db.ts error-free.
 - reviews-passed: none
 - review-fix-round: 0
 
 ## apps/api typecheck BASELINE (known cross-task breakage from Task 1's AuthUser/User shape change)
-As of HEAD after Task 4, `cd apps/api && bunx tsc --noEmit` has 10 known errors, all "Property 'tenantId'/'isPlatformOwner' is missing", in:
+As of HEAD after Task 4, `cd apps/api && bunx tsc --noEmit` has 9 known errors, all "Property 'tenantId'/'isPlatformOwner' is missing", in:
 - auth.service.ts (×2), jwt.strategy.ts → fixed by Task 10
 - auth.service.spec.ts → fixed by Task 10
 - users.service.ts, users.service.int.spec.ts → fixed by Task 11

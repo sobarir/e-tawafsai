@@ -504,7 +504,7 @@ git commit -m "feat(db): migration backfills default tenant and per-tenant email
 **Interfaces:**
 - Produces: `TENANT_ID_KEY` (CLS key string), `class TenantContextMissingError extends InternalServerErrorException`. `ClsModule` mounted globally so `ClsService` is injectable everywhere.
 
-- [ ] **Step 1: Add the dependency**
+- [x] **Step 1: Add the dependency**
 
 Resolve the current `nestjs-cls` version from npm (do not guess) and add it to `apps/api/package.json` dependencies, then install:
 
@@ -512,7 +512,7 @@ Resolve the current `nestjs-cls` version from npm (do not guess) and add it to `
 cd apps/api && bun add nestjs-cls
 ```
 
-- [ ] **Step 2: Create the context module file**
+- [x] **Step 2: Create the context module file**
 
 ```ts
 // apps/api/src/tenancy/tenant-context.ts
@@ -533,7 +533,7 @@ export class TenantContextMissingError extends InternalServerErrorException {
 }
 ```
 
-- [ ] **Step 3: Mount ClsModule globally**
+- [x] **Step 3: Mount ClsModule globally**
 
 In `apps/api/src/app.module.ts` add the import and module entry:
 
@@ -552,12 +552,12 @@ Add to the `imports` array (before `DatabaseModule`):
     }),
 ```
 
-- [ ] **Step 4: Typecheck**
+- [x] **Step 4: Typecheck**
 
 Run: `cd apps/api && bun run typecheck`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/api/package.json apps/api/src/tenancy/tenant-context.ts apps/api/src/app.module.ts
