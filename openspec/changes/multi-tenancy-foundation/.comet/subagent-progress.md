@@ -27,13 +27,13 @@ namespace zod imports to named form. See memory zod-namespace-import-under-vites
 - T12 → 4.1, 4.2 | T14 → 4.3, 4.4
 
 ## Current task
-- task: Task 6 — TenantScopedDb (loud-failure accessor; REAL TDD task)
-- plan-task-text: "## Task 6: `TenantScopedDb`"
-- openspec-task-text: "2.3 Loud-failure guard: accessing tenant-owned tables without tenant context throws; unit test proves it" (checkoff after this task; 2.1 deferred to T11)
+- task: Task 7 — Tenant registry service (unscoped lookups by slug/id)
+- plan-task-text: "## Task 7: Tenant registry service"
+- openspec-task-text: (infra for 3.1 resolution; no dedicated checkoff)
 - stage: implementing
-- base: (HEAD after Task 5 closeout — set at dispatch)
+- base: (HEAD after Task 6 closeout — set at dispatch)
 - impl-commit: (pending)
-- gate: TDD — spec tests loud failure (throws TenantContextMissingError when no CLS tenant) + returns id when present. RED (module not found) → GREEN (2 pass). tenant-scoped-db.ts uses Drizzle generics w/ internal casts (plan permits narrowing casts; public method names stable: tenantId getter, select, insertValues, update, deleteFrom, count). typecheck: no NEW errors beyond 9 baseline; tenant-scoped-db.ts error-free.
+- gate: create tenant-registry.service.ts — findBySlug/findById returning TenantContext|null, reads via RAW unscoped DB (documented escape hatch: tenants table is NOT tenant-owned). typecheck: no new errors beyond baseline. No unit test per plan.
 - reviews-passed: none
 - review-fix-round: 0
 
@@ -46,6 +46,8 @@ As of HEAD after Task 4, `cd apps/api && bunx tsc --noEmit` has 9 known errors, 
 For apps/api tasks 5-9: the verification gate is "MY changed files are error-free AND no NEW error beyond this baseline set" — NOT a clean package typecheck (impossible until T10/T11).
 
 ## Minor findings (defer to final whole-branch review triage)
+- T6: `tenant-scoped-db.ts:~79` `and(tenantPredicate, extra) as SQL` — add a source comment (not just report) explaining the cast is safe because and() has ≥1 condition here; a future zero-arg refactor wouldn't be compiler-caught.
+- T6: `insertValues`/`update` take `Record<string, unknown>` — widest trust boundary (mistyped columns slip through `as never`). Brief allows it; final review may tighten.
 - T3: `packages/db/src/schema/users.ts:1` imports `boolean` from `drizzle-orm/pg-core` instead of the `./tenants` re-export Task 2 added for this consumer. Functionally identical; matches the brief's (internally inconsistent) example. Consequence: the `boolean` re-export in `schema/tenants.ts:~30` is currently unused. Final review: either route users.ts import through ./tenants, or drop the unused re-export.
 
 ## Completed tasks

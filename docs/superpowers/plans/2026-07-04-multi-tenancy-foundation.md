@@ -575,7 +575,7 @@ git commit -m "feat(api): request-scoped tenant context via nestjs-cls"
 - Consumes: `DB` from `../database/database.module`; `ClsService`; `TENANT_ID_KEY`, `TenantContextMissingError`.
 - Produces: `class TenantScopedDb` with `get tenantId(): string` (throws `TenantContextMissingError` when absent), `select(table, extraWhere?)`, `insertValues(values)`, `update(table, set, extraWhere?)`, `deleteFrom(table, extraWhere?)`, `count(table, extraWhere?)`. All operations require a tenant-owned table (has a `tenantId` column) and compose the tenant predicate with `and(...)`.
 
-- [ ] **Step 1: Write the failing test (loud failure is the headline behavior)**
+- [x] **Step 1: Write the failing test (loud failure is the headline behavior)**
 
 ```ts
 // apps/api/src/tenancy/tenant-scoped-db.spec.ts
@@ -602,12 +602,12 @@ describe("TenantScopedDb", () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `cd apps/api && bunx vitest run src/tenancy/tenant-scoped-db.spec.ts`
 Expected: FAIL — module not found.
 
-- [ ] **Step 3: Implement `TenantScopedDb`**
+- [x] **Step 3: Implement `TenantScopedDb`**
 
 ```ts
 // apps/api/src/tenancy/tenant-scoped-db.ts
@@ -689,12 +689,12 @@ export class TenantScopedDb {
 
 > If Drizzle's generic types reject a call site during integration, keep the public method signatures and narrow the internal `as PgTable`/`as never` casts — the loud-failure and scoping behaviors are contract, the exact casts are implementation detail. Load `systematic-debugging` before reworking types.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `cd apps/api && bunx vitest run src/tenancy/tenant-scoped-db.spec.ts`
 Expected: PASS (2 tests).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/api/src/tenancy/tenant-scoped-db.ts apps/api/src/tenancy/tenant-scoped-db.spec.ts
