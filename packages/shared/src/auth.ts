@@ -19,6 +19,7 @@ export interface AuthUser {
   email: string;
   name: string | null;
   role: UserRole;
+  tenantId: string;
 }
 
 export interface AuthTokens {
