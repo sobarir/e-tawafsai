@@ -27,15 +27,16 @@ namespace zod imports to named form. See memory zod-namespace-import-under-vites
 - T12 → 4.1, 4.2 | T14 → 4.3, 4.4
 
 ## Current task
-- task: Task 12 — Isolation integration tests (the C15 acceptance; live Postgres)
-- plan-task-text: "## Task 12: Isolation integration tests (the C15 acceptance)"
-- openspec-task-text: checks off BOTH "4.1 Integration test: two-tenant fixture..." AND "4.2 Integration test: unscoped repository call fails loudly" after this task
+- task: Task 13 — Web subdomain seam (apps/web)
+- plan-task-text: "## Task 13: Web subdomain seam"
+- openspec-task-text: "3.3 Web: subdomain-aware tenant resolution seam in `apps/web` (middleware), single-tenant UX unchanged" (checkoff after this task)
 - stage: implementing
-- base: (HEAD after Task 11 closeout — set at dispatch)
+- base: (HEAD after Task 12 closeout — set at dispatch)
 - impl-commit: (pending)
-- gate: create tenancy.int.spec.ts — 2-tenant fixture (identical emails across tenants), scoped read returns only own rows (zero foreign tenantId), composite email uniqueness permits identical emails across tenants, unscoped (no CLS) call throws TenantContextMissingError, exactly 1 default tenant seeded. Run `bun run test:int` → this spec + the T11-updated users.service.int.spec PASS against live Postgres (already migrated+seeded).
-- reviews-passed: none
-- review-fix-round: 0
+- gate: create apps/web/src/lib/tenant.ts (tenantSlugFromHost mirror of API parser) + apps/web/middleware.ts (sets x-tenant-slug header, admin UX unchanged); modify apps/web/src/lib/api.ts (forward X-Forwarded-Host from window.location.host). Verify: `bun run verify` (web typecheck+lint) passes. Note the web parser is a deliberate cross-package mirror of API slugFromHost (can't share — web can't import api).
+
+## PROCESS LESSON (apply to T13, T14, and any spec task)
+vitest (test:int / test) does NOT typecheck or lint. A spec can pass tests while failing `bun run verify` (tsc + eslint). ALWAYS run `bun run verify` (typecheck+lint+unit) AND `bun run test:int` as the real gate for any task touching apps/api — not just the narrower command the plan step names. Task 12 shipped a TS2532 (`rows[0].tenantId` under noUncheckedIndexedAccess) + 3 unused-import lint errors that test:int never caught; fixed in the T12 fix commit. Full project lint baseline was 3 errors (now 0).
 
 ## VERIFY-PHASE GAP (address at Task 14 / verify)
 The Nest DI wiring — ClsModule (T5), TenancyModule providers/exports + middleware mount (T9), TenantScopedDb injectability — is NOT exercised by any test. Task 12's int spec constructs `new TenantScopedDb(db, clsStub)` directly, bypassing Nest DI. `bun run verify`/`test:int` never boot the full app. ACTION at T14/verify: actually boot the API (`bun run dev` or a bootstrap smoke) and hit /health + an authed route to prove the DI graph resolves (DB provider reachable by TenancyModule, middleware mounts, CLS context set by JwtStrategy visible to TenantScopedDb under Fastify).

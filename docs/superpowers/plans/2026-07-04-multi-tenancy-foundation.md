@@ -1181,7 +1181,7 @@ git commit -m "refactor(api): UsersService goes through TenantScopedDb"
 **Interfaces:**
 - Consumes: real Postgres via `createDb`; `TenantScopedDb`; `tenants`/`users` schema; `TENANT_ID_KEY`.
 
-- [ ] **Step 1: Write the isolation + loud-failure integration spec**
+- [x] **Step 1: Write the isolation + loud-failure integration spec**
 
 ```ts
 // apps/api/src/tenancy/tenancy.int.spec.ts
@@ -1257,14 +1257,14 @@ describe("tenant isolation (integration)", () => {
 });
 ```
 
-- [ ] **Step 2: Run the integration suite**
+- [x] **Step 2: Run the integration suite**
 
 Run: `cd apps/api && bun run test:int`
 Expected: PASS (this spec + the updated users int spec). Requires local Postgres migrated + seeded.
 
 > Any failure here: load `systematic-debugging` and write a minimal failing case before touching source.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add apps/api/src/tenancy/tenancy.int.spec.ts
