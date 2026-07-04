@@ -781,7 +781,7 @@ git commit -m "feat(api): tenant registry service (unscoped lookups by slug/id)"
 - Consumes: `TenantRegistryService`, `ClsService`, `TENANT_ID_KEY`, `DEFAULT_TENANT_SLUG`.
 - Produces: `slugFromHost(host: string | undefined): string` (pure; apex/localhost → `"default"`, `{slug}.host` → slug) and `class TenantResolutionMiddleware implements NestMiddleware`. For requests WITHOUT an `authorization` header it resolves the host tenant into CLS or throws `NotFoundException` on an unknown slug. Requests WITH an `authorization` header are left for `JwtStrategy` to resolve.
 
-- [ ] **Step 1: Write the failing test for the pure host parser**
+- [x] **Step 1: Write the failing test for the pure host parser**
 
 ```ts
 // apps/api/src/tenancy/tenant-resolution.middleware.spec.ts
@@ -810,12 +810,12 @@ describe("slugFromHost", () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `cd apps/api && bunx vitest run src/tenancy/tenant-resolution.middleware.spec.ts`
 Expected: FAIL — module not found.
 
-- [ ] **Step 3: Implement the parser and middleware**
+- [x] **Step 3: Implement the parser and middleware**
 
 ```ts
 // apps/api/src/tenancy/tenant-resolution.middleware.ts
@@ -875,12 +875,12 @@ export class TenantResolutionMiddleware implements NestMiddleware {
 
 > Fastify note: Nest middleware receives the raw Node req/res under the Fastify adapter. Header access via `req.headers[...]` is correct. If CLS values set here are not visible in handlers (a known Fastify + middleware edge case), load `systematic-debugging`; the fallback is a `ClsGuard`-based setup — but verify with the Task 12 integration test first.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `cd apps/api && bunx vitest run src/tenancy/tenant-resolution.middleware.spec.ts`
 Expected: PASS (6 tests).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/api/src/tenancy/tenant-resolution.middleware.ts apps/api/src/tenancy/tenant-resolution.middleware.spec.ts

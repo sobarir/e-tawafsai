@@ -27,15 +27,18 @@ namespace zod imports to named form. See memory zod-namespace-import-under-vites
 - T12 → 4.1, 4.2 | T14 → 4.3, 4.4
 
 ## Current task
-- task: Task 8 — Public host → tenant resolution middleware (REAL TDD)
-- plan-task-text: "## Task 8: Public host → tenant resolution"
-- openspec-task-text: "3.1 Public host → tenant resolver (apex/localhost → default tenant; unknown subdomain → 404)" (checkoff after this task)
+- task: Task 9 — Wire the tenancy module (completes OpenSpec 2.2)
+- plan-task-text: "## Task 9: Wire the tenancy module"
+- openspec-task-text: "2.2 Request-scoped tenant context (nestjs-cls/AsyncLocalStorage) populated by middleware; explicit-tenant API for jobs/scripts with no ambient context" (checkoff after this task)
 - stage: implementing
-- base: (HEAD after Task 7 closeout — set at dispatch)
+- base: (HEAD after Task 8 closeout — set at dispatch)
 - impl-commit: (pending)
-- gate: TDD — spec tests pure slugFromHost (6 cases: apex→default, localhost(:port)→default, sub.host→slug, {slug}.localhost→slug, www→default, undefined→default). RED→GREEN(6). Middleware: no auth header → resolve host tenant into CLS or 404 on unknown; auth header → leave for JwtStrategy. Fastify raw req headers. typecheck: no new errors beyond baseline.
+- gate: create tenancy.module.ts (@Global providers/exports TenantScopedDb + TenantRegistryService; applies TenantResolutionMiddleware to all routes except health); register in app.module.ts after DatabaseModule. typecheck: no new errors beyond baseline. NOTE: DI graph correctness (DB reachable by TenancyModule) is NOT proven by typecheck — validated at verify-phase boot (see VERIFY-PHASE GAP above). No unit test per plan.
 - reviews-passed: none
 - review-fix-round: 0
+
+## VERIFY-PHASE GAP (address at Task 14 / verify)
+The Nest DI wiring — ClsModule (T5), TenancyModule providers/exports + middleware mount (T9), TenantScopedDb injectability — is NOT exercised by any test. Task 12's int spec constructs `new TenantScopedDb(db, clsStub)` directly, bypassing Nest DI. `bun run verify`/`test:int` never boot the full app. ACTION at T14/verify: actually boot the API (`bun run dev` or a bootstrap smoke) and hit /health + an authed route to prove the DI graph resolves (DB provider reachable by TenancyModule, middleware mounts, CLS context set by JwtStrategy visible to TenantScopedDb under Fastify).
 
 ## apps/api typecheck BASELINE (known cross-task breakage from Task 1's AuthUser/User shape change)
 As of HEAD after Task 4, `cd apps/api && bunx tsc --noEmit` has 9 known errors, all "Property 'tenantId'/'isPlatformOwner' is missing", in:
