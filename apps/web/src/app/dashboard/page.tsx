@@ -39,9 +39,14 @@ export default function DashboardPage() {
         <div className="flex items-center gap-3">
           <HealthBadge />
           {user.role === "admin" ? (
-            <Button asChild variant="outline" size="sm">
-              <Link href="/dashboard/users">Users</Link>
-            </Button>
+            <>
+              <Button asChild variant="outline" size="sm">
+                <Link href="/dashboard/settings">Settings</Link>
+              </Button>
+              <Button asChild variant="outline" size="sm">
+                <Link href="/dashboard/users">Users</Link>
+              </Button>
+            </>
           ) : null}
           <Button variant="outline" size="sm" onClick={logout}>
             Sign out

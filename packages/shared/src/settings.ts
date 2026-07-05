@@ -46,3 +46,33 @@ export const templateInputSchema = z.object({
 });
 
 export type TemplateInput = z.infer<typeof templateInputSchema>;
+
+export interface SettingsDto {
+  id: string;
+  tenantId: string;
+  metaPixelId: string | null;
+  googleTagId: string | null;
+  almostFullThreshold: number;
+  holdExpiryHours: number;
+  followUpLeadDays: number;
+  followUpQuoteDays: number;
+  followUpDpReminderDays: number;
+  followUpFullPaymentDays: number;
+  brandName: string;
+  brandLogoUrl: string | null;
+  waNumber: string | null;
+  additionalWaNumbers: { waNumber: string; label: string }[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface MessageTemplateDto {
+  id: string;
+  tenantId: string;
+  key: string;
+  label: string;
+  body: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
