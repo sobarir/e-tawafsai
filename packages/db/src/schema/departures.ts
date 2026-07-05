@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, integer, pgEnum, check } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, integer, pgEnum, check, index } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { tenants } from "./tenants";
 import { packages } from "./packages";
@@ -29,6 +29,10 @@ export const departures = pgTable("departures", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 }, (table) => ({
   seatInvariant: check("seat_invariant", sql`${table.seatTotal} - ${table.seatBooked} - ${table.seatHeld} >= 0`),
+  // Serves the package-search correlated lateral (earliest matching departure per
+  // package). Leads with package_id so the lateral seeks directly instead of
+  // scanning the tenant/status/date index and post-filtering package_id.
+  pkgIdx: index("departures_pkg_idx").on(table.packageId, table.status, table.departureDate),
 }));
 
 export const inventoryAdjustments = pgTable("inventory_adjustments", {

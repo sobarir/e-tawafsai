@@ -18,5 +18,5 @@
 ## 4. Verification
 
 - [ ] 4.1 Unit tests: summary formatter output, query schema validation
-- [ ] 4.2 Integration tests: PRD filter acceptance case, seats-toggle, full-text; benchmark against seeded fixture with EXPLAIN sanity + P95 budget
+- [x] 4.2 Integration tests: PRD filter acceptance case, seats-toggle, full-text; benchmark against seeded fixture with EXPLAIN sanity + P95 budget
 - [ ] 4.3 `bun run verify` and `bun run test:int` pass

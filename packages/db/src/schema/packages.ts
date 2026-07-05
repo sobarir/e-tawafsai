@@ -1,4 +1,4 @@
-import { boolean, integer, pgEnum, pgTable, text, varchar, primaryKey, unique } from "drizzle-orm/pg-core";
+import { boolean, integer, pgEnum, pgTable, text, varchar, primaryKey, unique, index } from "drizzle-orm/pg-core";
 import { PRODUCT_TYPES, PACKAGE_CATEGORIES, PACKAGE_STATUSES } from "@cometkit/shared";
 import { timestamps, ulidPk, ulidRef } from "../columns";
 import { tenantOwned } from "./tenants";
@@ -44,7 +44,11 @@ export const packageHotels = pgTable("package_hotels", {
   distanceM: integer("distance_m"),
   isPelataran: boolean("is_pelataran").notNull().default(false),
   ...timestamps,
-});
+}, (table) => [
+  // Serves package-search hotel lateral (json_agg) and hotel-name EXISTS, both
+  // correlated on package_id. Postgres does not auto-index FK columns.
+  index("package_hotels_package_id_idx").on(table.packageId),
+]);
 
 export const tags = pgTable("tags", {
   id: ulidPk(),

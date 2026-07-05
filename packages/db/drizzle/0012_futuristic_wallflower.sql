@@ -1,0 +1,2 @@
+CREATE INDEX "package_hotels_package_id_idx" ON "package_hotels" USING btree ("package_id");--> statement-breakpoint
+CREATE INDEX "departures_pkg_idx" ON "departures" USING btree ("package_id","status","departure_date");
