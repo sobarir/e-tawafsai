@@ -3,7 +3,7 @@
 ## 1. Contracts & schema
 
 - [x] 1.1 Shared: search query schema (all filters + full-text), result card DTO, WhatsApp summary formatter (pure function + unit tests), public URL helper
-- [ ] 1.2 DB: tsvector generated column + GIN index; composite departure indexes; migration; 1k/5k benchmark seed fixture
+- [x] 1.2 DB: tsvector generated column + GIN index; composite departure indexes; migration; 1k/5k benchmark seed fixture
 
 ## 2. API
 
