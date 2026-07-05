@@ -32,4 +32,19 @@ describe("SettingsService", () => {
     expect(settings.almostFullThreshold).toBe(5); // default value
     expect(mockDb.insert).toHaveBeenCalled();
   });
+
+  it("retrieves templates from database", async () => {
+    const mockDb = {
+      query: {
+        messageTemplates: {
+          findMany: vi.fn().mockResolvedValue([{ key: "greeting", body: "Halo" }]),
+        },
+      },
+    };
+    const service = new SettingsService(mockDb as unknown as Database);
+    const templates = await service.getTemplates("tenant-1");
+
+    expect(templates[0]?.key).toBe("greeting");
+    expect(mockDb.query.messageTemplates.findMany).toHaveBeenCalled();
+  });
 });

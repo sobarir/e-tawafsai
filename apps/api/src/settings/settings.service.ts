@@ -97,4 +97,39 @@ export class SettingsService {
 
     return this.getSettings(tenantId);
   }
+
+  async getTemplates(tenantId: string) {
+    const { messageTemplates } = await import("@cometkit/db");
+    return this.db.query.messageTemplates.findMany({
+      where: eq(messageTemplates.tenantId, tenantId),
+    });
+  }
+
+  async updateTemplate(tenantId: string, key: string, label: string, body: string) {
+    const { messageTemplates } = await import("@cometkit/db");
+    const existing = await this.db.query.messageTemplates.findFirst({
+      where: (table, { and }) => and(eq(table.tenantId, tenantId), eq(table.key, key)),
+    });
+
+    if (existing) {
+      await this.db
+        .update(messageTemplates)
+        .set({ label, body, updatedAt: new Date() })
+        .where(eq(messageTemplates.id, existing.id));
+    } else {
+      await this.db.insert(messageTemplates).values({
+        id: ulid(),
+        tenantId,
+        key,
+        label,
+        body,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+    }
+
+    return this.db.query.messageTemplates.findFirst({
+      where: (table, { and }) => and(eq(table.tenantId, tenantId), eq(table.key, key)),
+    });
+  }
 }
