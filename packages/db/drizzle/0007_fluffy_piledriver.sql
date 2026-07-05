@@ -1,0 +1,1 @@
+ALTER TABLE "tags" ADD CONSTRAINT "tags_tenant_name_idx" UNIQUE("tenant_id","name");

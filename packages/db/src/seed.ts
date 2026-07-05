@@ -137,6 +137,33 @@ async function main() {
       });
   }
 
+  const starterTags = [
+    "visa",
+    "tiket PP",
+    "hotel",
+    "makan 3x",
+    "bus AC",
+    "muthawif",
+    "perlengkapan umrah",
+    "asuransi",
+    "handling",
+    "airport tax",
+    "kereta cepat Haramain",
+  ];
+
+  for (const tagName of starterTags) {
+    await db
+      .insert(schema.tags)
+      .values({
+        id: ulid(),
+        tenantId: tenant.id,
+        name: tagName,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .onConflictDoNothing();
+  }
+
   console.log(
     "Seed complete: default tenant + admin@cometkit.dev (admin), staff@cometkit.dev (staff) / password123",
   );

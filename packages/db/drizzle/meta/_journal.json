@@ -43,6 +43,20 @@
       "when": 1783250734829,
       "tag": "0005_chief_mesmero",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1783254239027,
+      "tag": "0006_gray_carnage",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1783254255890,
+      "tag": "0007_fluffy_piledriver",
+      "breakpoints": true
     }
   ]
 }
