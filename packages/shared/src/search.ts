@@ -68,3 +68,58 @@ export interface SearchResultDto {
   hotels: { cityName: string; name: string; stars: number; distanceM: number | null }[];
   publicUrl: string; // server-computed via packagePublicUrl (build-time decision 1)
 }
+
+function formatIdr(amount: number): string {
+  return "Rp " + amount.toLocaleString("id-ID");
+}
+
+function formatDateId(iso: string): string {
+  return new Date(iso).toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
+/**
+ * Deterministic plain-text WhatsApp block. Pure — reused verbatim by C8/C21.
+ * Legality line follows locked decision (D): the "— PPIU SK …" clause is
+ * dropped when ppiuLicenseNo is null.
+ */
+export function formatWhatsappSummary(dto: SearchResultDto): string {
+  const priceLines: string[] = [`- Quad: ${formatIdr(dto.priceByOccupancy.quad)}`];
+  if (dto.priceByOccupancy.triple !== null) {
+    priceLines.push(`- Triple: ${formatIdr(dto.priceByOccupancy.triple)}`);
+  }
+  if (dto.priceByOccupancy.double !== null) {
+    priceLines.push(`- Double: ${formatIdr(dto.priceByOccupancy.double)}`);
+  }
+
+  const hotelLines = dto.hotels.map((h) => {
+    const dist = h.distanceM !== null ? ` (${h.distanceM} m)` : "";
+    return `- ${h.cityName}: ${h.name} ${"★".repeat(h.stars)}${dist}`;
+  });
+
+  const legality =
+    dto.ppiuLicenseNo !== null
+      ? `Diselenggarakan oleh ${dto.providerBrandName} — PPIU SK ${dto.ppiuLicenseNo}`
+      : `Diselenggarakan oleh ${dto.providerBrandName}`;
+
+  return [
+    `*${dto.title}*`,
+    `Keberangkatan: ${formatDateId(dto.nextDepartureDate)}`,
+    `Maskapai: ${dto.airline ?? "-"}`,
+    "",
+    "Harga:",
+    ...priceLines,
+    "",
+    "Hotel:",
+    ...hotelLines,
+    "",
+    `Sisa kursi: ${dto.seatsLeft}`,
+    dto.publicUrl,
+    "",
+    legality,
+  ].join("\n");
+}
