@@ -147,7 +147,7 @@ implements the actual `/paket/{slug}` route (cross-change contract, noted in bot
 
 ### 3.1 Endpoint
 
-- `GET /search/packages` — `@UseGuards(JwtAuthGuard, RolesGuard)` + `@Roles("admin","user")`,
+- `GET /search/packages` — `@UseGuards(JwtAuthGuard, RolesGuard)` + `@Roles("admin","staff")`,
   `ZodValidationPipe(searchPackagesSchema)` on the query. Tenant-scoped via
   `TenantScopedDb`. Returns `Paginated<SearchResultDto>`.
 
