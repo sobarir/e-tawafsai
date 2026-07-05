@@ -6,7 +6,7 @@ base-ref: 32a180ad4cf324684684aa823bcdf11f92449a08
 
 # tenant-settings Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Implement tenant-scoped settings (Meta Pixel/Google Tag, thresholds, pipeline intervals), custom WA numbers, and message template library with Indonesia starter seed, admin-only access, and integration into the inventory status engine.
 
@@ -33,7 +33,7 @@ base-ref: 32a180ad4cf324684684aa823bcdf11f92449a08
 **Interfaces:**
 - Produces: `settingsInputSchema`, `templateInputSchema`, `TEMPLATE_ALLOWED_VARIABLES`
 
-- [ ] **Step 1: Create shared settings file**
+- [x] **Step 1: Create shared settings file**
   Create `packages/shared/src/settings.ts` with:
   ```ts
   import * as z from "zod";
@@ -84,17 +84,17 @@ base-ref: 32a180ad4cf324684684aa823bcdf11f92449a08
   export type TemplateInput = z.infer<typeof templateInputSchema>;
   ```
 
-- [ ] **Step 2: Export from shared package**
+- [x] **Step 2: Export from shared package**
   Add export to `packages/shared/src/index.ts`:
   ```ts
   export * from "./settings";
   ```
 
-- [ ] **Step 3: Run verify**
+- [x] **Step 3: Run verify**
   Run: `bun run verify`
   Expected: PASS
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
   ```bash
   git add packages/shared/src
   git commit -m "feat(tenant-settings): add shared settings and template validation schemas"
@@ -111,7 +111,7 @@ base-ref: 32a180ad4cf324684684aa823bcdf11f92449a08
 **Interfaces:**
 - Produces: `tenantSettings`, `tenantWaNumbers`, `messageTemplates` tables
 
-- [ ] **Step 1: Add Drizzle schema definitions**
+- [x] **Step 1: Add Drizzle schema definitions**
   Modify `packages/db/src/schema/tenants.ts` to add the tables:
   ```ts
   import { pgTable, varchar, integer, text, unique } from "drizzle-orm/pg-core";
@@ -158,12 +158,12 @@ base-ref: 32a180ad4cf324684684aa823bcdf11f92449a08
   ]);
   ```
 
-- [ ] **Step 2: Generate and apply migrations**
+- [x] **Step 2: Generate and apply migrations**
   Run: `bun run db:generate`
   Run: `bun run db:migrate`
   Expected: Migration succeeds and updates local DB schema.
 
-- [ ] **Step 3: Update seed script**
+- [x] **Step 3: Update seed script**
   Modify `packages/db/src/seed.ts` to insert initial message templates for the default tenant:
   ```ts
   import { messageTemplates } from "./schema/tenants";
@@ -188,11 +188,11 @@ base-ref: 32a180ad4cf324684684aa823bcdf11f92449a08
   ]).onConflictDoNothing();
   ```
 
-- [ ] **Step 4: Seed DB**
+- [x] **Step 4: Seed DB**
   Run: `bun run db:seed`
   Expected: Seed runs successfully.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
   ```bash
   git add packages/db
   git commit -m "feat(tenant-settings): add tables, run migrations, and seed starter templates"
@@ -211,7 +211,7 @@ base-ref: 32a180ad4cf324684684aa823bcdf11f92449a08
 **Interfaces:**
 - Produces: `SettingsService.getSettings()`, `SettingsService.updateSettings()`, endpoints `GET /settings`, `PATCH /settings`
 
-- [ ] **Step 1: Create Settings Service**
+- [x] **Step 1: Create Settings Service**
   Create `apps/api/src/settings/settings.service.ts` implementing lazy upsert on read:
   ```ts
   import { Inject, Injectable } from "@nestjs/common";
@@ -307,7 +307,7 @@ base-ref: 32a180ad4cf324684684aa823bcdf11f92449a08
   }
   ```
 
-- [ ] **Step 2: Create Settings Controller**
+- [x] **Step 2: Create Settings Controller**
   Create `apps/api/src/settings/settings.controller.ts` with roles guard:
   ```ts
   import { Body, Controller, Get, Patch, UseGuards } from "@nestjs/common";
@@ -340,7 +340,7 @@ base-ref: 32a180ad4cf324684684aa823bcdf11f92449a08
   }
   ```
 
-- [ ] **Step 3: Create module and register in app module**
+- [x] **Step 3: Create module and register in app module**
   Create `apps/api/src/settings/settings.module.ts`:
   ```ts
   import { Module } from "@nestjs/common";
@@ -356,7 +356,7 @@ base-ref: 32a180ad4cf324684684aa823bcdf11f92449a08
   ```
   Modify `apps/api/src/app.module.ts` to import `SettingsModule`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
   ```bash
   git add apps/api/src/settings apps/api/src/app.module.ts
   git commit -m "feat(tenant-settings): settings backend endpoints with admin roles guard"
@@ -374,7 +374,7 @@ base-ref: 32a180ad4cf324684684aa823bcdf11f92449a08
 **Interfaces:**
 - Produces: `GET /settings/templates`, `PATCH /settings/templates/:key`
 
-- [ ] **Step 1: Add templates methods to Settings Service**
+- [x] **Step 1: Add templates methods to Settings Service**
   Modify `apps/api/src/settings/settings.service.ts`:
   ```ts
   import { messageTemplates } from "@cometkit/db";
@@ -411,7 +411,7 @@ base-ref: 32a180ad4cf324684684aa823bcdf11f92449a08
   }
   ```
 
-- [ ] **Step 2: Create Templates Controller**
+- [x] **Step 2: Create Templates Controller**
   Create `apps/api/src/settings/templates.controller.ts`:
   ```ts
   import { Body, Controller, Get, Param, Patch, UseGuards } from "@nestjs/common";
@@ -445,10 +445,10 @@ base-ref: 32a180ad4cf324684684aa823bcdf11f92449a08
   }
   ```
 
-- [ ] **Step 3: Register controller in module**
+- [x] **Step 3: Register controller in module**
   Modify `apps/api/src/settings/settings.module.ts` to add `TemplatesController`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
   ```bash
   git add apps/api/src/settings
   git commit -m "feat(tenant-settings): add message templates REST endpoints"
@@ -465,7 +465,7 @@ base-ref: 32a180ad4cf324684684aa823bcdf11f92449a08
 **Interfaces:**
 - Produces: `useSettings()`, `useUpdateSettings()`, visual settings editing forms.
 
-- [ ] **Step 1: Create TanStack Query hooks for Settings**
+- [x] **Step 1: Create TanStack Query hooks for Settings**
   Create `apps/web/src/hooks/use-settings.ts`:
   ```ts
   import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -493,10 +493,10 @@ base-ref: 32a180ad4cf324684684aa823bcdf11f92449a08
   }
   ```
 
-- [ ] **Step 2: Create Settings page**
+- [x] **Step 2: Create Settings page**
   Create `apps/web/src/app/dashboard/settings/page.tsx` with identity, integrations, and operations settings forms. Render a mobile-first, clean form validating WA numbers and inputs. Ensure admin navigation link is rendered conditionally in dashboard/page.tsx.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
   ```bash
   git add apps/web/src/hooks/use-settings.ts apps/web/src/app/dashboard/settings/page.tsx
   git commit -m "feat(tenant-settings): settings UI management panels"
@@ -513,7 +513,7 @@ base-ref: 32a180ad4cf324684684aa823bcdf11f92449a08
 **Interfaces:**
 - Produces: `useTemplates()`, `useUpdateTemplate()`, templates editor.
 
-- [ ] **Step 1: Create Query hooks for Templates**
+- [x] **Step 1: Create Query hooks for Templates**
   Create `apps/web/src/hooks/use-templates.ts`:
   ```ts
   import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -541,10 +541,10 @@ base-ref: 32a180ad4cf324684684aa823bcdf11f92449a08
   }
   ```
 
-- [ ] **Step 2: Create Templates page**
+- [x] **Step 2: Create Templates page**
   Create `apps/web/src/app/dashboard/settings/templates/page.tsx`. Provide visual guidance on placeholder variables per template key, showing error alerts if unauthorized placeholders are saved.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
   ```bash
   git add apps/web/src/hooks/use-templates.ts apps/web/src/app/dashboard/settings/templates/page.tsx
   git commit -m "feat(tenant-settings): message templates editor UI with validation warnings"
@@ -561,18 +561,18 @@ base-ref: 32a180ad4cf324684684aa823bcdf11f92449a08
 **Interfaces:**
 - Produces: Caching mechanism for threshold reads, comprehensive unit and integration test coverage.
 
-- [ ] **Step 1: Add cache in SettingsService**
+- [x] **Step 1: Add cache in SettingsService**
   Implement caching inside `SettingsService` (60s memory TTL for `almostFullThreshold`).
 
-- [ ] **Step 2: Write tests**
+- [x] **Step 2: Write tests**
   Create unit tests in `apps/api/src/settings/settings.service.spec.ts` to assert WA formatting, default values fallback, and templates validation. Write integration tests to check that the status engine respects settings updates.
 
-- [ ] **Step 3: Run verify**
+- [x] **Step 3: Run verify**
   Run: `bun run verify`
   Run: `bun run test:int`
   Expected: All tests pass cleanly.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
   ```bash
   git add apps/api/src/settings
   git commit -m "test(tenant-settings): settings cache implementation and test coverage"
