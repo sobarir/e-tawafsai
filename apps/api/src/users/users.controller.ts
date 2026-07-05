@@ -1,9 +1,7 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
-  HttpCode,
   Param,
   Patch,
   Post,
@@ -69,13 +67,18 @@ export class UsersController {
     return this.users.updateUser(id, input);
   }
 
-  @Delete(":id")
+  @Patch(":id/deactivate")
   @Roles("admin")
-  @HttpCode(204)
-  async remove(
+  deactivate(
     @CurrentUser() user: AuthUser,
     @Param("id") id: string,
-  ): Promise<void> {
-    await this.users.deleteUser(user, id);
+  ): Promise<UserDto> {
+    return this.users.deactivateUser(user, id);
+  }
+
+  @Patch(":id/reactivate")
+  @Roles("admin")
+  reactivate(@Param("id") id: string): Promise<UserDto> {
+    return this.users.reactivateUser(id);
   }
 }

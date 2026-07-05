@@ -18,7 +18,7 @@ import type {
 } from "@cometkit/shared";
 import { hashPassword } from "../common/password";
 import { TenantScopedDb } from "../tenancy/tenant-scoped-db";
-import { buildPageMeta, canDeleteUser, toUserDto } from "./users.policy";
+import { buildPageMeta, canDeactivateUser, toUserDto } from "./users.policy";
 
 @Injectable()
 export class UsersService {
@@ -66,6 +66,7 @@ export class UsersService {
       passwordHash: await hashPassword(input.password),
       name: input.name ?? null,
       role: input.role,
+      waNumber: input.waNumber ?? null,
     });
     return toUserDto(row);
   }
@@ -80,14 +81,23 @@ export class UsersService {
     return toUserDto(row as User);
   }
 
-  /** Admin: delete any user except yourself. */
-  async deleteUser(actor: AuthUser, id: string): Promise<void> {
-    if (!canDeleteUser(actor, id)) {
-      throw new ForbiddenException("You cannot delete your own account");
+  /** Admin: soft-deactivate any user except yourself. */
+  async deactivateUser(actor: AuthUser, id: string): Promise<UserDto> {
+    if (!canDeactivateUser(actor, id)) {
+      throw new ForbiddenException("You cannot deactivate your own account");
     }
-    const [row] = await this.db.deleteFrom(users, eq(users.id, id));
+    const [row] = await this.db.update(users, { isActive: false }, eq(users.id, id));
     if (!row) throw new NotFoundException("User not found");
-    this.logger.info({ userId: id, actorId: actor.id }, "user.deleted");
+    this.logger.info({ userId: id, actorId: actor.id }, "user.deactivated");
+    return toUserDto(row as User);
+  }
+
+  /** Admin: reactivate a previously deactivated user. */
+  async reactivateUser(id: string): Promise<UserDto> {
+    const [row] = await this.db.update(users, { isActive: true }, eq(users.id, id));
+    if (!row) throw new NotFoundException("User not found");
+    this.logger.info({ userId: id }, "user.reactivated");
+    return toUserDto(row as User);
   }
 
   /** Any signed-in user: update own profile. */
