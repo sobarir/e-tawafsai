@@ -19,6 +19,10 @@
 - [x] 3.2 Authenticated resolution: JWT carries `tenantId`; guards re-read user+tenant fresh per request; client host/params can never override
 - [x] 3.3 Web: subdomain-aware tenant resolution seam in `apps/web` (middleware), single-tenant UX unchanged
 
+## 3b. Tenant-prefixed file storage (seam)
+
+- [x] 3b.1 Add `tenantStorageKey(tenantId, path)` helper to `packages/shared` (returns a `<tenantId>/…` prefixed key) with a unit test proving the key begins with the tenant id — satisfies the `multi-tenancy` / "Tenant-prefixed file storage" requirement (convention seam; no upload feature ships)
+
 ## 4. Verification
 
 - [x] 4.1 Integration test: two-tenant fixture with identical slugs — each context returns only its own rows, zero foreign `tenantId` in responses

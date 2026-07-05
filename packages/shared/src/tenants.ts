@@ -47,6 +47,17 @@ export const tenantInputSchema = z
   });
 export type TenantInput = z.infer<typeof tenantInputSchema>;
 
+/**
+ * Storage key for a tenant-owned file: always prefixed with the tenant id so
+ * backups and exports are tenant-separable (a leading slash on `path` is
+ * stripped so the path can never escape the prefix). This is the Phase-1 seam
+ * — no upload feature ships yet; consumers call this when they store a file.
+ */
+export function tenantStorageKey(tenantId: string, path: string): string {
+  if (!tenantId) throw new Error("tenantStorageKey requires a tenant id");
+  return `${tenantId}/${path.replace(/^\/+/, "")}`;
+}
+
 /** The resolved active tenant carried in request context. */
 export interface TenantContext {
   id: string;

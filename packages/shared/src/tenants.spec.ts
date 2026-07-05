@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { tenantInputSchema, TENANT_TYPES, DEFAULT_TENANT_SLUG } from "./tenants";
+import {
+  tenantInputSchema,
+  tenantStorageKey,
+  TENANT_TYPES,
+  DEFAULT_TENANT_SLUG,
+} from "./tenants";
 
 const base = {
   name: "Tawafsai", slug: "default", tenantType: "agent" as const,
@@ -22,5 +27,19 @@ describe("tenantInputSchema", () => {
   it("keeps the seam values defined in the tuple", () => {
     expect(TENANT_TYPES).toContain("ppiu");
     expect(DEFAULT_TENANT_SLUG).toBe("default");
+  });
+});
+
+describe("tenantStorageKey", () => {
+  it("prefixes the storage key with the tenant id", () => {
+    const key = tenantStorageKey("01HTENANT", "packages/brochure.pdf");
+    expect(key).toBe("01HTENANT/packages/brochure.pdf");
+    expect(key.startsWith("01HTENANT/")).toBe(true);
+  });
+  it("normalizes a leading slash so the path cannot escape the prefix", () => {
+    expect(tenantStorageKey("t1", "/avatars/a.png")).toBe("t1/avatars/a.png");
+  });
+  it("throws when the tenant id is missing", () => {
+    expect(() => tenantStorageKey("", "a.png")).toThrow();
   });
 });
