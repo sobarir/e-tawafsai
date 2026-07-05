@@ -38,6 +38,9 @@ export default function DashboardPage() {
         </span>
         <div className="flex items-center gap-3">
           <HealthBadge />
+          <Button asChild variant="outline" size="sm">
+            <Link href="/dashboard/providers">Providers</Link>
+          </Button>
           {user.role === "admin" ? (
             <>
               <Button asChild variant="outline" size="sm">
