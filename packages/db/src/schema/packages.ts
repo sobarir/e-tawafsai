@@ -25,9 +25,12 @@ export const packages = pgTable("packages", {
   flightRoute: varchar("flight_route", { length: 255 }),
   departureCity: varchar("departure_city", { length: 120 }),
   isFeatured: boolean("is_featured").notNull().default(false),
+  hasBeenPublished: boolean("has_been_published").notNull().default(false),
   status: statusEnum("status").notNull().default("draft"),
   ...timestamps,
-});
+}, (table) => [
+  unique("packages_tenant_slug_idx").on(table.tenantId, table.slug),
+]);
 
 export const packageHotels = pgTable("package_hotels", {
   id: ulidPk(),

@@ -1,0 +1,1 @@
+ALTER TABLE "packages" ADD COLUMN "has_been_published" boolean DEFAULT false NOT NULL;

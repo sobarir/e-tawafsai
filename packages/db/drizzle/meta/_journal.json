@@ -57,6 +57,20 @@
       "when": 1783254255890,
       "tag": "0007_fluffy_piledriver",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1783254321112,
+      "tag": "0008_handy_butterfly",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1783254329757,
+      "tag": "0009_big_shadowcat",
+      "breakpoints": true
     }
   ]
 }

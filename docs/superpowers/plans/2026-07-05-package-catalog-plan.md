@@ -2,6 +2,7 @@
 change: package-catalog
 design-doc: docs/superpowers/specs/2026-07-05-package-catalog-design.md
 base-ref: a1c3a6f41da1c4d81a76f6367715a26ae47104f4
+archived-with: 2026-07-05-package-catalog
 ---
 
 # Package Catalog (C3) Implementation Plan
@@ -20,6 +21,7 @@ base-ref: a1c3a6f41da1c4d81a76f6367715a26ae47104f4
 - API validation uses ZodValidationPipe on body payloads.
 - Database access scoped to active tenant context.
 
+archived-with: 2026-07-05-package-catalog
 ---
 
 ### Task 1: Shared Schema Contracts & Validation
@@ -127,6 +129,7 @@ base-ref: a1c3a6f41da1c4d81a76f6367715a26ae47104f4
   git commit -m "feat(package-catalog): create shared package schemas and dtos"
   ```
 
+archived-with: 2026-07-05-package-catalog
 ---
 
 ### Task 2: Database Schema & Seeding
@@ -172,6 +175,7 @@ base-ref: a1c3a6f41da1c4d81a76f6367715a26ae47104f4
   git commit -m "feat(package-catalog): create package catalog tables and seeding"
   ```
 
+archived-with: 2026-07-05-package-catalog
 ---
 
 ### Task 3: Slug Service & API CRUD
@@ -204,6 +208,7 @@ base-ref: a1c3a6f41da1c4d81a76f6367715a26ae47104f4
   git commit -m "feat(package-catalog): implement packages endpoints and validation policy"
   ```
 
+archived-with: 2026-07-05-package-catalog
 ---
 
 ### Task 4: Web UI Catalog Registry
@@ -226,6 +231,7 @@ base-ref: a1c3a6f41da1c4d81a76f6367715a26ae47104f4
   git commit -m "feat(package-catalog): implement Web UI package registry view"
   ```
 
+archived-with: 2026-07-05-package-catalog
 ---
 
 ### Task 5: Web UI Package Edit/Create Form

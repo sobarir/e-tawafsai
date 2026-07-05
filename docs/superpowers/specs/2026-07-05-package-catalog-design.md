@@ -2,12 +2,16 @@
 comet_change: package-catalog
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-07-05-package-catalog
+status: final
 ---
 
 # Technical Design: Package Catalog (C3)
 
 This design document outlines the implementation plan for the Package Catalog (C3) capability. It specifies the database schemas, API routes, data validation rules, and the Web UI.
 
+archived-with: 2026-07-05-package-catalog
+status: final
 ---
 
 ## 1. Database Schema Design
@@ -91,6 +95,8 @@ export const packageFlyers = pgTable("package_flyers", {
 });
 ```
 
+archived-with: 2026-07-05-package-catalog
+status: final
 ---
 
 ## 2. API Design & Routing
@@ -108,6 +114,8 @@ export const packageFlyers = pgTable("package_flyers", {
 - `GET /tags` (Admin/Staff): Fetch seeded and custom tags for the active tenant.
 - `POST /tags` (Admin only): Add custom tag.
 
+archived-with: 2026-07-05-package-catalog
+status: final
 ---
 
 ## 3. Core Logic & Validation Policies
@@ -128,6 +136,8 @@ A package can only transition from `draft` to `published` if:
 - Integrated into `ProvidersService` from `provider-management`.
 - When a provider is deactivated, we locate all its packages where `status === 'published'` and change status to `'draft'` atomically.
 
+archived-with: 2026-07-05-package-catalog
+status: final
 ---
 
 ## 4. Web UI Layout
