@@ -12,11 +12,11 @@
 
 ## 3. Web UI
 
-- [ ] 3.1 Search screen: bottom-sheet filters with active-filter chips, result card list (mobile-first 380px)
-- [ ] 3.2 Clipboard actions (WhatsApp summary, public link) with mobile fallback
+- [x] 3.1 Search screen: bottom-sheet filters with active-filter chips, result card list (mobile-first 380px)
+- [x] 3.2 Clipboard actions (WhatsApp summary, public link) with mobile fallback
 
 ## 4. Verification
 
-- [ ] 4.1 Unit tests: summary formatter output, query schema validation
+- [x] 4.1 Unit tests: summary formatter output, query schema validation
 - [x] 4.2 Integration tests: PRD filter acceptance case, seats-toggle, full-text; benchmark against seeded fixture with EXPLAIN sanity + P95 budget
 - [ ] 4.3 `bun run verify` and `bun run test:int` pass
