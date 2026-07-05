@@ -41,6 +41,9 @@ export default function DashboardPage() {
           <Button asChild variant="outline" size="sm">
             <Link href="/dashboard/providers">Providers</Link>
           </Button>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/dashboard/packages">Packages</Link>
+          </Button>
           {user.role === "admin" ? (
             <>
               <Button asChild variant="outline" size="sm">
