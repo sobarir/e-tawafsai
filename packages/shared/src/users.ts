@@ -7,6 +7,8 @@ export interface UserDto {
   email: string;
   name: string | null;
   role: UserRole;
+  waNumber: string | null;
+  isActive: boolean;
   createdAt: string;
 }
 
@@ -14,7 +16,8 @@ export const createUserSchema = z.object({
   email: z.email().max(255),
   password: z.string().min(8).max(72),
   name: z.string().min(1).max(120).optional(),
-  role: z.enum(USER_ROLES).default("user"),
+  role: z.enum(USER_ROLES).default("staff"),
+  waNumber: z.string().min(1).max(32).optional(),
 });
 export type CreateUserInput = z.infer<typeof createUserSchema>;
 
@@ -22,6 +25,7 @@ export const updateUserSchema = z
   .object({
     name: z.string().min(1).max(120).nullable().optional(),
     role: z.enum(USER_ROLES).optional(),
+    waNumber: z.string().min(1).max(32).nullable().optional(),
   })
   .refine((value) => Object.keys(value).length > 0, {
     message: "Provide at least one field to update",
