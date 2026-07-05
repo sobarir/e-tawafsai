@@ -5,6 +5,8 @@
 ### Requirement: Combined-filter search with departure semantics
 The admin search SHALL combine filters — max price (quad by default, occupancy selectable), departure month/date range, duration range, category, airline, direct-only, hotel max distance (Makkah and/or Madinah), min stars, departure city, provider, seats-available-only — and SHALL return only packages having at least one departure satisfying all departure-level predicates (`open`/`almost_full`, date in range, price within budget, seats available when toggled). Direct-only filters on an explicit `packages.directOnly` boolean. The max-price predicate compares against the selected occupancy's price, falling back to `priceQuad` when that occupancy's price is null. All queries are tenant-scoped.
 
+> **UI scope (Phase 1):** the search endpoint accepts and enforces the full filter set above. The Phase-1 admin screen surfaces a subset of filter controls — full-text query, max price, minimum duration, direct-only, and seats-available-only. The remaining controls (occupancy selector, month/date range, exact duration range, category, airline, hotel city + min stars + max distance, departure city, provider) are a documented follow-up; the API contract already supports them.
+
 #### Scenario: PRD acceptance filter combination
 - **WHEN** the agent searches duration 9, max price 30,000,000, month September
 - **THEN** results contain only packages with `durationDays = 9` having ≥1 open September departure with `priceQuad ≤ 30,000,000`

@@ -19,4 +19,31 @@
 
 - [x] 4.1 Unit tests: summary formatter output, query schema validation
 - [x] 4.2 Integration tests: PRD filter acceptance case, seats-toggle, full-text; benchmark against seeded fixture with EXPLAIN sanity + P95 budget
-- [ ] 4.3 `bun run verify` and `bun run test:int` pass
+- [x] 4.3 `bun run verify` and `bun run test:int` pass
+
+## Code review outcome
+
+Reviewed range `e6f7667..HEAD` (senior-reviewer subagent). No Critical issues.
+
+**Fixed:**
+- Important: stable pagination tiebreaker (`ORDER BY nd.departure_date, p.id`).
+- Important: `priceFrom` now = MIN(price_quad) across matching departures (was the
+  earliest departure's price), via a window; added int specs for both fixes plus
+  occupancy-over-budget and hotel city/stars/distance coverage.
+- Minor: filter sheet a11y (Escape-to-close, `aria-labelledby`).
+
+**Accepted / de-scoped (rationale):**
+- UI exposes a Phase-1 filter subset; remaining controls (occupancy, month range,
+  category, airline, hotel facets, departure city, provider, durationMax) are a
+  documented follow-up. API supports the full set. Recorded in delta spec + design
+  doc. Impact: decision C (occupancy fallback) is API-only until the occupancy
+  selector ships.
+- Minor `search_doc`/GIN/`departures_search_idx` live only in hand-written
+  migration 0011 (not the Drizzle model); reproducible on replay. `departures_search_idx`
+  is likely superseded by `departures_pkg_idx` — left in place, flagged for a
+  future cleanup rather than churning another migration.
+- Minor: no debounce on the query input; benchmark fixture re-exported from the db
+  barrel; some coverage gaps (cross-tenant isolation, custom-domain publicUrl) —
+  low risk, deferred.
+- Observation: `departures.departureDate` is a tz-naive `timestamp` column, so
+  exact-instant round-trips shift by the session offset. Pre-existing; not in scope.

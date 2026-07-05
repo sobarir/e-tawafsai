@@ -190,6 +190,13 @@ correlated aggregation) to keep the endpoint within the P95 budget.
   for older mobile browsers; success/failure surfaced with `role="alert"`.
 - **Data fetching:** TanStack Query hook `useSearchPackages(params)`, query key
   `["search", params]`, all HTTP via the shared `api` ky instance.
+- **Phase-1 filter subset (de-scoped after review):** the screen surfaces
+  full-text query, max price, minimum duration, direct-only, and
+  seats-available-only. The API accepts the full filter set; the remaining UI
+  controls (occupancy selector, month/date range, exact duration range, category,
+  airline, hotel city + min stars + max distance, departure city, provider) are a
+  documented follow-up. Note this leaves decision C (occupancy fallback)
+  API-only until the occupancy selector ships.
 
 ## 5. Search scope decision
 

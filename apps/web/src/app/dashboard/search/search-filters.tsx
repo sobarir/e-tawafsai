@@ -49,13 +49,19 @@ export function FilterSheet({
       className="fixed inset-0 z-50 flex items-end bg-black/40"
       role="dialog"
       aria-modal="true"
+      aria-labelledby="filter-sheet-title"
       onClick={onClose}
+      onKeyDown={(e) => {
+        if (e.key === "Escape") onClose();
+      }}
     >
       <div
         className="w-full space-y-3 rounded-t-2xl bg-background p-4"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-sm font-semibold">Filter</h2>
+        <h2 id="filter-sheet-title" className="text-sm font-semibold">
+          Filter
+        </h2>
         <label className="block text-xs">
           Harga maksimum
           <Input
