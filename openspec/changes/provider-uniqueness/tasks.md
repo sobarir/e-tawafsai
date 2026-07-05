@@ -5,10 +5,10 @@
 
 ## 2. API enforcement (create/update pre-check)
 
-- [ ] 2.1 In `ProvidersService.create`, normalize PPIU (blank→null) and pre-check the tenant for a name or PPIU collision; throw `ConflictException` identifying the existing provider
-- [ ] 2.2 In `ProvidersService.update`, apply the same normalization + collision pre-check, excluding the row being updated
-- [ ] 2.3 Map a DB unique-violation to the same `409 Conflict` as a concurrency backstop
-- [ ] 2.4 Unit specs: create/update rejected on name dup, PPIU dup, update-into-collision; blank PPIU allowed; cross-tenant allowed (policy/service-level)
+- [x] 2.1 In `ProvidersService.create`, normalize PPIU (blank→null) and pre-check the tenant for a name or PPIU collision; throw `ConflictException` identifying the existing provider
+- [x] 2.2 In `ProvidersService.update`, apply the same normalization + collision pre-check, excluding the row being updated
+- [x] 2.3 Map a DB unique-violation to the same `409 Conflict` as a concurrency backstop
+- [x] 2.4 Unit specs: create/update rejected on name dup, PPIU dup, update-into-collision; blank PPIU allowed; cross-tenant allowed (policy/service-level)
 
 ## 3. Dedup migration (one-time cleanup)
 

@@ -131,10 +131,21 @@ export class ProvidersService {
   }
 
   async update(id: string, input: UpdateProviderInput): Promise<Provider> {
-    const [row] = await this.db.update(providers, input, eq(providers.id, id));
-    if (!row) throw new NotFoundException("Provider not found");
-    this.logger.info({ providerId: id }, "provider.updated");
-    return row as Provider;
+    const ppiu = "ppiuLicenseNo" in input ? normalizePpiu(input.ppiuLicenseNo) : null;
+    await this.assertNoConflict(input.name, ppiu, id);
+    const set: Record<string, unknown> = { ...input };
+    if ("ppiuLicenseNo" in input) set.ppiuLicenseNo = ppiu;
+    try {
+      const [row] = await this.db.update(providers, set, eq(providers.id, id));
+      if (!row) throw new NotFoundException("Provider not found");
+      this.logger.info({ providerId: id }, "provider.updated");
+      return row as Provider;
+    } catch (err) {
+      if (this.isUniqueViolation(err)) {
+        throw new ConflictException("A provider with the same name or PPIU license already exists");
+      }
+      throw err;
+    }
   }
 
   async activate(

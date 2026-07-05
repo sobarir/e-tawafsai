@@ -137,4 +137,27 @@ describe("ProvidersService (integration)", () => {
     createdIds.push(blank.id);
     expect(blank.ppiuLicenseNo).toBeNull();
   });
+
+  it("rejects an update whose normalized name collides with another provider", async () => {
+    const base = {
+      brandName: "Upd Co",
+      contactPerson: "A",
+      contactPhone: "628111",
+      accreditation: "A" as const,
+      defaultCommissionType: "flat_per_pax" as const,
+      defaultCommissionValue: 0,
+    };
+    const a = await service.create({ ...base, name: `Upd A ${suffix}` });
+    const b = await service.create({ ...base, name: `Upd B ${suffix}` });
+    createdIds.push(a.id, b.id);
+
+    // rename B onto A's normalized name
+    await expect(service.update(b.id, { name: ` upd a ${suffix} ` })).rejects.toBeInstanceOf(
+      ConflictException,
+    );
+
+    // renaming B to itself (same normalized name) must NOT conflict (self excluded)
+    const ok = await service.update(b.id, { name: `Upd B ${suffix}`, contactPhone: "628999" });
+    expect(ok.contactPhone).toBe("628999");
+  });
 });
