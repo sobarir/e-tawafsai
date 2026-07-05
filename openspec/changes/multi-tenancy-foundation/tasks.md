@@ -22,6 +22,8 @@
 ## 3b. Tenant-prefixed file storage (seam)
 
 - [x] 3b.1 Add `tenantStorageKey(tenantId, path)` helper to `packages/shared` (returns a `<tenantId>/…` prefixed key) with a unit test proving the key begins with the tenant id — satisfies the `multi-tenancy` / "Tenant-prefixed file storage" requirement (convention seam; no upload feature ships)
+  <!-- code review (executing-plans gate, inline low-effort): no Critical/Important findings. Accepted Minor: helper does not normalize `..` segments; harmless for opaque object-storage keys and there is no Phase-1 consumer — the first upload-storing change validates its own paths. -->
+
 
 ## 4. Verification
 
