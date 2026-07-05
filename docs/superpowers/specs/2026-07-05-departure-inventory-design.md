@@ -1,3 +1,8 @@
+---
+archived-with: 2026-07-05-departure-inventory
+status: final
+status: final
+---
 # Design Doc: Departure & Inventory (C4)
 
 ## Context

@@ -1,0 +1,14 @@
+{
+  "change": "departure-inventory",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "5c291a7c9d3400e37109bc1626f37556ecf76948ce6209f0aad454a4809223ac",
+  "files": [
+    { "path": "openspec/changes/departure-inventory/proposal.md", "sha256": "f3d9b5a32c412057e1b0f3bd0e0c4e404465e024b4b445ce742dbceed0e0ff9f" },
+    { "path": "openspec/changes/departure-inventory/design.md", "sha256": "534810b8667b7691bc8e5b92ac5afd34d15698c2541a1772a791ec7986306334" },
+    { "path": "openspec/changes/departure-inventory/tasks.md", "sha256": "b532b697a052f42a271b322056df65e6fcf15fe154a50f053e7ff94305dec459" },
+    { "path": "openspec/changes/departure-inventory/specs/departure-inventory/spec.md", "sha256": "bd54ec74695676c8d20354beb634d222a7e994cf7a4963485aeacdf288f5f91e" }
+  ]
+}
