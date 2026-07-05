@@ -1,5 +1,5 @@
 workflow: full
-phase: verify
+phase: archive
 context_compression: off
 build_mode: executing-plans
 build_pause: null
@@ -12,11 +12,11 @@ auto_transition: false
 base_ref: 2ac747b1e6f3f1cbac212ba2c6c6bb7a8fc138ad
 design_doc: docs/superpowers/specs/2026-07-05-auth-rbac-design.md
 plan: docs/superpowers/plans/2026-07-05-auth-rbac.md
-verify_result: pending
+verify_result: pass
 verification_report: docs/superpowers/reports/2026-07-05-auth-rbac-verify.md
 branch_status: handled
 created_at: 2026-07-04
-verified_at: null
+verified_at: 2026-07-05
 archived: false
 handoff_context: openspec/changes/auth-rbac/.comet/handoff/design-context.json
 handoff_hash: a995b7bc1b5197e67933884d313effacc239ec65f7d35bd1f2cb751cbca9657f
