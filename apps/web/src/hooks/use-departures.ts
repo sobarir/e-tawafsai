@@ -13,6 +13,7 @@ export const departureKeys = {
   all: ["departures"] as const,
   list: (packageId?: string) => ["departures", { packageId }] as const,
   detail: (id: string) => ["departures", id] as const,
+  widgets: () => ["departures", "widgets"] as const,
 };
 
 export function useDepartures(packageId?: string) {
@@ -106,5 +107,27 @@ export function useReleaseDepartureSeats() {
       void queryClient.invalidateQueries({ queryKey: departureKeys.detail(res.id) });
       void queryClient.invalidateQueries({ queryKey: packageKeys.detail(res.packageId) });
     },
+  });
+}
+
+export function useDepartureWidgets() {
+  return useQuery<{
+    pushNeeded: {
+      departureId: string;
+      packageName: string;
+      departureDate: string;
+      seatsAvailable: number;
+      daysToDeparture: number;
+    }[];
+    almostFull: {
+      departureId: string;
+      packageName: string;
+      departureDate: string;
+      seatsAvailable: number;
+      daysToDeparture: number;
+    }[];
+  }>({
+    queryKey: departureKeys.widgets(),
+    queryFn: () => api.get("departures/widgets").json(),
   });
 }

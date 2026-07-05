@@ -5,6 +5,7 @@ import { PinoLogger, InjectPinoLogger } from "nestjs-pino";
 import {
   departures,
   inventoryAdjustments,
+  packages,
   type DbDeparture,
   type Database,
 } from "@cometkit/db";
@@ -340,5 +341,60 @@ export class DeparturesService {
       actorId: adj.actorId,
       createdAt: adj.createdAt.toISOString(),
     }));
+  }
+
+  async getDashboardWidgets(): Promise<unknown> {
+    const allDepartures = await this.db
+      .select({
+        departure: departures,
+        packageName: packages.title,
+      })
+      .from(departures)
+      .innerJoin(packages, eq(departures.packageId, packages.id))
+      .where(eq(departures.tenantId, this.tenantDb.tenantId));
+
+    const now = new Date();
+    const fortyFiveDaysLater = new Date(now.getTime() + 45 * 24 * 60 * 60 * 1000);
+
+    interface WidgetItem {
+      departureId: string;
+      packageName: string;
+      departureDate: string;
+      seatsAvailable: number;
+      daysToDeparture: number;
+    }
+
+    const pushNeeded: WidgetItem[] = [];
+    const almostFull: WidgetItem[] = [];
+
+    for (const row of allDepartures) {
+      const dep = row.departure;
+      const seatAvailable = dep.seatTotal - dep.seatBooked - dep.seatHeld;
+      const daysToDeparture = Math.ceil((dep.departureDate.getTime() - now.getTime()) / (24 * 60 * 60 * 1000));
+
+      if (dep.status === "cancelled" || dep.status === "departed") {
+        continue;
+      }
+
+      const item = {
+        departureId: dep.id,
+        packageName: row.packageName,
+        departureDate: dep.departureDate.toISOString(),
+        seatsAvailable: seatAvailable,
+        daysToDeparture,
+      };
+
+      // pushNeeded: within 45 days that still have seats
+      if (dep.departureDate >= now && dep.departureDate <= fortyFiveDaysLater && seatAvailable > 0) {
+        pushNeeded.push(item);
+      }
+
+      // almostFull: departures in almost_full status
+      if (dep.status === "almost_full" && seatAvailable > 0) {
+        almostFull.push(item);
+      }
+    }
+
+    return { pushNeeded, almostFull };
   }
 }

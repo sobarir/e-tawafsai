@@ -45,6 +45,11 @@ export class DeparturesController {
     return this.departuresService.findAll(packageId);
   }
 
+  @Get("widgets")
+  async widgets(): Promise<unknown> {
+    return this.departuresService.getDashboardWidgets();
+  }
+
   @Get(":id")
   async findOne(@Param("id") id: string): Promise<DepartureDto> {
     return this.departuresService.findOne(id);
