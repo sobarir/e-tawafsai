@@ -32,7 +32,7 @@ base-ref: a1c3a6f41da1c4d81a76f6367715a26ae47104f4
 **Interfaces:**
 - Produces: `CreatePackageInput`, `UpdatePackageInput`, `PackageDto`, `StaffPackageDto` types.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
   Write `packages/shared/src/packages.spec.ts` asserting that schemas parse correct objects and catch validation errors:
   ```ts
   import { describe, expect, it } from "vitest";
@@ -50,11 +50,11 @@ base-ref: a1c3a6f41da1c4d81a76f6367715a26ae47104f4
   });
   ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
   Run: `bun run test packages.spec` in `packages/shared`
   Expected: FAIL with "Cannot find module './packages'"
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
   Create `packages/shared/src/packages.ts`:
   ```ts
   import * as z from "zod";
@@ -117,11 +117,11 @@ base-ref: a1c3a6f41da1c4d81a76f6367715a26ae47104f4
   ```
   Modify `packages/shared/src/index.ts` to export `./packages`.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
   Run: `bun run test packages.spec` in `packages/shared`
   Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
   ```bash
   git add packages/shared/src/packages.ts packages/shared/src/packages.spec.ts packages/shared/src/index.ts
   git commit -m "feat(package-catalog): create shared package schemas and dtos"
@@ -136,7 +136,7 @@ base-ref: a1c3a6f41da1c4d81a76f6367715a26ae47104f4
 - Modify: `packages/db/src/schema/index.ts`
 - Modify: `packages/db/src/seed.ts`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
   Create `apps/api/src/packages/packages.service.int.spec.ts` asserting the packages schema matches DB columns:
   ```ts
   import { describe, expect, it } from "vitest";
@@ -149,16 +149,16 @@ base-ref: a1c3a6f41da1c4d81a76f6367715a26ae47104f4
   });
   ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
   Run: `bun run test:int packages.service.int.spec` in `apps/api`
   Expected: FAIL (packages table not defined/exported from @cometkit/db)
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
   Create `packages/db/src/schema/packages.ts` defining `packages`, `packageHotels`, `tags`, `packageTags`, and `packageFlyers`.
   Export everything from `packages/db/src/schema/index.ts`.
   Update seed script `packages/db/src/seed.ts` to populate default inclusion tags.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
   Run migrations:
   `bun run db:generate`
   `bun run db:migrate`
@@ -166,7 +166,7 @@ base-ref: a1c3a6f41da1c4d81a76f6367715a26ae47104f4
   Run test: `bun run test:int packages.service.int.spec` in `apps/api`
   Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
   ```bash
   git add packages/db/src/schema/packages.ts packages/db/src/schema/index.ts packages/db/src/seed.ts packages/db/drizzle/
   git commit -m "feat(package-catalog): create package catalog tables and seeding"
@@ -183,22 +183,22 @@ base-ref: a1c3a6f41da1c4d81a76f6367715a26ae47104f4
 - Create: `apps/api/src/packages/packages.module.ts`
 - Modify: `apps/api/src/app.module.ts`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
   Add unit tests in `apps/api/src/packages/packages.service.int.spec.ts` testing publish validation (blocked without Makkah hotel or inactive provider) and slug collisions.
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
   Run: `bun run test:int packages.service.int.spec`
   Expected: FAIL (controllers/services not found)
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
   Implement `packages.policy.ts` (validation rules), `packages.service.ts` (handling CRUD + transaction-wrapped cascade unpublishes), and `packages.controller.ts`.
   Register `PackagesModule` in `app.module.ts`.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
   Run: `bun run test:int packages.service.int.spec`
   Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
   ```bash
   git add apps/api/src/packages/ apps/api/src/app.module.ts
   git commit -m "feat(package-catalog): implement packages endpoints and validation policy"
@@ -213,14 +213,14 @@ base-ref: a1c3a6f41da1c4d81a76f6367715a26ae47104f4
 - Create: `apps/web/src/app/dashboard/packages/page.tsx`
 - Modify: `apps/web/src/app/dashboard/page.tsx`
 
-- [ ] **Step 1: Write the hook & registry page**
+- [x] **Step 1: Write the hook & registry page**
   Implement TanStack query hooks in `use-packages.ts` and catalog table layout in `page.tsx` showing status tags. Link registry page in dashboard.
 
-- [ ] **Step 2: Verify lint and compilation**
+- [x] **Step 2: Verify lint and compilation**
   Run: `bun run verify` in workspace root.
   Expected: PASS
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
   ```bash
   git add apps/web/src/hooks/use-packages.ts apps/web/src/app/dashboard/packages/page.tsx apps/web/src/app/dashboard/page.tsx
   git commit -m "feat(package-catalog): implement Web UI package registry view"
@@ -233,14 +233,14 @@ base-ref: a1c3a6f41da1c4d81a76f6367715a26ae47104f4
 **Files:**
 - Create: `apps/web/src/app/dashboard/packages/[id]/page.tsx`
 
-- [ ] **Step 1: Write the forms page**
+- [x] **Step 1: Write the forms page**
   Implement form rendering side-by-side with optional flyer upload component, dynamic hotel city entries, and tags multiselect. Surfacing publish failures.
 
-- [ ] **Step 2: Verify lint and compilation**
+- [x] **Step 2: Verify lint and compilation**
   Run: `bun run verify` in workspace root.
   Expected: PASS
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
   ```bash
   git add apps/web/src/app/dashboard/packages/[id]/page.tsx
   git commit -m "feat(package-catalog): build Web UI create/edit package form"
