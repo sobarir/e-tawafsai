@@ -2,6 +2,7 @@
 change: web-search-filters-expansion
 design-doc: docs/superpowers/specs/2026-07-05-web-search-filters-expansion-design.md
 base-ref: 24ec16fa9e6ee319479d86d8cef6495dba6e47b2
+archived-with: 2026-07-05-web-search-filters-expansion
 ---
 
 # Web Search Filters Expansion Implementation Plan
@@ -19,6 +20,7 @@ base-ref: 24ec16fa9e6ee319479d86d8cef6495dba6e47b2
 - UI copy: Indonesian language (e.g. "Terapkan", "Kategori", "Tipe Produk", "Kota Keberangkatan", "Kota Hotel").
 - Mobile-first: Scrollable layout within the sheet container, fits nicely on viewport widths down to 380px.
 
+archived-with: 2026-07-05-web-search-filters-expansion
 ---
 
 ### Task 1: Expose Filters in FilterSheet
@@ -118,6 +120,7 @@ base-ref: 24ec16fa9e6ee319479d86d8cef6495dba6e47b2
 - [x] **Step 1.5: Apply Scroll Styling**
   Ensure the container has `overflow-y-auto max-h-[80vh] px-1 py-2` styles applied to prevent layout overflow on mobile screens.
 
+archived-with: 2026-07-05-web-search-filters-expansion
 ---
 
 ### Task 2: Implement Human-Readable Labels in ActiveChips
@@ -148,6 +151,7 @@ base-ref: 24ec16fa9e6ee319479d86d8cef6495dba6e47b2
   - `directOnly`: "Direct flight"
   - `seatsAvailableOnly`: "Ada kursi"
 
+archived-with: 2026-07-05-web-search-filters-expansion
 ---
 
 ### Task 3: Integrate and Verify Search Page

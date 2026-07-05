@@ -2,6 +2,8 @@
 comet_change: web-search-filters-expansion
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-07-05-web-search-filters-expansion
+status: final
 ---
 
 # Design: web-search-filters-expansion
