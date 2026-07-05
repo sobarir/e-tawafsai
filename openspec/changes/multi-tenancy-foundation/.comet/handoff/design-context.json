@@ -1,0 +1,15 @@
+{
+  "change": "multi-tenancy-foundation",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "5957b7464e00f4078fe8051c2544c52c0be0844a048609573ec9ed9720775dc3",
+  "files": [
+    { "path": "openspec/changes/multi-tenancy-foundation/proposal.md", "sha256": "5fe53f447457bc0dd1246956cd06f5031214abc3685ee87a61106656545e564f" },
+    { "path": "openspec/changes/multi-tenancy-foundation/design.md", "sha256": "338f499d3fb1439571c2362851f6db1e29baa69c049a491f633347bb89bae0ee" },
+    { "path": "openspec/changes/multi-tenancy-foundation/tasks.md", "sha256": "8d8f164057c47514b2b0729de0039009509e9c08f321b8625642f963b1a7d543" },
+    { "path": "openspec/changes/multi-tenancy-foundation/specs/multi-tenancy/spec.md", "sha256": "ba79bc3354f4e1c1043636e1430b2fb11f0eb3cd9b444d0830973558333dee1e" },
+    { "path": "openspec/changes/multi-tenancy-foundation/specs/tenant-resolution/spec.md", "sha256": "74c89014521ead4a8289a97c9251677f10775a8f196a5ea7e52ceb3f91e2fa93" }
+  ]
+}
