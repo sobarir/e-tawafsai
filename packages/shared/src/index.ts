@@ -7,6 +7,7 @@ export * from "./errors";
 export * from "./settings";
 export * from "./providers";
 export * from "./packages";
+export * from "./departures";
 
 
 
