@@ -1,6 +1,14 @@
 import { z } from "zod";
 import { USER_ROLES, type UserRole } from "./constants";
 
+/**
+ * Convention: Staff-DTO Seam
+ * Any resource with admin-only fields should expose a distinct staff response type in packages/shared,
+ * and its mapper should take the viewer role to determine which fields are returned.
+ * Since users have no admin-only fields today, UserDto remains single.
+ * A generic field-stripping helper (e.g. pickAdminOnly) is deferred to the provider-management change.
+ */
+
 /** Wire shape for a user. Dates cross the wire as ISO strings. */
 export interface UserDto {
   id: string;
