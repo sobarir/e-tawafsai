@@ -40,3 +40,6 @@ export const inventoryAdjustments = pgTable("inventory_adjustments", {
   actorId: text("actor_id").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+
+export type DbDeparture = typeof departures.$inferSelect;
+export type DbInventoryAdjustment = typeof inventoryAdjustments.$inferSelect;
