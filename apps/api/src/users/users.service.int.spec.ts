@@ -52,11 +52,11 @@ describe("UsersService (integration)", () => {
     const created = await service.createUser({
       email: `int-${suffix}@cometkit.dev`,
       password: "password123",
-      role: "user",
+      role: "staff",
     });
     createdIds.push(created.id);
     expect(created.id).toHaveLength(26);
-    expect(created.role).toBe("user");
+    expect(created.role).toBe("staff");
 
     const page = await service.list({ page: 1, limit: 100 });
     expect(page.data.some((u) => u.id === created.id)).toBe(true);

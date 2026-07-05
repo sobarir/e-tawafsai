@@ -17,6 +17,8 @@ export function toUserDto(user: User): UserDto {
     email: user.email,
     name: user.name,
     role: user.role,
+    waNumber: user.waNumber,
+    isActive: user.isActive,
     createdAt: user.createdAt.toISOString(),
   };
 }

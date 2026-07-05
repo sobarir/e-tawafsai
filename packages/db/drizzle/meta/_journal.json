@@ -22,6 +22,13 @@
       "when": 1783183291116,
       "tag": "0002_hard_makkari",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1783231564283,
+      "tag": "0003_yielding_riptide",
+      "breakpoints": true
     }
   ]
 }

@@ -31,6 +31,8 @@ describe("toUserDto", () => {
       role: "admin",
       tenantId: "01HTENANTAAAAAAAAAAAAAAAAA",
       isPlatformOwner: false,
+      isActive: true,
+      waNumber: "12345678",
       createdAt: new Date("2026-01-01T00:00:00Z"),
       updatedAt: new Date("2026-01-01T00:00:00Z"),
     };
@@ -40,6 +42,8 @@ describe("toUserDto", () => {
       email: admin.email,
       name: "Admin",
       role: "admin",
+      isActive: true,
+      waNumber: "12345678",
       createdAt: "2026-01-01T00:00:00.000Z",
     });
     expect("passwordHash" in dto).toBe(false);
