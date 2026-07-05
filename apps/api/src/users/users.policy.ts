@@ -5,8 +5,8 @@
 import type { AuthUser, PageMeta, UserDto } from "@cometkit/shared";
 import type { User } from "@cometkit/db";
 
-/** Business rule: you cannot delete your own account. */
-export function canDeleteUser(actor: AuthUser, targetId: string): boolean {
+/** Business rule: you cannot deactivate your own account. */
+export function canDeactivateUser(actor: AuthUser, targetId: string): boolean {
   return actor.id !== targetId;
 }
 
@@ -17,6 +17,8 @@ export function toUserDto(user: User): UserDto {
     email: user.email,
     name: user.name,
     role: user.role,
+    waNumber: user.waNumber,
+    isActive: user.isActive,
     createdAt: user.createdAt.toISOString(),
   };
 }

@@ -10,6 +10,11 @@ import { TenancyModule } from "./tenancy/tenancy.module";
 import { AuthModule } from "./auth/auth.module";
 import { UsersModule } from "./users/users.module";
 import { HealthModule } from "./health/health.module";
+import { SettingsModule } from "./settings/settings.module";
+import { ProvidersModule } from "./providers/providers.module";
+import { PackagesModule } from "./packages/packages.module";
+import { DeparturesModule } from "./departures/departures.module";
+import { SearchModule } from "./search/search.module";
 
 @Module({
   imports: [
@@ -39,7 +44,13 @@ import { HealthModule } from "./health/health.module";
     UsersModule,
     AuthModule,
     HealthModule,
+    SettingsModule,
+    ProvidersModule,
+    PackagesModule,
+    DeparturesModule,
+    SearchModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: AllExceptionsFilter }],
 })
 export class AppModule {}
+

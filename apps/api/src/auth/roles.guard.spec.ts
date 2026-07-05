@@ -24,7 +24,7 @@ const user: AuthUser = {
   id: "01JX0000000000000000000002",
   email: "demo@cometkit.dev",
   name: null,
-  role: "user",
+  role: "staff",
   tenantId: "01JX0000000000000000000001",
 };
 
@@ -34,7 +34,7 @@ describe("RolesGuard", () => {
     expect(guard.canActivate(context)).toBe(true);
   });
 
-  it("blocks a standard user from admin routes", () => {
+  it("blocks a standard staff user from admin routes", () => {
     const { guard, context } = contextWith(user, ["admin"]);
     expect(guard.canActivate(context)).toBe(false);
   });

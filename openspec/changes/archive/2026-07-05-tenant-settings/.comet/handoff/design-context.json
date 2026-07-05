@@ -1,0 +1,14 @@
+{
+  "change": "tenant-settings",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "f739ec440a94a90beced40f98f359a623e08b7f5b0309b98a84dbd61c8b26dc4",
+  "files": [
+    { "path": "openspec/changes/tenant-settings/proposal.md", "sha256": "8b9144fc705ed88574df18d3c99ed66de86689997fffdc4cb42812486a604f49" },
+    { "path": "openspec/changes/tenant-settings/design.md", "sha256": "da35a660d25557fca3ff8b6e9c0b0715fa542683374fd2d05a53d8a21bd20b69" },
+    { "path": "openspec/changes/tenant-settings/tasks.md", "sha256": "79f6028b9b50ce1e10720be710c4be64d270e42829b83ffb9086654d3adccc6b" },
+    { "path": "openspec/changes/tenant-settings/specs/tenant-settings/spec.md", "sha256": "003e930e875b09837572ad8a6ce3c87c945616e56c1503aad7585f52cc15ea97" }
+  ]
+}

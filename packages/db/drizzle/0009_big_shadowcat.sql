@@ -1,0 +1,1 @@
+ALTER TABLE "packages" ADD CONSTRAINT "packages_tenant_slug_idx" UNIQUE("tenant_id","slug");

@@ -1,11 +1,15 @@
 import { NestFactory } from "@nestjs/core";
+import { Logger } from "nestjs-pino";
+import { ulid } from "ulid";
 import {
   FastifyAdapter,
   type NestFastifyApplication,
 } from "@nestjs/platform-fastify";
 import { ConfigService } from "@nestjs/config";
-import { Logger } from "nestjs-pino";
-import { ulid } from "ulid";
+import fastifyCookie from "@fastify/cookie";
+import fastifyStatic from "@fastify/static";
+import fastifyMultipart from "@fastify/multipart";
+import * as path from "path";
 import { AppModule } from "./app.module";
 
 async function bootstrap() {
@@ -15,6 +19,19 @@ async function bootstrap() {
     new FastifyAdapter({ genReqId: () => ulid() }),
     { bufferLogs: true },
   );
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await app.register(fastifyCookie as any);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await app.register(fastifyMultipart as any);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await app.register(fastifyStatic as any, {
+    root: path.join(process.cwd(), "public/uploads"),
+    prefix: "/uploads/",
+    decorateReply: false,
+  });
 
   app.useLogger(app.get(Logger));
 

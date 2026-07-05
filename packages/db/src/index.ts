@@ -18,3 +18,7 @@ export type Database = ReturnType<typeof createDb>;
 export * from "./columns";
 export * from "./schema";
 export { schema };
+
+// Test/benchmark seed fixture. Inert unless called; imported by the search
+// benchmark integration spec.
+export * from "./fixtures/search-benchmark";

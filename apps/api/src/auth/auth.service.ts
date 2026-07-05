@@ -1,5 +1,4 @@
 import {
-  ConflictException,
   Injectable,
   UnauthorizedException,
 } from "@nestjs/common";
@@ -8,10 +7,9 @@ import type {
   AuthResponse,
   AuthUser,
   LoginInput,
-  RegisterInput,
 } from "@cometkit/shared";
 import type { User } from "@cometkit/db";
-import { hashPassword, verifyPassword } from "../common/password";
+import { verifyPassword } from "../common/password";
 import { UsersService } from "../users/users.service";
 import type { JwtPayload } from "./jwt.strategy";
 
@@ -22,25 +20,9 @@ export class AuthService {
     private readonly jwt: JwtService,
   ) {}
 
-  async register(input: RegisterInput): Promise<AuthResponse> {
-    const existing = await this.users.findByEmail(input.email);
-    if (existing) {
-      throw new ConflictException("An account with this email already exists");
-    }
-
-    const user = await this.users.create({
-      email: input.email,
-      passwordHash: await hashPassword(input.password),
-      name: input.name ?? null,
-      role: "user",
-    });
-
-    return this.toAuthResponse(user);
-  }
-
   async login(input: LoginInput): Promise<AuthResponse> {
     const user = await this.users.findByEmail(input.email);
-    if (!user) {
+    if (!user || !user.isActive) {
       throw new UnauthorizedException("Invalid email or password");
     }
 

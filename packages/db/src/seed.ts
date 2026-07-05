@@ -13,7 +13,7 @@ import * as schema from "./schema";
 
 const DEMO_ACCOUNTS = [
   { email: "admin@cometkit.dev", name: "Demo Admin", role: "admin" as const },
-  { email: "demo@cometkit.dev", name: "Demo User", role: "user" as const },
+  { email: "staff@cometkit.dev", name: "Demo Staff", role: "staff" as const },
 ];
 
 async function main() {
@@ -57,8 +57,169 @@ async function main() {
       });
   }
 
+  await db
+    .insert(schema.providers)
+    .values({
+      id: ulid(),
+      tenantId: tenant.id,
+      name: "PT. Handoff Al-Amin",
+      brandName: "Al-Amin Umrah",
+      ppiuLicenseNo: "PPIU-999-2026",
+      accreditation: "A",
+      contactPerson: "Budi",
+      contactPhone: "62812345678",
+      isActive: true,
+      pricePublicationConsentAt: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .onConflictDoNothing();
+
+  const starterTemplates = [
+    {
+      id: ulid(),
+      tenantId: tenant.id,
+      key: "greeting",
+      label: "Greeting",
+      body: "Halo {customerName}, selamat datang! Saya {agentName} akan membantu Anda hari ini.",
+    },
+    {
+      id: ulid(),
+      tenantId: tenant.id,
+      key: "price_quote",
+      label: "Price Quote",
+      body: "Halo {customerName}, berikut penawaran harga untuk paket {packageName}: Rp {packagePrice}.",
+    },
+    {
+      id: ulid(),
+      tenantId: tenant.id,
+      key: "dp_reminder",
+      label: "Down Payment Reminder",
+      body: "Halo {customerName}, mohon segera melakukan pembayaran Down Payment untuk paket {packageName} sebesar Rp {dpAmount}.",
+    },
+    {
+      id: ulid(),
+      tenantId: tenant.id,
+      key: "h60_reminder",
+      label: "H-60 Departure Reminder",
+      body: "Halo {customerName}, mengingatkan keberangkatan paket {packageName} Anda kurang 60 hari lagi pada tanggal {departureDate}.",
+    },
+    {
+      id: ulid(),
+      tenantId: tenant.id,
+      key: "h30_reminder",
+      label: "H-30 Settlement Reminder",
+      body: "Halo {customerName}, sisa pembayaran Anda untuk paket {packageName} sebesar Rp {remainingAmount} jatuh tempo pada {dueDate}.",
+    },
+    {
+      id: ulid(),
+      tenantId: tenant.id,
+      key: "doc_checklist",
+      label: "Document Checklist",
+      body: "Halo {customerName}, mohon melengkapi berkas berikut: {checklistItems}.",
+    },
+    {
+      id: ulid(),
+      tenantId: tenant.id,
+      key: "testimonial_ask",
+      label: "Testimonial Request",
+      body: "Halo {customerName}, bagaimana pengalaman Anda mengikuti paket {packageName}? Kirim ulasan Anda ya!",
+    },
+  ];
+
+  for (const template of starterTemplates) {
+    await db
+      .insert(schema.messageTemplates)
+      .values(template)
+      .onConflictDoUpdate({
+        target: [schema.messageTemplates.tenantId, schema.messageTemplates.key],
+        set: { label: template.label, body: template.body },
+      });
+  }
+
+  const starterTags = [
+    "visa",
+    "tiket PP",
+    "hotel",
+    "makan 3x",
+    "bus AC",
+    "muthawif",
+    "perlengkapan umrah",
+    "asuransi",
+    "handling",
+    "airport tax",
+    "kereta cepat Haramain",
+  ];
+
+  for (const tagName of starterTags) {
+    await db
+      .insert(schema.tags)
+      .values({
+        id: ulid(),
+        tenantId: tenant.id,
+        name: tagName,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .onConflictDoNothing();
+  }
+
+  // Seed demo package
+  const [provider] = await db
+    .select({ id: schema.providers.id })
+    .from(schema.providers)
+    .where(eq(schema.providers.name, "PT. Handoff Al-Amin"));
+
+  if (provider) {
+    const packageId = ulid();
+    await db
+      .insert(schema.packages)
+      .values({
+        id: packageId,
+        tenantId: tenant.id,
+        providerId: provider.id,
+        productType: "umrah",
+        title: "Paket Umrah Akbar 9 Hari",
+        slug: "paket-umrah-akbar-9-hari",
+        category: "regular",
+        durationDays: 9,
+        description: "Paket Umrah Al-Amin Akbar regular 9 hari hemat dan lengkap.",
+        airline: "Saudi Arabian Airlines",
+        flightRoute: "CGK-JED-CGK",
+        departureCity: "Jakarta",
+        status: "published",
+        hasBeenPublished: true,
+      })
+      .onConflictDoNothing();
+
+    // Seed mock departure
+    await db
+      .insert(schema.departures)
+      .values({
+        id: ulid(),
+        tenantId: tenant.id,
+        packageId,
+        departureType: "fixed_date",
+        departureDate: new Date("2026-08-15T00:00:00Z"),
+        returnDate: new Date("2026-08-24T00:00:00Z"),
+        seatTotal: 45,
+        seatBooked: 0,
+        seatHeld: 0,
+        currency: "IDR",
+        priceQuad: 35000000,
+        dpAmount: 5000000,
+        paymentSchedule: JSON.stringify([
+          { name: "DP", amount: 5000000, daysBeforeDeparture: 60 }
+        ]),
+        status: "open",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .onConflictDoNothing();
+  }
+
   console.log(
-    "Seed complete: default tenant + admin@cometkit.dev (admin), demo@cometkit.dev (user) / password123",
+    "Seed complete: default tenant + admin@cometkit.dev (admin), staff@cometkit.dev (staff) / password123",
   );
   await client.end();
 }

@@ -49,10 +49,19 @@ export function useUpdateUser() {
   });
 }
 
-export function useDeleteUser() {
+export function useDeactivateUser() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => api.delete(`users/${id}`),
+    mutationFn: (id: string) => api.patch(`users/${id}/deactivate`).json<UserDto>(),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: usersKeys.all }),
+  });
+}
+
+export function useReactivateUser() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.patch(`users/${id}/reactivate`).json<UserDto>(),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: usersKeys.all }),
   });

@@ -7,15 +7,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { HealthBadge } from "@/components/health-badge";
 import { useLogout, useMe } from "@/hooks/use-auth";
-import { getToken } from "@/lib/auth-storage";
+import { useDepartureWidgets } from "@/hooks/use-departures";
+import { hasSession } from "@/lib/auth-storage";
 
 export default function DashboardPage() {
   const router = useRouter();
   const { data: user, isError, isPending } = useMe();
+  const { data: widgets } = useDepartureWidgets();
   const logout = useLogout();
 
   useEffect(() => {
-    if (getToken() === null || isError) {
+    if (!hasSession() || isError) {
       router.replace("/login");
     }
   }, [isError, router]);
@@ -38,10 +40,21 @@ export default function DashboardPage() {
         </span>
         <div className="flex items-center gap-3">
           <HealthBadge />
+          <Button asChild variant="outline" size="sm">
+            <Link href="/dashboard/providers">Providers</Link>
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/dashboard/packages">Packages</Link>
+          </Button>
           {user.role === "admin" ? (
-            <Button asChild variant="outline" size="sm">
-              <Link href="/dashboard/users">Users</Link>
-            </Button>
+            <>
+              <Button asChild variant="outline" size="sm">
+                <Link href="/dashboard/settings">Settings</Link>
+              </Button>
+              <Button asChild variant="outline" size="sm">
+                <Link href="/dashboard/users">Users</Link>
+              </Button>
+            </>
           ) : null}
           <Button variant="outline" size="sm" onClick={logout}>
             Sign out
@@ -58,6 +71,68 @@ export default function DashboardPage() {
       </p>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
+        <Card className="border-amber-500/20 bg-amber-500/5">
+          <CardHeader className="pb-2">
+            <CardTitle className="font-mono text-sm font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+              Urgensi Closing (Almost Full)
+            </CardTitle>
+            <CardDescription className="text-xs">Departures with high booking urgency (status: almost_full).</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {!widgets?.almostFull || widgets.almostFull.length === 0 ? (
+              <p className="text-xs text-muted-foreground italic">No departures in almost_full status.</p>
+            ) : (
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {widgets.almostFull.map((item) => (
+                  <div key={item.departureId} className="text-xs border-b pb-1.5 flex justify-between">
+                    <div>
+                      <span className="font-semibold block">{item.packageName}</span>
+                      <span className="text-[10px] text-muted-foreground font-mono">
+                        Date: {new Date(item.departureDate).toLocaleDateString("id-ID")}
+                      </span>
+                    </div>
+                    <div className="text-right font-mono text-[10px] space-y-0.5">
+                      <p className="text-amber-600 font-semibold">{item.seatsAvailable} seats left</p>
+                      <p className="text-muted-foreground">in {item.daysToDeparture} days</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="border-indigo-500/20 bg-indigo-500/5">
+          <CardHeader className="pb-2">
+            <CardTitle className="font-mono text-sm font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+              Perlu Didorong (H-45)
+            </CardTitle>
+            <CardDescription className="text-xs">Departures within 45 days that still have available seats.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {!widgets?.pushNeeded || widgets.pushNeeded.length === 0 ? (
+              <p className="text-xs text-muted-foreground italic">No departures requiring sales push.</p>
+            ) : (
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {widgets.pushNeeded.map((item) => (
+                  <div key={item.departureId} className="text-xs border-b pb-1.5 flex justify-between">
+                    <div>
+                      <span className="font-semibold block">{item.packageName}</span>
+                      <span className="text-[10px] text-muted-foreground font-mono">
+                        Date: {new Date(item.departureDate).toLocaleDateString("id-ID")}
+                      </span>
+                    </div>
+                    <div className="text-right font-mono text-[10px] space-y-0.5">
+                      <p className="text-indigo-600 font-semibold">{item.seatsAvailable} seats left</p>
+                      <p className="text-muted-foreground">in {item.daysToDeparture} days</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader>
             <CardTitle>Identity</CardTitle>

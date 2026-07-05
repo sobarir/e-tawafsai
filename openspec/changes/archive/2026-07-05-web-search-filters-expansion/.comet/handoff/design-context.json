@@ -1,0 +1,14 @@
+{
+  "change": "web-search-filters-expansion",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "28c03879e3ec6b8bd215674b2389d814a13a84b9c0867cf774d685ecba6b997a",
+  "files": [
+    { "path": "openspec/changes/web-search-filters-expansion/proposal.md", "sha256": "d82e83934b1336178b04b9d9eca6d497526403352f343c70bc8a9bb09e9d3cde" },
+    { "path": "openspec/changes/web-search-filters-expansion/design.md", "sha256": "d9de2f98d95a3655ba4a42f7e4c1b8d0556b0ccb6f7ea0eea583ad714014508d" },
+    { "path": "openspec/changes/web-search-filters-expansion/tasks.md", "sha256": "8eb91db6efe97cdb3bcc77f58f364f7ca414d781f05306dffb39a040c7b8e6ea" },
+    { "path": "openspec/changes/web-search-filters-expansion/specs/package-search/spec.md", "sha256": "7d70f942159e7c3e00dd4ad4ec571837291bb9383b72d90f01659ac27f9983c1" }
+  ]
+}

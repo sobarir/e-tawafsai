@@ -48,15 +48,18 @@ describe("UsersService (integration)", () => {
     }
   });
 
-  it("creates, lists, updates role, and refuses self-delete", async () => {
+  it("creates, lists, updates role, and refuses self-deactivate", async () => {
     const created = await service.createUser({
       email: `int-${suffix}@cometkit.dev`,
       password: "password123",
-      role: "user",
+      role: "staff",
+      waNumber: "12345",
     });
     createdIds.push(created.id);
     expect(created.id).toHaveLength(26);
-    expect(created.role).toBe("user");
+    expect(created.role).toBe("staff");
+    expect(created.waNumber).toBe("12345");
+    expect(created.isActive).toBe(true);
 
     const page = await service.list({ page: 1, limit: 100 });
     expect(page.data.some((u) => u.id === created.id)).toBe(true);
@@ -72,12 +75,21 @@ describe("UsersService (integration)", () => {
       role: "admin",
       tenantId: (await service.findById(created.id))!.tenantId,
     };
-    await expect(service.deleteUser(actor, created.id)).rejects.toBeInstanceOf(
+    await expect(service.deactivateUser(actor, created.id)).rejects.toBeInstanceOf(
       ForbiddenException,
     );
 
-    // row still present after refused delete
-    const [row] = await db.select().from(users).where(eq(users.id, created.id));
-    expect(row).toBeDefined();
+    const adminActor: AuthUser = {
+      id: "01ADMINAAAAAAAAAAAAAAAAAAA",
+      email: "admin-test@cometkit.dev",
+      name: "Test Admin",
+      role: "admin",
+      tenantId: actor.tenantId,
+    };
+    const deactivated = await service.deactivateUser(adminActor, created.id);
+    expect(deactivated.isActive).toBe(false);
+
+    const reactivated = await service.reactivateUser(created.id);
+    expect(reactivated.isActive).toBe(true);
   });
 });

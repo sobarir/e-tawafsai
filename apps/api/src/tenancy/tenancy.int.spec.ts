@@ -36,7 +36,7 @@ describe("tenant isolation (integration)", () => {
       // Each tenant gets a user with the SAME email — proves per-tenant uniqueness.
       const scoped = new TenantScopedDb(db, clsStub(id));
       await scoped.insertValues(users, {
-        email, passwordHash: "x", name: slug, role: "user",
+        email, passwordHash: "x", name: slug, role: "staff",
       });
     }
   });
@@ -73,7 +73,7 @@ describe("tenant isolation (integration)", () => {
     const staleEmail = `stale-${suffix}@cometkit.dev`;
     const scopedA = new TenantScopedDb(db, clsStub(tenantIds[0]));
     await scopedA.insertValues(users, {
-      email: staleEmail, passwordHash: "x", name: "stale", role: "user",
+      email: staleEmail, passwordHash: "x", name: "stale", role: "staff",
     });
     const [created] = await db.select().from(users)
       .where(and(eq(users.tenantId, tenantIds[0]!), eq(users.email, staleEmail)));

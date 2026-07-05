@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
-import type { UserRole } from "@cometkit/shared";
+import type { UserRole, UserDto } from "@cometkit/shared";
 import { USER_ROLES } from "@cometkit/shared";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +11,8 @@ import { Label } from "@/components/ui/label";
 import { useMe } from "@/hooks/use-auth";
 import {
   useCreateUser,
-  useDeleteUser,
+  useDeactivateUser,
+  useReactivateUser,
   useUpdateUser,
   useUsers,
 } from "@/hooks/use-users";
@@ -24,7 +25,8 @@ export default function UsersPage() {
   const { data, isPending } = useUsers(page);
   const createUser = useCreateUser();
   const updateUser = useUpdateUser();
-  const deleteUser = useDeleteUser();
+  const deactivateUser = useDeactivateUser();
+  const reactivateUser = useReactivateUser();
   const [error, setError] = useState<string | null>(null);
 
   if (me && me.role !== "admin") {
@@ -34,8 +36,7 @@ export default function UsersPage() {
           admin required
         </span>
         <p className="text-sm text-muted-foreground">
-          User management needs an admin account. You are signed in as a
-          standard user.
+          User management needs an admin account. You are signed in as staff.
         </p>
         <Button asChild variant="outline" size="sm">
           <Link href="/dashboard">Back to dashboard</Link>
@@ -50,12 +51,14 @@ export default function UsersPage() {
     const form = event.currentTarget;
     const fields = new FormData(form);
     const name = String(fields.get("name") ?? "").trim();
+    const waNumber = String(fields.get("waNumber") ?? "").trim();
     try {
       await createUser.mutateAsync({
         email: String(fields.get("email")),
         password: String(fields.get("password")),
         role: fields.get("role") as UserRole,
         ...(name ? { name } : {}),
+        ...(waNumber ? { waNumber } : {}),
       });
       form.reset();
     } catch (err) {
@@ -72,10 +75,14 @@ export default function UsersPage() {
     }
   }
 
-  async function onDelete(id: string) {
+  async function onToggleActive(user: UserDto) {
     setError(null);
     try {
-      await deleteUser.mutateAsync(id);
+      if (user.isActive) {
+        await deactivateUser.mutateAsync(user.id);
+      } else {
+        await reactivateUser.mutateAsync(user.id);
+      }
     } catch (err) {
       setError(await readApiError(err));
     }
@@ -116,13 +123,15 @@ export default function UsersPage() {
                 <th className="px-4 py-3 font-medium">user</th>
                 <th className="px-4 py-3 font-medium">ulid</th>
                 <th className="px-4 py-3 font-medium">role</th>
+                <th className="px-4 py-3 font-medium">wa</th>
+                <th className="px-4 py-3 font-medium">status</th>
                 <th className="px-4 py-3 font-medium sr-only">actions</th>
               </tr>
             </thead>
             <tbody>
               {isPending ? (
                 <tr>
-                  <td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">
+                  <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
                     Loading users…
                   </td>
                 </tr>
@@ -153,18 +162,33 @@ export default function UsersPage() {
                         ))}
                       </select>
                     </td>
+                    <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
+                      {user.waNumber ?? "—"}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={cn(
+                        "inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset",
+                        user.isActive
+                          ? "bg-green-500/10 text-green-400 ring-green-500/20"
+                          : "bg-red-500/10 text-red-400 ring-red-500/20"
+                      )}>
+                        {user.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </td>
                     <td className="px-4 py-3 text-right">
                       <Button
                         variant="ghost"
                         size="sm"
                         className={cn(
-                          "text-destructive hover:bg-destructive/10 hover:text-destructive",
+                          user.isActive
+                            ? "text-destructive hover:bg-destructive/10 hover:text-destructive"
+                            : "text-primary hover:bg-primary/10",
                           user.id === me?.id && "invisible",
                         )}
-                        onClick={() => onDelete(user.id)}
-                        disabled={deleteUser.isPending}
+                        onClick={() => onToggleActive(user)}
+                        disabled={deactivateUser.isPending || reactivateUser.isPending}
                       >
-                        Delete
+                        {user.isActive ? "Deactivate" : "Reactivate"}
                       </Button>
                     </td>
                   </tr>
@@ -229,11 +253,15 @@ export default function UsersPage() {
               <Input id="new-name" name="name" />
             </div>
             <div className="space-y-2">
+              <Label htmlFor="new-wa">WhatsApp Number (optional)</Label>
+              <Input id="new-wa" name="waNumber" placeholder="e.g. 628123..." />
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="new-role">Role</Label>
               <select
                 id="new-role"
                 name="role"
-                defaultValue="user"
+                defaultValue="staff"
                 className="flex h-10 w-full rounded-md border border-input bg-card px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 {USER_ROLES.map((role) => (
