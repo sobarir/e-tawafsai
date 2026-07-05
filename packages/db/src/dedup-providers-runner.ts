@@ -14,13 +14,11 @@ import { dedupeProviders } from "./scripts/dedup-providers";
 async function main() {
   const db = createDb(databaseUrl);
   const plans = await dedupeProviders(db);
-  // eslint-disable-next-line no-console
   console.log(JSON.stringify({ event: "provider.dedup.done", clusters: plans.length }));
   process.exit(0);
 }
 
 main().catch((err: unknown) => {
-  // eslint-disable-next-line no-console
   console.error(err);
   process.exit(1);
 });

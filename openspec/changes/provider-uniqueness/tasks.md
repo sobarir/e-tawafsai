@@ -26,5 +26,5 @@
 
 ## 5. Verify
 
-- [ ] 5.1 Run `bun run db:migrate` then `bun run db:seed` on a duplicate-laden fixture and confirm clean apply
-- [ ] 5.2 `bun run verify` (typecheck + lint + test) and `bun run test:int` for providers pass
+- [x] 5.1 Run `bun run db:migrate` then `bun run db:seed` on a duplicate-laden fixture and confirm clean apply
+- [x] 5.2 `bun run verify` (typecheck + lint + test) and `bun run test:int` for providers pass

@@ -74,12 +74,10 @@ export async function dedupeProviders(db: Database): Promise<ProviderMergePlan[]
     if (plans.length === 0) continue;
     const res = await applyProviderMerges(db, plans);
     for (const p of plans) {
-      // eslint-disable-next-line no-console
       console.log(
         JSON.stringify({ event: "provider.merged", tenantId, survivorId: p.survivorId, loserIds: p.loserIds }),
       );
     }
-    // eslint-disable-next-line no-console
     console.log(JSON.stringify({ event: "provider.dedup.tenant", tenantId, ...res }));
     allPlans.push(...plans);
   }
