@@ -164,6 +164,60 @@ async function main() {
       .onConflictDoNothing();
   }
 
+  // Seed demo package
+  const [provider] = await db
+    .select({ id: schema.providers.id })
+    .from(schema.providers)
+    .where(eq(schema.providers.name, "PT. Handoff Al-Amin"));
+
+  if (provider) {
+    const packageId = ulid();
+    await db
+      .insert(schema.packages)
+      .values({
+        id: packageId,
+        tenantId: tenant.id,
+        providerId: provider.id,
+        productType: "umrah",
+        title: "Paket Umrah Akbar 9 Hari",
+        slug: "paket-umrah-akbar-9-hari",
+        category: "regular",
+        durationDays: 9,
+        description: "Paket Umrah Al-Amin Akbar regular 9 hari hemat dan lengkap.",
+        airline: "Saudi Arabian Airlines",
+        flightRoute: "CGK-JED-CGK",
+        departureCity: "Jakarta",
+        status: "published",
+        hasBeenPublished: true,
+      })
+      .onConflictDoNothing();
+
+    // Seed mock departure
+    await db
+      .insert(schema.departures)
+      .values({
+        id: ulid(),
+        tenantId: tenant.id,
+        packageId,
+        departureType: "fixed_date",
+        departureDate: new Date("2026-08-15T00:00:00Z"),
+        returnDate: new Date("2026-08-24T00:00:00Z"),
+        seatTotal: 45,
+        seatBooked: 0,
+        seatHeld: 0,
+        currency: "IDR",
+        priceQuad: 35000000,
+        dpAmount: 5000000,
+        paymentSchedule: JSON.stringify([
+          { name: "DP", amount: 5000000, daysBeforeDeparture: 60 }
+        ]),
+        status: "open",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .onConflictDoNothing();
+  }
+
   console.log(
     "Seed complete: default tenant + admin@cometkit.dev (admin), staff@cometkit.dev (staff) / password123",
   );

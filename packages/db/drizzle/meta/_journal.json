@@ -71,6 +71,13 @@
       "when": 1783254329757,
       "tag": "0009_big_shadowcat",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1783255712681,
+      "tag": "0010_smart_chronomancer",
+      "breakpoints": true
     }
   ]
 }
