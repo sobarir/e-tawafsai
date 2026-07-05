@@ -2,12 +2,16 @@
 comet_change: provider-management
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-07-05-provider-management
+status: final
 ---
 
 # Technical Design: provider-management
 
 This document specifies the technical design for implementing the Licensed Operator (Provider) management capability. It details the database schema, DTO boundaries, local-disk storage uploads, and UI flow components.
 
+archived-with: 2026-07-05-provider-management
+status: final
 ---
 
 ## 1. Database Schema
@@ -42,6 +46,8 @@ export const providers = pgTable("providers", {
 });
 ```
 
+archived-with: 2026-07-05-provider-management
+status: final
 ---
 
 ## 2. API Design & Data Scoping
@@ -69,6 +75,8 @@ export class ProvidersController {
 }
 ```
 
+archived-with: 2026-07-05-provider-management
+status: final
 ---
 
 ## 3. Storage Seam & Logo Uploads
@@ -84,6 +92,8 @@ export abstract class StorageService {
 
 In development, `LocalStorageService` writes files to `apps/api/public/uploads` and NestJS is configured with `fastify-static` serving to resolve them via local URLs.
 
+archived-with: 2026-07-05-provider-management
+status: final
 ---
 
 ## 4. Deactivation Cascade Stub
@@ -93,6 +103,8 @@ To avoid circular dependencies between the `providers` and future `package-catal
 - Register a mock implementation returning zero affected packages.
 - The future package-catalog module will override this registration and perform the actual SQL unpublish cascades.
 
+archived-with: 2026-07-05-provider-management
+status: final
 ---
 
 ## 5. UI Integration
