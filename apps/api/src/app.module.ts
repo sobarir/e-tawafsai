@@ -10,6 +10,7 @@ import { TenancyModule } from "./tenancy/tenancy.module";
 import { AuthModule } from "./auth/auth.module";
 import { UsersModule } from "./users/users.module";
 import { HealthModule } from "./health/health.module";
+import { SettingsModule } from "./settings/settings.module";
 
 @Module({
   imports: [
@@ -39,7 +40,9 @@ import { HealthModule } from "./health/health.module";
     UsersModule,
     AuthModule,
     HealthModule,
+    SettingsModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: AllExceptionsFilter }],
 })
 export class AppModule {}
+
