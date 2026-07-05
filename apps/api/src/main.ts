@@ -6,6 +6,7 @@ import {
 import { ConfigService } from "@nestjs/config";
 import { Logger } from "nestjs-pino";
 import { ulid } from "ulid";
+import fastifyCookie from "@fastify/cookie";
 import { AppModule } from "./app.module";
 
 async function bootstrap() {
@@ -15,6 +16,9 @@ async function bootstrap() {
     new FastifyAdapter({ genReqId: () => ulid() }),
     { bufferLogs: true },
   );
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await app.register(fastifyCookie as any);
 
   app.useLogger(app.get(Logger));
 
