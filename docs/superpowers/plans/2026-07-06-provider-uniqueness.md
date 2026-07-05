@@ -6,7 +6,7 @@ base-ref: f62d9901db75beb238507c9b42aa838c47fd7ecf
 
 # Provider Uniqueness Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Enforce per-tenant provider uniqueness (normalized name + PPIU) with a 409 on conflicting create/update, and merge existing duplicates (repointing packages) via a one-time script.
 
@@ -40,7 +40,7 @@ base-ref: f62d9901db75beb238507c9b42aa838c47fd7ecf
   - `normalizeProviderName(name: string): string` — `name.trim().toLowerCase()`
   - `normalizePpiu(ppiu: string | null | undefined): string | null` — trims; empty/whitespace or nullish → `null`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // packages/shared/src/provider-dedup.spec.ts
@@ -69,12 +69,12 @@ describe("normalizePpiu", () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH" && cd packages/shared && bunx vitest run src/provider-dedup.spec.ts`
 Expected: FAIL — cannot find module `./provider-dedup`.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 ```ts
 // packages/shared/src/provider-dedup.ts
@@ -89,19 +89,19 @@ export function normalizePpiu(ppiu: string | null | undefined): string | null {
 }
 ```
 
-- [ ] **Step 4: Export from the shared barrel**
+- [x] **Step 4: Export from the shared barrel**
 
 ```ts
 // packages/shared/src/index.ts — add after the ./providers line
 export * from "./provider-dedup";
 ```
 
-- [ ] **Step 5: Run test to verify it passes**
+- [x] **Step 5: Run test to verify it passes**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH" && cd packages/shared && bunx vitest run src/provider-dedup.spec.ts`
 Expected: PASS (6 assertions).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add packages/shared/src/provider-dedup.ts packages/shared/src/provider-dedup.spec.ts packages/shared/src/index.ts
@@ -123,7 +123,7 @@ git commit -m "feat(provider-uniqueness): add shared provider normalization help
   - `interface ProviderMergePlan { survivorId: string; loserIds: string[] }`
   - `planProviderMerges(rows: ProviderMergeInput[]): ProviderMergePlan[]` — groups ONE tenant's rows into clusters by transitive closure of shared normalized name OR shared non-empty normalized PPIU; returns one plan per cluster that has ≥1 loser. Survivor = `isActive` first, then lowest `id` (ULID lexicographic). `loserIds` sorted ascending. Plans sorted by `survivorId`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // append to packages/shared/src/provider-dedup.spec.ts
@@ -171,12 +171,12 @@ describe("planProviderMerges", () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH" && cd packages/shared && bunx vitest run src/provider-dedup.spec.ts`
 Expected: FAIL — `planProviderMerges` is not exported.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 ```ts
 // append to packages/shared/src/provider-dedup.ts
@@ -249,12 +249,12 @@ export function planProviderMerges(rows: ProviderMergeInput[]): ProviderMergePla
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH" && cd packages/shared && bunx vitest run src/provider-dedup.spec.ts`
 Expected: PASS (all describe blocks).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add packages/shared/src/provider-dedup.ts packages/shared/src/provider-dedup.spec.ts
@@ -273,7 +273,7 @@ git commit -m "feat(provider-uniqueness): add union-find provider merge planner"
 - Consumes: `normalizeProviderName`, `normalizePpiu` from `@cometkit/shared`; `TenantScopedDb.select(table, extraWhere)` (auto tenant-scoped).
 - Produces: `create()` throws `ConflictException` on a name or PPIU collision within the tenant; stores normalized (blank→null) `ppiuLicenseNo`; a DB unique-violation (`code 23505`) is mapped to the same `ConflictException`.
 
-- [ ] **Step 1: Write the failing test** (append a new `it` to the existing integration describe block; reuse its `service`, `createdIds`, `suffix`)
+- [x] **Step 1: Write the failing test** (append a new `it` to the existing integration describe block; reuse its `service`, `createdIds`, `suffix`)
 
 ```ts
 // add these imports at the top of providers.service.int.spec.ts
@@ -313,13 +313,13 @@ it("rejects a create whose normalized PPIU duplicates, and stores blank PPIU as 
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH" && cd apps/api && bun run test:int -- providers.service.int`
 Expected: FAIL — second create succeeds (no conflict thrown) / blank stored as `"   "` not null.
 (If Postgres/seed not available, note it and run after Task 7's migrate+seed.)
 
-- [ ] **Step 3: Write minimal implementation** — replace the `create` method and add a private helper. Add imports.
+- [x] **Step 3: Write minimal implementation** — replace the `create` method and add a private helper. Add imports.
 
 ```ts
 // top of providers.service.ts — extend the @nestjs/common import
@@ -395,12 +395,12 @@ async create(input: CreateProviderInput): Promise<Provider> {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH" && cd apps/api && bun run test:int -- providers.service.int`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/api/src/providers/providers.service.ts apps/api/src/providers/providers.service.int.spec.ts
@@ -419,7 +419,7 @@ git commit -m "feat(provider-uniqueness): 409 conflict pre-check on provider cre
 - Consumes: `assertNoConflict`, `isUniqueViolation`, `normalizePpiu` (Task 3).
 - Produces: `update()` normalizes PPIU, rejects a change that collides with another provider (excluding self) via `ConflictException`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // add inside describe("ProvidersService (integration)", ...)
@@ -442,12 +442,12 @@ it("rejects an update whose normalized name collides with another provider", asy
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH" && cd apps/api && bun run test:int -- providers.service.int`
 Expected: FAIL — update does not pre-check; collision update succeeds.
 
-- [ ] **Step 3: Write minimal implementation** — replace `update()`
+- [x] **Step 3: Write minimal implementation** — replace `update()`
 
 ```ts
 async update(id: string, input: UpdateProviderInput): Promise<Provider> {
@@ -471,12 +471,12 @@ async update(id: string, input: UpdateProviderInput): Promise<Provider> {
 
 Note: `assertNoConflict` only checks PPIU when the caller passed a non-null normalized value, so an update that omits `ppiuLicenseNo` is not blocked by an unrelated provider's PPIU.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH" && cd apps/api && bun run test:int -- providers.service.int`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/api/src/providers/providers.service.ts apps/api/src/providers/providers.service.int.spec.ts
@@ -500,7 +500,7 @@ git commit -m "feat(provider-uniqueness): 409 conflict pre-check on provider upd
 
   Because the unique indexes forbid inserting real duplicate rows, the integration test exercises `applyProviderMerges` with DISTINCT rows plus a hand-built plan (mechanics), and the blank-PPIU normalization separately. Cluster logic itself is unit-covered in Task 2.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // apps/api/src/providers/dedup-providers.int.spec.ts
@@ -576,12 +576,12 @@ describe("dedupeProviders (integration)", () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH" && cd apps/api && bun run test:int -- dedup-providers.int`
 Expected: FAIL — `applyProviderMerges`/`dedupeProviders` not exported from `@cometkit/db`.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
 
 ```ts
 // packages/db/src/scripts/dedup-providers.ts
@@ -665,7 +665,7 @@ if (import.meta.main) {
 }
 ```
 
-- [ ] **Step 4: Export from the db barrel and add a package script**
+- [x] **Step 4: Export from the db barrel and add a package script**
 
 ```ts
 // packages/db/src/index.ts — add near the other exports
@@ -677,12 +677,12 @@ export * from "./scripts/dedup-providers";
 "db:dedup-providers": "bun src/scripts/dedup-providers.ts",
 ```
 
-- [ ] **Step 5: Run test to verify it passes**
+- [x] **Step 5: Run test to verify it passes**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH" && cd apps/api && bun run test:int -- dedup-providers.int`
 Expected: PASS (both cases).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add packages/db/src/scripts/dedup-providers.ts packages/db/src/index.ts packages/db/package.json apps/api/src/providers/dedup-providers.int.spec.ts
@@ -702,7 +702,7 @@ git commit -m "feat(provider-uniqueness): one-time dedup-providers merge script"
 - Consumes: existing `providers` table.
 - Produces: `providers_tenant_name_unique` on `(tenant_id, lower(trim(name)))`; `providers_tenant_ppiu_unique` on `(tenant_id, trim(ppiu_license_no)) WHERE ppiu_license_no IS NOT NULL`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // apps/api/src/providers/providers-unique-index.int.spec.ts
@@ -752,12 +752,12 @@ describe("provider unique indexes (integration)", () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH" && cd apps/api && bun run test:int -- providers-unique-index.int`
 Expected: FAIL — duplicate name insert succeeds (no index yet).
 
-- [ ] **Step 3: Add indexes to the schema**
+- [x] **Step 3: Add indexes to the schema**
 
 ```ts
 // packages/db/src/schema/providers.ts
@@ -779,7 +779,7 @@ export const providers = pgTable("providers", {
 ]);
 ```
 
-- [ ] **Step 4: Generate and hand-verify the migration**
+- [x] **Step 4: Generate and hand-verify the migration**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH" && cd packages/db && bunx drizzle-kit generate`
 Then open the new `packages/db/drizzle/00NN_*.sql` and confirm it contains (edit by hand to match if drizzle emits column-only indexes):
@@ -789,7 +789,7 @@ CREATE UNIQUE INDEX "providers_tenant_name_unique" ON "providers" ("tenant_id", 
 CREATE UNIQUE INDEX "providers_tenant_ppiu_unique" ON "providers" ("tenant_id", btrim("ppiu_license_no")) WHERE "ppiu_license_no" IS NOT NULL;
 ```
 
-- [ ] **Step 5: Apply and run the test**
+- [x] **Step 5: Apply and run the test**
 
 Run:
 ```
@@ -800,7 +800,7 @@ cd apps/api && bun run test:int -- providers-unique-index.int
 Expected: migrate applies clean; test PASSES.
 If migrate fails because the dev DB already holds duplicates, run `bun packages/db/src/scripts/dedup-providers.ts` first (the documented runbook order), then re-run migrate.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add packages/db/src/schema/providers.ts packages/db/drizzle/ apps/api/src/providers/providers-unique-index.int.spec.ts
@@ -813,7 +813,7 @@ git commit -m "feat(provider-uniqueness): per-tenant unique indexes on name and 
 
 **Files:** none (verification only).
 
-- [ ] **Step 1: Dedup then migrate on a real DB**
+- [x] **Step 1: Dedup then migrate on a real DB**
 
 Run:
 ```
@@ -825,17 +825,17 @@ bun run db:seed                                   # ensure default tenant/accoun
 ```
 Expected: dedup logs (or a no-op), migrate applies, seed idempotent.
 
-- [ ] **Step 2: Run the quality gate**
+- [x] **Step 2: Run the quality gate**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH" && cd /c/Sobari/Ai/tawaf-sai/e-tawafsai && bun run verify`
 Expected: typecheck + lint + test all PASS.
 
-- [ ] **Step 3: Run provider integration specs**
+- [x] **Step 3: Run provider integration specs**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH" && cd apps/api && bun run test:int -- providers`
 Expected: service, dedup, and unique-index int specs PASS.
 
-- [ ] **Step 4: Commit any lockfile/config touch-ups (if generated)**
+- [x] **Step 4: Commit any lockfile/config touch-ups (if generated)**
 
 ```bash
 git add -A && git commit -m "chore(provider-uniqueness): verification pass" || echo "nothing to commit"
