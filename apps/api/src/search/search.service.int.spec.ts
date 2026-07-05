@@ -161,4 +161,76 @@ describe("SearchService (integration)", () => {
     const res = await service.search(makeParams({ occupancy: "triple", maxPrice: 30_000_000, q: `OccFallback ${suffix}` }));
     expect(res.data.map((r) => r.id)).toContain(hit);
   });
+
+  it("excludes when the fallback priceQuad still exceeds the budget", async () => {
+    // triple null -> compares priceQuad (31M) which is over the 30M budget.
+    const miss = await seedPackage({ title: `OccTooHigh ${suffix}`, priceQuad: 31_000_000, priceTriple: null, depDate: new Date(Date.UTC(2026, 8, 12)) });
+    const res = await service.search(makeParams({ occupancy: "triple", maxPrice: 30_000_000, q: `OccTooHigh ${suffix}` }));
+    expect(res.data.map((r) => r.id)).not.toContain(miss);
+  });
+
+  it("priceFrom is the cheapest matching departure while date/prices come from the earliest", async () => {
+    const id = ulid();
+    pkgIds.push(id);
+    await db.insert(packages).values({
+      id, tenantId, providerId, productType: "umrah", title: `PriceFrom ${suffix}`,
+      slug: `pricefrom-${suffix}`, category: "regular", durationDays: 9, description: "paket",
+      airline: "Saudia", departureCity: "Jakarta", directOnly: false, status: "published", hasBeenPublished: true,
+    });
+    const mkDep = (depDate: Date, priceQuad: number) => ({
+      id: ulid(), tenantId, packageId: id, departureType: "fixed_date" as const,
+      departureDate: depDate, returnDate: new Date(depDate.getTime() + 9 * 86400000),
+      seatTotal: 45, seatBooked: 10, seatHeld: 0, currency: "IDR" as const,
+      priceQuad, priceTriple: priceQuad + 2_000_000, priceDouble: priceQuad + 5_000_000, dpAmount: 5_000_000,
+      paymentSchedule: JSON.stringify([{ name: "DP", amount: 5_000_000, daysBeforeDeparture: 60 }]),
+      status: "open" as const,
+    });
+    // Earliest departure is the pricier one; a later departure is cheaper.
+    await db.insert(departures).values(mkDep(new Date(Date.UTC(2026, 8, 10)), 30_000_000));
+    await db.insert(departures).values(mkDep(new Date(Date.UTC(2026, 8, 20)), 26_000_000));
+    const res = await service.search(makeParams({ q: `PriceFrom ${suffix}` }));
+    const row = res.data.find((r) => r.id === id)!;
+    // priceByOccupancy.quad = the EARLIEST departure's quad (30M, not the later 26M),
+    // proving the earliest row was selected; priceFrom = MIN across matching (26M).
+    // (Exact ISO not asserted: departureDate is a tz-naive `timestamp` column.)
+    expect(row.priceByOccupancy.quad).toBe(30_000_000);
+    expect(row.priceFrom).toBe(26_000_000);
+    expect(new Date(row.nextDepartureDate).getTime()).toBeLessThan(Date.UTC(2026, 8, 20)); // before the later departure
+  });
+
+  it("paginates without duplicating or skipping packages that share a departure date", async () => {
+    const ids: string[] = [];
+    for (let i = 0; i < 3; i++) {
+      ids.push(await seedPackage({ title: `Page ${suffix} ${i}`, depDate: new Date(Date.UTC(2026, 8, 12)) }));
+    }
+    const p1 = await service.search(makeParams({ q: `Page ${suffix}`, page: 1, pageSize: 2 }));
+    const p2 = await service.search(makeParams({ q: `Page ${suffix}`, page: 2, pageSize: 2 }));
+    const seen = [...p1.data.map((r) => r.id), ...p2.data.map((r) => r.id)];
+    expect(p1.meta.total).toBe(3);
+    expect(new Set(seen).size).toBe(seen.length); // no duplicates across pages
+    expect(new Set(seen)).toEqual(new Set(ids)); // full, exact coverage
+  });
+
+  it("filters by hotel city with min stars and max distance", async () => {
+    const near5 = await seedPackage({ title: `HotelNear ${suffix}`, hotelName: `Near Hotel ${suffix}`, depDate: new Date(Date.UTC(2026, 8, 12)) });
+    // near5's seeded hotel is Makkah, 5 stars, 150 m (see seedPackage).
+    const far3Id = ulid();
+    pkgIds.push(far3Id);
+    await db.insert(packages).values({
+      id: far3Id, tenantId, providerId, productType: "umrah", title: `HotelFar ${suffix}`,
+      slug: `hotelfar-${suffix}`, category: "regular", durationDays: 9, description: "paket",
+      airline: "Saudia", departureCity: "Jakarta", directOnly: false, status: "published", hasBeenPublished: true,
+    });
+    await db.insert(packageHotels).values({ id: ulid(), packageId: far3Id, cityName: "Makkah", name: `Far Hotel ${suffix}`, stars: 3, distanceM: 900, isPelataran: false });
+    await db.insert(departures).values({
+      id: ulid(), tenantId, packageId: far3Id, departureType: "fixed_date",
+      departureDate: new Date(Date.UTC(2026, 8, 12)), returnDate: new Date(Date.UTC(2026, 8, 21)),
+      seatTotal: 45, seatBooked: 10, seatHeld: 0, currency: "IDR", priceQuad: 28_000_000, priceTriple: 30_000_000, priceDouble: 33_000_000,
+      dpAmount: 5_000_000, paymentSchedule: JSON.stringify([{ name: "DP", amount: 5_000_000, daysBeforeDeparture: 60 }]), status: "open",
+    });
+    const res = await service.search(makeParams({ hotelCity: "Makkah", minStars: 4, maxDistanceM: 300 }));
+    const ids = res.data.map((r) => r.id);
+    expect(ids).toContain(near5);
+    expect(ids).not.toContain(far3Id);
+  });
 });

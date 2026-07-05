@@ -58,23 +58,28 @@ export class SearchService {
 
     const occExpr = sql.raw(OCC_COL[params.occupancy]);
 
-    // Correlated LATERAL: earliest matching departure. The INNER JOIN also
-    // enforces the "at least one matching departure" semantics.
+    // Earliest matching departure carries date/seats/occupancy prices; price_from
+    // is the MIN price_quad across ALL matching departures (design §3.2 "starting
+    // from"), computed with a window so a cheaper later departure isn't over-quoted.
+    // The INNER JOIN also enforces the "at least one matching departure" semantics.
     const depLateral = sql`
       join lateral (
-        select d.departure_date,
-               d.price_quad as price_from,
-               (d.seat_total - d.seat_booked - d.seat_held) as seats_left,
-               d.price_quad, d.price_triple, d.price_double
-        from departures d
-        where d.package_id = p.id
-          and d.tenant_id = p.tenant_id
-          and d.status in ('open','almost_full')
-          and (${dateFrom}::timestamptz is null or d.departure_date >= ${dateFrom}::timestamptz)
-          and (${dateTo}::timestamptz   is null or d.departure_date <= ${dateTo}::timestamptz)
-          and (${params.seatsAvailableOnly} = false or (d.seat_total - d.seat_booked - d.seat_held) > 0)
-          and (${params.maxPrice ?? null}::int is null or ${occExpr} <= ${params.maxPrice ?? null}::int)
-        order by d.departure_date asc
+        select departure_date, price_from, seats_left, price_quad, price_triple, price_double
+        from (
+          select d.departure_date,
+                 (d.seat_total - d.seat_booked - d.seat_held) as seats_left,
+                 d.price_quad, d.price_triple, d.price_double,
+                 min(d.price_quad) over () as price_from
+          from departures d
+          where d.package_id = p.id
+            and d.tenant_id = p.tenant_id
+            and d.status in ('open','almost_full')
+            and (${dateFrom}::timestamptz is null or d.departure_date >= ${dateFrom}::timestamptz)
+            and (${dateTo}::timestamptz   is null or d.departure_date <= ${dateTo}::timestamptz)
+            and (${params.seatsAvailableOnly} = false or (d.seat_total - d.seat_booked - d.seat_held) > 0)
+            and (${params.maxPrice ?? null}::int is null or ${occExpr} <= ${params.maxPrice ?? null}::int)
+        ) m
+        order by m.departure_date asc
         limit 1
       ) nd on true`;
 
@@ -120,7 +125,7 @@ export class SearchService {
       ${depLateral}
       ${hotelLateral}
       where ${filters}
-      order by nd.departure_date asc
+      order by nd.departure_date asc, p.id asc
       limit ${params.pageSize} offset ${offset}`);
 
     const countResult = await this.db.execute(sql`
