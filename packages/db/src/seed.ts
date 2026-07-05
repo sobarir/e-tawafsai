@@ -57,6 +57,68 @@ async function main() {
       });
   }
 
+  const starterTemplates = [
+    {
+      id: ulid(),
+      tenantId: tenant.id,
+      key: "greeting",
+      label: "Greeting",
+      body: "Halo {customerName}, selamat datang! Saya {agentName} akan membantu Anda hari ini.",
+    },
+    {
+      id: ulid(),
+      tenantId: tenant.id,
+      key: "price_quote",
+      label: "Price Quote",
+      body: "Halo {customerName}, berikut penawaran harga untuk paket {packageName}: Rp {packagePrice}.",
+    },
+    {
+      id: ulid(),
+      tenantId: tenant.id,
+      key: "dp_reminder",
+      label: "Down Payment Reminder",
+      body: "Halo {customerName}, mohon segera melakukan pembayaran Down Payment untuk paket {packageName} sebesar Rp {dpAmount}.",
+    },
+    {
+      id: ulid(),
+      tenantId: tenant.id,
+      key: "h60_reminder",
+      label: "H-60 Departure Reminder",
+      body: "Halo {customerName}, mengingatkan keberangkatan paket {packageName} Anda kurang 60 hari lagi pada tanggal {departureDate}.",
+    },
+    {
+      id: ulid(),
+      tenantId: tenant.id,
+      key: "h30_reminder",
+      label: "H-30 Settlement Reminder",
+      body: "Halo {customerName}, sisa pembayaran Anda untuk paket {packageName} sebesar Rp {remainingAmount} jatuh tempo pada {dueDate}.",
+    },
+    {
+      id: ulid(),
+      tenantId: tenant.id,
+      key: "doc_checklist",
+      label: "Document Checklist",
+      body: "Halo {customerName}, mohon melengkapi berkas berikut: {checklistItems}.",
+    },
+    {
+      id: ulid(),
+      tenantId: tenant.id,
+      key: "testimonial_ask",
+      label: "Testimonial Request",
+      body: "Halo {customerName}, bagaimana pengalaman Anda mengikuti paket {packageName}? Kirim ulasan Anda ya!",
+    },
+  ];
+
+  for (const template of starterTemplates) {
+    await db
+      .insert(schema.messageTemplates)
+      .values(template)
+      .onConflictDoUpdate({
+        target: [schema.messageTemplates.tenantId, schema.messageTemplates.key],
+        set: { label: template.label, body: template.body },
+      });
+  }
+
   console.log(
     "Seed complete: default tenant + admin@cometkit.dev (admin), staff@cometkit.dev (staff) / password123",
   );
