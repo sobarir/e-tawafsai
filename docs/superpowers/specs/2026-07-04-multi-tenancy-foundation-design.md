@@ -2,6 +2,8 @@
 comet_change: multi-tenancy-foundation
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-07-05-multi-tenancy-foundation
+status: final
 ---
 
 # Multi-Tenancy Foundation — Technical Design

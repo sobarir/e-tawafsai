@@ -17,6 +17,6 @@ verification_report: docs/superpowers/reports/2026-07-05-multi-tenancy-foundatio
 branch_status: handled
 created_at: 2026-07-04
 verified_at: 2026-07-05
-archived: false
+archived: true
 handoff_context: openspec/changes/multi-tenancy-foundation/.comet/handoff/design-context.json
 handoff_hash: 5957b7464e00f4078fe8051c2544c52c0be0844a048609573ec9ed9720775dc3

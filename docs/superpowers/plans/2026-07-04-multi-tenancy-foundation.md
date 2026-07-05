@@ -2,6 +2,7 @@
 change: multi-tenancy-foundation
 design-doc: docs/superpowers/specs/2026-07-04-multi-tenancy-foundation-design.md
 base-ref: 2ac747b1e6f3f1cbac212ba2c6c6bb7a8fc138ad
+archived-with: 2026-07-05-multi-tenancy-foundation
 ---
 
 # Multi-Tenancy Foundation Implementation Plan
@@ -28,6 +29,7 @@ base-ref: 2ac747b1e6f3f1cbac212ba2c6c6bb7a8fc138ad
 - No global unique constraints on tenant-owned tables — uniqueness is composite with `tenantId`.
 - The default tenant is resolved by its well-known slug `"default"`, never by a hardcoded id in application code.
 
+archived-with: 2026-07-05-multi-tenancy-foundation
 ---
 
 ## File Structure
@@ -63,6 +65,7 @@ base-ref: 2ac747b1e6f3f1cbac212ba2c6c6bb7a8fc138ad
 - `apps/api/src/users/users.service.int.spec.ts` — establish tenant context.
 - `apps/web/src/lib/api.ts` — forward `X-Forwarded-Host`.
 
+archived-with: 2026-07-05-multi-tenancy-foundation
 ---
 
 ## Task 1: Shared tenant contracts
@@ -213,6 +216,7 @@ git add packages/shared/src/tenants.ts packages/shared/src/tenants.spec.ts packa
 git commit -m "feat(shared): tenant enums, contracts, and tenantInputSchema seams"
 ```
 
+archived-with: 2026-07-05-multi-tenancy-foundation
 ---
 
 ## Task 2: `tenants` table + `tenantOwned()` helper
@@ -294,6 +298,7 @@ git add packages/db/src/schema/tenants.ts packages/db/src/schema/index.ts
 git commit -m "feat(db): tenants table and tenantOwned() column helper"
 ```
 
+archived-with: 2026-07-05-multi-tenancy-foundation
 ---
 
 ## Task 3: `users` becomes tenant-owned
@@ -348,6 +353,7 @@ git add packages/db/src/schema/users.ts
 git commit -m "feat(db): users is tenant-owned with per-tenant email uniqueness and platform-owner seam"
 ```
 
+archived-with: 2026-07-05-multi-tenancy-foundation
 ---
 
 ## Task 4: Migration + seed
@@ -493,6 +499,7 @@ git add packages/db/drizzle packages/db/src/seed.ts
 git commit -m "feat(db): migration backfills default tenant and per-tenant email unique; seed attaches users"
 ```
 
+archived-with: 2026-07-05-multi-tenancy-foundation
 ---
 
 ## Task 5: CLS tenant context
@@ -564,6 +571,7 @@ git add apps/api/package.json apps/api/src/tenancy/tenant-context.ts apps/api/sr
 git commit -m "feat(api): request-scoped tenant context via nestjs-cls"
 ```
 
+archived-with: 2026-07-05-multi-tenancy-foundation
 ---
 
 ## Task 6: `TenantScopedDb`
@@ -701,6 +709,7 @@ git add apps/api/src/tenancy/tenant-scoped-db.ts apps/api/src/tenancy/tenant-sco
 git commit -m "feat(api): TenantScopedDb - sole tenant-owned accessor with loud failure"
 ```
 
+archived-with: 2026-07-05-multi-tenancy-foundation
 ---
 
 ## Task 7: Tenant registry service
@@ -770,6 +779,7 @@ git add apps/api/src/tenancy/tenant-registry.service.ts
 git commit -m "feat(api): tenant registry service (unscoped lookups by slug/id)"
 ```
 
+archived-with: 2026-07-05-multi-tenancy-foundation
 ---
 
 ## Task 8: Public host → tenant resolution
@@ -887,6 +897,7 @@ git add apps/api/src/tenancy/tenant-resolution.middleware.ts apps/api/src/tenanc
 git commit -m "feat(api): public host -> tenant resolution middleware"
 ```
 
+archived-with: 2026-07-05-multi-tenancy-foundation
 ---
 
 ## Task 9: Wire the tenancy module
@@ -951,6 +962,7 @@ git add apps/api/src/tenancy/tenancy.module.ts apps/api/src/app.module.ts
 git commit -m "feat(api): TenancyModule wires scoped db, registry, and host resolution"
 ```
 
+archived-with: 2026-07-05-multi-tenancy-foundation
 ---
 
 ## Task 10: Auth carries the tenant
@@ -1058,6 +1070,7 @@ git add apps/api/src/auth/jwt.strategy.ts apps/api/src/auth/auth.service.ts apps
 git commit -m "feat(api): JWT and auth responses carry tenantId; validate sets tenant context"
 ```
 
+archived-with: 2026-07-05-multi-tenancy-foundation
 ---
 
 ## Task 11: Refactor UsersService onto TenantScopedDb
@@ -1171,6 +1184,7 @@ git add apps/api/src/users/users.service.ts apps/api/src/users/users.service.int
 git commit -m "refactor(api): UsersService goes through TenantScopedDb"
 ```
 
+archived-with: 2026-07-05-multi-tenancy-foundation
 ---
 
 ## Task 12: Isolation integration tests (the C15 acceptance)
@@ -1271,6 +1285,7 @@ git add apps/api/src/tenancy/tenancy.int.spec.ts
 git commit -m "test(api): two-tenant isolation, composite email, loud failure, default-tenant seed"
 ```
 
+archived-with: 2026-07-05-multi-tenancy-foundation
 ---
 
 ## Task 13: Web subdomain seam
@@ -1348,6 +1363,7 @@ git add apps/web/middleware.ts apps/web/src/lib/tenant.ts apps/web/src/lib/api.t
 git commit -m "feat(web): subdomain tenant seam and host forwarding (admin UX unchanged)"
 ```
 
+archived-with: 2026-07-05-multi-tenancy-foundation
 ---
 
 ## Task 14: Stale-tenant token integration check + full gate
@@ -1396,6 +1412,7 @@ git add apps/api/src/tenancy/tenancy.int.spec.ts
 git commit -m "test(api): stale-tenant token is rejected on fresh scoped re-read"
 ```
 
+archived-with: 2026-07-05-multi-tenancy-foundation
 ---
 
 ## Self-Review Notes
