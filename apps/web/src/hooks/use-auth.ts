@@ -8,13 +8,13 @@ import type {
   LoginInput,
 } from "@cometkit/shared";
 import { api } from "@/lib/api";
-import { clearToken, getToken, setToken } from "@/lib/auth-storage";
+import { clearSessionHint, hasSession, setSessionHint } from "@/lib/auth-storage";
 
 export function useMe() {
   return useQuery<AuthUser>({
     queryKey: ["me"],
     queryFn: () => api.get("auth/me").json<AuthUser>(),
-    enabled: typeof window !== "undefined" && getToken() !== null,
+    enabled: typeof window !== "undefined" && hasSession(),
     retry: false,
     staleTime: 60_000,
   });
@@ -26,7 +26,7 @@ export function useLogin() {
     mutationFn: (input: LoginInput) =>
       api.post("auth/login", { json: input }).json<AuthResponse>(),
     onSuccess: (data) => {
-      setToken(data.tokens.accessToken);
+      setSessionHint();
       queryClient.setQueryData(["me"], data.user);
     },
   });
@@ -35,8 +35,13 @@ export function useLogin() {
 export function useLogout() {
   const queryClient = useQueryClient();
   const router = useRouter();
-  return () => {
-    clearToken();
+  return async () => {
+    try {
+      await api.post("auth/logout");
+    } catch {
+      // ignore — clear client state regardless
+    }
+    clearSessionHint();
     queryClient.removeQueries({ queryKey: ["me"] });
     router.push("/login");
   };

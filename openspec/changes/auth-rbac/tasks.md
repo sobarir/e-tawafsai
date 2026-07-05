@@ -16,12 +16,12 @@
 
 ## 3. Web UI
 
-- [ ] 3.1 User-management screens (list, create, edit name/role/WA, deactivate/reactivate) under dashboard, admin-only navigation, mobile-usable at 380px
-- [ ] 3.2 Move token to cookie (`auth-storage` + ky `credentials: "include"`, drop manual Authorization header); `dashboard/layout.tsx` with role-aware nav (no Users entry for staff)
-- [ ] 3.3 `middleware.ts` gates `/dashboard/*` server-side via the session cookie; unauthenticated access redirects to `/login`; logout clears session client-side
+- [x] 3.1 User-management screens (list, create, edit name/role/WA, deactivate/reactivate) under dashboard, admin-only navigation, mobile-usable at 380px
+- [x] 3.2 Move token to cookie (`auth-storage` + ky `credentials: "include"`, drop manual Authorization header); `dashboard/layout.tsx` with role-aware nav (no Users entry for staff)
+- [x] 3.3 `middleware.ts` gates `/dashboard/*` server-side via the session cookie; unauthenticated access redirects to `/login`; logout clears session client-side
 
 ## 4. Verification
 
-- [ ] 4.1 Unit tests: `canDeactivateUser`, roles guard (fresh role, staff blocked), login rejects inactive, jwt.strategy rejects inactive
-- [ ] 4.2 Integration test: staff receives 403 on users endpoints; admin CRUD + deactivate/reactivate round-trip tenant-scoped; deactivated user login fails; cookie login → authed request succeeds
-- [ ] 4.3 `bun run verify` and `bun run test:int` pass
+- [x] 4.1 Unit tests: `canDeactivateUser`, roles guard (fresh role, staff blocked), login rejects inactive, jwt.strategy rejects inactive
+- [x] 4.2 Integration test: staff receives 403 on users endpoints; admin CRUD + deactivate/reactivate round-trip tenant-scoped; deactivated user login fails; cookie login → authed request succeeds
+- [x] 4.3 `bun run verify` and `bun run test:int` pass

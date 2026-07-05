@@ -78,9 +78,9 @@ export default function LoginPage() {
             </Button>
           </form>
           <p className="mt-4 text-sm text-muted-foreground">
-            No account?{" "}
+            Need access?{" "}
             <Link href="/register" className="font-medium text-primary hover:underline">
-              Create account
+              Request access
             </Link>
           </p>
         </CardContent>

@@ -1,21 +1,14 @@
 import ky from "ky";
-import { getToken } from "./auth-storage";
 
 /**
  * API client - single ky instance for the NestJS API.
- * Bearer token is attached from localStorage when present.
- * Reference pattern: swap to httpOnly cookies if your threat model needs it.
+ * Uses httpOnly cookie session context via credentials: "include".
  */
 export const api = ky.create({
   prefix: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001",
+  credentials: "include",
   hooks: {
     beforeRequest: [
-      ({ request }) => {
-        const token = getToken();
-        if (token) {
-          request.headers.set("Authorization", `Bearer ${token}`);
-        }
-      },
       ({ request }) => {
         if (typeof window !== "undefined") {
           request.headers.set("X-Forwarded-Host", window.location.host);

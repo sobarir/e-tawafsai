@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { HealthBadge } from "@/components/health-badge";
 import { useLogout, useMe } from "@/hooks/use-auth";
-import { getToken } from "@/lib/auth-storage";
+import { hasSession } from "@/lib/auth-storage";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -15,7 +15,7 @@ export default function DashboardPage() {
   const logout = useLogout();
 
   useEffect(() => {
-    if (getToken() === null || isError) {
+    if (!hasSession() || isError) {
       router.replace("/login");
     }
   }, [isError, router]);
