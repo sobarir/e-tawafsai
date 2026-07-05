@@ -22,6 +22,7 @@ import {
   type UpdateDepartureInput,
   type AuthUser,
   type DepartureDto,
+  type InventoryAdjustmentDto,
 } from "@cometkit/shared";
 import { DeparturesService } from "./departures.service";
 import * as z from "zod";
@@ -73,6 +74,12 @@ export class DeparturesController {
     @CurrentUser() user: AuthUser,
   ): Promise<DepartureDto> {
     return this.departuresService.adjustInventory(id, input, user.id);
+  }
+
+  @Get(":id/adjustments")
+  @Roles("admin")
+  async getAdjustments(@Param("id") id: string): Promise<InventoryAdjustmentDto[]> {
+    return this.departuresService.getAdjustments(id);
   }
 
   @Post(":id/hold")

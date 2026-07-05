@@ -13,6 +13,7 @@ import {
   type UpdateDepartureInput,
   type DepartureDto,
   type PaymentMilestone,
+  type InventoryAdjustmentDto,
 } from "@cometkit/shared";
 import { TenantScopedDb } from "../tenancy/tenant-scoped-db";
 import { DB } from "../database/database.module";
@@ -317,5 +318,27 @@ export class DeparturesService {
 
       return this.mapToDto(updated);
     });
+  }
+
+  async getAdjustments(departureId: string): Promise<InventoryAdjustmentDto[]> {
+    const list = await this.db
+      .select()
+      .from(inventoryAdjustments)
+      .where(
+        and(
+          eq(inventoryAdjustments.tenantId, this.tenantDb.tenantId),
+          eq(inventoryAdjustments.departureId, departureId)
+        )
+      );
+
+    return list.map((adj) => ({
+      id: adj.id,
+      tenantId: adj.tenantId,
+      departureId: adj.departureId,
+      delta: adj.delta,
+      reason: adj.reason,
+      actorId: adj.actorId,
+      createdAt: adj.createdAt.toISOString(),
+    }));
   }
 }

@@ -19,6 +19,12 @@ import {
   useTags,
   useCreateTag,
 } from "@/hooks/use-packages";
+import {
+  useDepartures,
+  useCreateDeparture,
+  useDeleteDeparture,
+  useAdjustDepartureSeats,
+} from "@/hooks/use-departures";
 import { useProviders } from "@/hooks/use-providers";
 import { api, readApiError } from "@/lib/api";
 
@@ -285,6 +291,15 @@ export default function PackageDetailPage() {
         </div>
       </header>
 
+      {pkg?.needsReview && (
+        <div role="alert" className="mb-6 rounded-md bg-amber-500/10 border border-amber-500/20 p-4 text-sm text-amber-600 dark:text-amber-400 font-medium flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="font-mono text-xs uppercase bg-amber-500/20 px-1.5 py-0.5 rounded text-[10px] tracking-wider">needs review</span>
+            <span>All departure slots for this package are closed (full, departed, or cancelled). Please review and add new schedules.</span>
+          </div>
+        </div>
+      )}
+
       {error && (
         <div role="alert" className="mb-6 rounded-md bg-destructive/10 p-3 text-sm text-destructive font-medium">
           {error}
@@ -546,6 +561,12 @@ export default function PackageDetailPage() {
               </div>
             )}
           </form>
+
+          {!isNew && (
+            <div className="mt-8">
+              <DeparturesSection packageId={id} isAdmin={isAdmin} />
+            </div>
+          )}
         </div>
 
         {!isNew && (
@@ -694,5 +715,375 @@ export default function PackageDetailPage() {
         )}
       </div>
     </main>
+  );
+}
+
+function DeparturesSection({ packageId, isAdmin }: { packageId: string; isAdmin: boolean }) {
+  const { data: departures = [], refetch } = useDepartures(packageId);
+  const createMutation = useCreateDeparture();
+  const deleteMutation = useDeleteDeparture();
+  const adjustMutation = useAdjustDepartureSeats();
+
+  // Create state
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [depDate, setDepDate] = useState("");
+  const [retDate, setRetDate] = useState("");
+  const [seatTotal, setSeatTotal] = useState(45);
+  const [priceQuad, setPriceQuad] = useState(35000000);
+  const [dpAmount, setDpAmount] = useState(5000000);
+  const [error, setError] = useState<string | null>(null);
+
+  // Adjust state
+  const [adjustingId, setAdjustingId] = useState<string | null>(null);
+  const [adjustDelta, setAdjustDelta] = useState(0);
+  const [adjustReason, setAdjustReason] = useState("");
+
+  // Audit Logs state
+  const [logsId, setLogsId] = useState<string | null>(null);
+  const [logs, setLogs] = useState<{ id: string; delta: number; reason: string; actorId: string; createdAt: string }[]>([]);
+
+  useEffect(() => {
+    if (logsId) {
+      api.get(`departures/${logsId}/adjustments`).json<unknown[]>()
+        .then((data) => setLogs(data as typeof logs))
+        .catch(() => {});
+    }
+  }, [logsId]);
+
+  const handleAddDeparture = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    if (!depDate || !retDate) {
+      setError("Departure and return dates are required.");
+      return;
+    }
+
+    try {
+      await createMutation.mutateAsync({
+        packageId,
+        departureType: "fixed_date",
+        departureDate: new Date(depDate).toISOString(),
+        returnDate: new Date(retDate).toISOString(),
+        seatTotal,
+        currency: "IDR",
+        priceQuad,
+        dpAmount,
+        paymentSchedule: [
+          { name: "DP", amount: dpAmount, daysBeforeDeparture: 60 },
+          { name: "Pelunasan", amount: priceQuad - dpAmount, daysBeforeDeparture: 30 }
+        ],
+      });
+      setShowAddForm(false);
+      setDepDate("");
+      setRetDate("");
+      setSeatTotal(45);
+      setPriceQuad(35000000);
+      setDpAmount(5000000);
+      void refetch();
+    } catch (err) {
+      setError(await readApiError(err));
+    }
+  };
+
+  const handleAdjustSeats = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    if (!adjustingId) return;
+    if (!adjustReason.trim()) {
+      setError("Reason is required for manual inventory adjustment.");
+      return;
+    }
+
+    try {
+      await adjustMutation.mutateAsync({
+        id: adjustingId,
+        delta: adjustDelta,
+        reason: adjustReason.trim(),
+      });
+      setAdjustingId(null);
+      setAdjustDelta(0);
+      setAdjustReason("");
+      void refetch();
+    } catch (err) {
+      setError(await readApiError(err));
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this departure schedule?")) return;
+    try {
+      await deleteMutation.mutateAsync(id);
+      void refetch();
+    } catch (err) {
+      alert(await readApiError(err));
+    }
+  };
+
+  const formatDate = (dStr: string) => {
+    return new Date(dStr).toLocaleDateString("id-ID", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  return (
+    <Card className="border-border/60 shadow-lg bg-card/50 backdrop-blur-sm">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 border-b pb-4">
+        <div>
+          <CardTitle className="font-mono text-lg font-bold tracking-tight">Departure Schedules</CardTitle>
+          <CardDescription className="text-xs">Manage travel dates, pricing milestones, and real-time seat allotments.</CardDescription>
+        </div>
+        {isAdmin && !showAddForm && (
+          <Button type="button" size="sm" onClick={() => setShowAddForm(true)}>
+            Add Departure Slot
+          </Button>
+        )}
+      </CardHeader>
+      <CardContent className="pt-6">
+        {error && (
+          <div role="alert" className="mb-4 rounded-md bg-destructive/10 p-3 text-xs text-destructive font-medium">
+            {error}
+          </div>
+        )}
+
+        {showAddForm && (
+          <form onSubmit={handleAddDeparture} className="mb-6 border p-4 rounded-lg bg-muted/40 space-y-4">
+            <h3 className="font-mono text-sm font-bold uppercase tracking-wider">New Departure Slot</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-1.5">
+                <Label htmlFor="depDate" className="text-xs">Departure Date</Label>
+                <Input
+                  id="depDate"
+                  type="date"
+                  value={depDate}
+                  onChange={(e) => setDepDate(e.target.value)}
+                  className="h-8 text-xs"
+                  required
+                />
+              </div>
+              <div className="grid gap-1.5">
+                <Label htmlFor="retDate" className="text-xs">Return Date</Label>
+                <Input
+                  id="retDate"
+                  type="date"
+                  value={retDate}
+                  onChange={(e) => setRetDate(e.target.value)}
+                  className="h-8 text-xs"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div className="grid gap-1.5">
+                <Label htmlFor="seatTotalInput" className="text-xs">Total Seats</Label>
+                <Input
+                  id="seatTotalInput"
+                  type="number"
+                  value={seatTotal}
+                  onChange={(e) => setSeatTotal(Number(e.target.value))}
+                  className="h-8 text-xs"
+                  required
+                />
+              </div>
+              <div className="grid gap-1.5">
+                <Label htmlFor="priceQuadInput" className="text-xs">Quad Price (Rp)</Label>
+                <Input
+                  id="priceQuadInput"
+                  type="number"
+                  value={priceQuad}
+                  onChange={(e) => setPriceQuad(Number(e.target.value))}
+                  className="h-8 text-xs"
+                  required
+                />
+              </div>
+              <div className="grid gap-1.5">
+                <Label htmlFor="dpAmountInput" className="text-xs">DP Amount (Rp)</Label>
+                <Input
+                  id="dpAmountInput"
+                  type="number"
+                  value={dpAmount}
+                  onChange={(e) => setDpAmount(Number(e.target.value))}
+                  className="h-8 text-xs"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2 border-t">
+              <Button type="button" variant="outline" size="sm" onClick={() => setShowAddForm(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" size="sm">
+                Create Schedule
+              </Button>
+            </div>
+          </form>
+        )}
+
+        {adjustingId && (
+          <form onSubmit={handleAdjustSeats} className="mb-6 border border-amber-500/30 p-4 rounded-lg bg-amber-500/5 space-y-4">
+            <h3 className="font-mono text-sm font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+              Adjust Seat Allotment
+            </h3>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="grid gap-1.5 col-span-1">
+                <Label htmlFor="adjustDelta" className="text-xs">Delta (e.g. +5 or -3)</Label>
+                <Input
+                  id="adjustDelta"
+                  type="number"
+                  value={adjustDelta}
+                  onChange={(e) => setAdjustDelta(Number(e.target.value))}
+                  className="h-8 text-xs"
+                  required
+                />
+              </div>
+              <div className="grid gap-1.5 col-span-2">
+                <Label htmlFor="adjustReason" className="text-xs">Adjustment Reason Note</Label>
+                <Input
+                  id="adjustReason"
+                  placeholder="Reason for change..."
+                  value={adjustReason}
+                  onChange={(e) => setAdjustReason(e.target.value)}
+                  className="h-8 text-xs"
+                  required
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 pt-2 border-t">
+              <Button type="button" variant="outline" size="sm" onClick={() => setAdjustingId(null)}>
+                Cancel
+              </Button>
+              <Button type="submit" size="sm" className="bg-amber-600 hover:bg-amber-700 text-white">
+                Apply Allotment
+              </Button>
+            </div>
+          </form>
+        )}
+
+        {logsId && (
+          <div className="mb-6 border p-4 rounded-lg bg-muted/30 space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="font-mono text-sm font-bold uppercase tracking-wider">Inventory Audit Logs</h3>
+              <Button type="button" variant="ghost" size="sm" onClick={() => setLogsId(null)} className="h-7 text-xs">
+                Close Logs
+              </Button>
+            </div>
+            {logs.length === 0 ? (
+              <p className="text-xs text-muted-foreground italic">No manual adjustments recorded for this slot.</p>
+            ) : (
+              <div className="max-h-40 overflow-y-auto space-y-2">
+                {logs.map((log) => (
+                  <div key={log.id} className="text-xs border-b pb-1.5 flex justify-between">
+                    <div>
+                      <span className={`font-semibold font-mono ${log.delta > 0 ? "text-emerald-600" : "text-destructive"}`}>
+                        {log.delta > 0 ? `+${log.delta}` : log.delta} seats
+                      </span>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">{log.reason}</p>
+                    </div>
+                    <div className="text-right text-[10px] text-muted-foreground font-mono">
+                      <p>Actor: {log.actorId.slice(0, 8)}</p>
+                      <p className="mt-0.5">{new Date(log.createdAt).toLocaleString("id-ID")}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {departures.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-sm text-muted-foreground italic">No departure schedules created yet.</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {departures.map((dep) => {
+              const statusColors: Record<string, string> = {
+                open: "bg-emerald-500/10 text-emerald-500 ring-emerald-500/20",
+                almost_full: "bg-amber-500/10 text-amber-500 ring-amber-500/20",
+                full: "bg-rose-500/10 text-rose-500 ring-rose-500/20",
+                departed: "bg-slate-500/10 text-slate-500 ring-slate-500/20",
+                cancelled: "bg-neutral-500/10 text-neutral-500 ring-neutral-500/20 border-dashed border",
+              };
+
+              return (
+                <div key={dep.id} className="border p-4 rounded-lg bg-card hover:shadow-md transition-shadow flex flex-col md:flex-row justify-between gap-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2.5">
+                      <span className="font-mono text-sm font-bold tracking-tight">
+                        {formatDate(dep.departureDate)} — {formatDate(dep.returnDate)}
+                      </span>
+                      <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ring-1 ring-inset ${statusColors[dep.status] || ""}`}>
+                        {dep.status.toUpperCase()}
+                      </span>
+                    </div>
+
+                    <div className="flex gap-4 text-xs font-mono text-muted-foreground">
+                      <span>Available: <strong className="text-foreground">{dep.seatAvailable}</strong></span>
+                      <span>Total: <strong className="text-foreground">{dep.seatTotal}</strong></span>
+                      <span>Booked: <strong className="text-foreground">{dep.seatBooked}</strong></span>
+                      <span>Held: <strong className="text-foreground">{dep.seatHeld}</strong></span>
+                    </div>
+
+                    <div className="text-xs pt-1 border-t border-dashed mt-2">
+                      <span className="text-[10px] text-muted-foreground uppercase font-mono block">Pricing & Schedule</span>
+                      <div className="flex flex-wrap gap-x-4 mt-0.5 text-muted-foreground font-mono">
+                        <span>Base: <strong className="text-foreground">Rp {dep.priceQuad.toLocaleString("id-ID")}</strong></span>
+                        <span>DP: <strong className="text-foreground">Rp {dep.dpAmount.toLocaleString("id-ID")}</strong></span>
+                        {dep.paymentSchedule.map((milestone, mIdx) => (
+                          <span key={mIdx}>
+                            {milestone.name}: <strong className="text-foreground">Rp {milestone.amount.toLocaleString("id-ID")}</strong> ({milestone.daysBeforeDeparture} days before departure)
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex md:flex-col justify-end gap-2 items-end">
+                    {isAdmin && (
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setAdjustingId(dep.id);
+                            setAdjustDelta(0);
+                            setAdjustReason("");
+                          }}
+                          className="h-8 text-xs"
+                        >
+                          Adjust Seats
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setLogsId(dep.id)}
+                          className="h-8 text-xs font-mono"
+                        >
+                          Logs
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDelete(dep.id)}
+                          className="h-8 text-xs text-destructive hover:bg-destructive/10"
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
