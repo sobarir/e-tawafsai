@@ -2,6 +2,7 @@
 change: provider-uniqueness
 design-doc: docs/superpowers/specs/2026-07-06-provider-uniqueness-design.md
 base-ref: f62d9901db75beb238507c9b42aa838c47fd7ecf
+archived-with: 2026-07-05-provider-uniqueness
 ---
 
 # Provider Uniqueness Implementation Plan
@@ -25,6 +26,7 @@ base-ref: f62d9901db75beb238507c9b42aa838c47fd7ecf
 - Nest route order and existing provider behavior (activation/cascade/commission DTO) are unchanged.
 - `bun` is not on the bash PATH by default: `export PATH="/c/Users/rahma/.bun/bin:$PATH"` before bun/bunx.
 
+archived-with: 2026-07-05-provider-uniqueness
 ---
 
 ### Task 1: Provider normalization helpers (shared)
@@ -108,6 +110,7 @@ git add packages/shared/src/provider-dedup.ts packages/shared/src/provider-dedup
 git commit -m "feat(provider-uniqueness): add shared provider normalization helpers"
 ```
 
+archived-with: 2026-07-05-provider-uniqueness
 ---
 
 ### Task 2: Union-find merge planner (shared)
@@ -261,6 +264,7 @@ git add packages/shared/src/provider-dedup.ts packages/shared/src/provider-dedup
 git commit -m "feat(provider-uniqueness): add union-find provider merge planner"
 ```
 
+archived-with: 2026-07-05-provider-uniqueness
 ---
 
 ### Task 3: Create pre-check + 409 in ProvidersService
@@ -407,6 +411,7 @@ git add apps/api/src/providers/providers.service.ts apps/api/src/providers/provi
 git commit -m "feat(provider-uniqueness): 409 conflict pre-check on provider create"
 ```
 
+archived-with: 2026-07-05-provider-uniqueness
 ---
 
 ### Task 4: Update pre-check + 409 in ProvidersService
@@ -483,6 +488,7 @@ git add apps/api/src/providers/providers.service.ts apps/api/src/providers/provi
 git commit -m "feat(provider-uniqueness): 409 conflict pre-check on provider update"
 ```
 
+archived-with: 2026-07-05-provider-uniqueness
 ---
 
 ### Task 5: Dedup script — apply + orchestrate (packages/db)
@@ -689,6 +695,7 @@ git add packages/db/src/scripts/dedup-providers.ts packages/db/src/index.ts pack
 git commit -m "feat(provider-uniqueness): one-time dedup-providers merge script"
 ```
 
+archived-with: 2026-07-05-provider-uniqueness
 ---
 
 ### Task 6: Per-tenant unique indexes (schema + migration)
@@ -807,6 +814,7 @@ git add packages/db/src/schema/providers.ts packages/db/drizzle/ apps/api/src/pr
 git commit -m "feat(provider-uniqueness): per-tenant unique indexes on name and PPIU"
 ```
 
+archived-with: 2026-07-05-provider-uniqueness
 ---
 
 ### Task 7: Full verification
