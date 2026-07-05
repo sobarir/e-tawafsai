@@ -6,7 +6,7 @@ base-ref: e6f766749b59dab64463a62525e30e1c2a230af7
 
 # Package Search (C5) Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Give internal admins a single tenant-scoped search over the umrah catalog that combines full-text and structured filters with departure-level semantics, returns compact result cards, and produces one-tap WhatsApp summaries and public links — all within a 500 ms P95 at 1,000 packages / 5,000 departures.
 
@@ -86,7 +86,7 @@ These resolve two under-specified points in the design so the plan is buildable;
   - `searchPackagesSchema` (Zod object; parsed type `SearchParams = z.infer<typeof searchPackagesSchema>`).
   - `interface SearchResultDto` (adds `publicUrl: string` to the design's §2.2 shape).
 
-- [ ] **Step 1: Write the failing test** — `packages/shared/src/search.spec.ts` (schema portion only for now; formatter/url tests are added in Tasks 2–3):
+- [x] **Step 1: Write the failing test** — `packages/shared/src/search.spec.ts` (schema portion only for now; formatter/url tests are added in Tasks 2–3):
 
 ```ts
 import { describe, expect, it } from "vitest";
@@ -131,7 +131,7 @@ describe("searchPackagesSchema", () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -140,7 +140,7 @@ cd packages/shared && bun run test -- search.spec.ts
 
 Expected: FAIL — cannot resolve `./search`.
 
-- [ ] **Step 3: Write minimal implementation** — `packages/shared/src/search.ts`. Query params arrive as strings on the URL, so numeric/boolean fields use `z.coerce`. `hotelCity` uses string equality against `package_hotels.cityName` (canonical `Makkah`/`Madinah`, per design §2.1).
+- [x] **Step 3: Write minimal implementation** — `packages/shared/src/search.ts`. Query params arrive as strings on the URL, so numeric/boolean fields use `z.coerce`. `hotelCity` uses string equality against `package_hotels.cityName` (canonical `Makkah`/`Madinah`, per design §2.1).
 
 ```ts
 import * as z from "zod";
@@ -203,13 +203,13 @@ export interface SearchResultDto {
 }
 ```
 
-- [ ] **Step 4: Add barrel export** — in `packages/shared/src/index.ts` append:
+- [x] **Step 4: Add barrel export** — in `packages/shared/src/index.ts` append:
 
 ```ts
 export * from "./search";
 ```
 
-- [ ] **Step 5: Run test to verify it passes**
+- [x] **Step 5: Run test to verify it passes**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -218,7 +218,7 @@ cd packages/shared && bun run test -- search.spec.ts
 
 Expected: PASS (4 schema tests).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add packages/shared/src/search.ts packages/shared/src/search.spec.ts packages/shared/src/index.ts
@@ -237,7 +237,7 @@ git commit -m "feat(package-search): add search query schema and result DTO in s
 - Consumes: `SearchResultDto` (Task 1).
 - Produces: `export function formatWhatsappSummary(dto: SearchResultDto): string;` — pure, deterministic plain-text block. Reused byte-for-byte by C8/C21 later, so its output is pinned by tests. Locked decision **(D)** for the legality line.
 
-- [ ] **Step 1: Write the failing tests** — append to `packages/shared/src/search.spec.ts`:
+- [x] **Step 1: Write the failing tests** — append to `packages/shared/src/search.spec.ts`:
 
 ```ts
 import { formatWhatsappSummary } from "./search";
@@ -286,7 +286,7 @@ describe("formatWhatsappSummary", () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -295,7 +295,7 @@ cd packages/shared && bun run test -- search.spec.ts
 
 Expected: FAIL — `formatWhatsappSummary` is not exported.
 
-- [ ] **Step 3: Write minimal implementation** — append to `packages/shared/src/search.ts`:
+- [x] **Step 3: Write minimal implementation** — append to `packages/shared/src/search.ts`:
 
 ```ts
 function formatIdr(amount: number): string {
@@ -354,7 +354,7 @@ export function formatWhatsappSummary(dto: SearchResultDto): string {
 }
 ```
 
-- [ ] **Step 4: Run to verify it passes**
+- [x] **Step 4: Run to verify it passes**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -363,7 +363,7 @@ cd packages/shared && bun run test -- search.spec.ts
 
 Expected: PASS (both formatter tests + Task 1 tests).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add packages/shared/src/search.ts packages/shared/src/search.spec.ts
@@ -381,7 +381,7 @@ git commit -m "feat(package-search): add WhatsApp summary formatter with null-li
 **Interfaces:**
 - Produces: `export function packagePublicUrl(tenant: { slug: string; customDomain: string | null }, slug: string, baseDomain: string): string;` — pure. Locked decision **(E)**. `baseDomain` is passed in (from `PUBLIC_BASE_DOMAIN` config on the API) so the helper stays pure and testable.
 
-- [ ] **Step 1: Write the failing tests** — append to `packages/shared/src/search.spec.ts`:
+- [x] **Step 1: Write the failing tests** — append to `packages/shared/src/search.spec.ts`:
 
 ```ts
 import { packagePublicUrl } from "./search";
@@ -407,7 +407,7 @@ describe("packagePublicUrl", () => {
 });
 ```
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -416,7 +416,7 @@ cd packages/shared && bun run test -- search.spec.ts
 
 Expected: FAIL — `packagePublicUrl` not exported.
 
-- [ ] **Step 3: Write minimal implementation** — append to `packages/shared/src/search.ts`:
+- [x] **Step 3: Write minimal implementation** — append to `packages/shared/src/search.ts`:
 
 ```ts
 /**
@@ -434,7 +434,7 @@ export function packagePublicUrl(
 }
 ```
 
-- [ ] **Step 4: Run to verify it passes; then run the whole shared suite**
+- [x] **Step 4: Run to verify it passes; then run the whole shared suite**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -443,7 +443,7 @@ cd packages/shared && bun run test
 
 Expected: PASS (all shared specs, including the new search specs).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add packages/shared/src/search.ts packages/shared/src/search.spec.ts
@@ -462,7 +462,7 @@ git commit -m "feat(package-search): add packagePublicUrl helper"
 **Interfaces:**
 - Produces: `packages.directOnly` (Drizzle column, `boolean("direct_only").notNull().default(false)`); DB objects `search_doc` (generated tsvector), index `packages_search_doc_gin`, index `departures_search_idx`, extension `unaccent`.
 
-- [ ] **Step 1: Add the Drizzle column** — in `packages/db/src/schema/packages.ts`, inside the `packages` table definition, add `directOnly` next to the other booleans (after `isFeatured`):
+- [x] **Step 1: Add the Drizzle column** — in `packages/db/src/schema/packages.ts`, inside the `packages` table definition, add `directOnly` next to the other booleans (after `isFeatured`):
 
 ```ts
   isFeatured: boolean("is_featured").notNull().default(false),
@@ -471,7 +471,7 @@ git commit -m "feat(package-search): add packagePublicUrl helper"
 
 (No schema change is added for `search_doc`/GIN/`departures_search_idx` — Drizzle cannot express a generated tsvector column or a GIN index cleanly; those go in the migration by hand in Step 3.)
 
-- [ ] **Step 2: Generate the base migration**
+- [x] **Step 2: Generate the base migration**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -480,7 +480,7 @@ cd packages/db && bun run db:generate
 
 Expected: a new `drizzle/00XX_*.sql` containing `ALTER TABLE "packages" ADD COLUMN "direct_only" boolean DEFAULT false NOT NULL;`. Note the exact new filename for Step 3.
 
-- [ ] **Step 3: Hand-append the full-text + index SQL** to the newly generated `drizzle/00XX_*.sql` (append after the generated `direct_only` statement, each block separated by `--> statement-breakpoint`):
+- [x] **Step 3: Hand-append the full-text + index SQL** to the newly generated `drizzle/00XX_*.sql` (append after the generated `direct_only` statement, each block separated by `--> statement-breakpoint`):
 
 ```sql
 --> statement-breakpoint
@@ -498,7 +498,7 @@ CREATE INDEX "departures_search_idx" ON "departures" ("tenant_id", "status", "de
 
 > **Design §1.2 / §6 unaccent immutability — decide HERE, against the real PG image.** `unaccent()` is not `IMMUTABLE` by default, so Postgres MAY reject the generated-column expression in Step 4 with `ERROR: generation expression is not immutable`. If that happens, use the fallback: drop the `unaccent(...)` wrapper from the generated column so it reads `to_tsvector('simple', coalesce("title",'') || ' ' || coalesce("description",'') || ' ' || coalesce("airline",''))`, and correspondingly drop `unaccent(...)` from the query's `plainto_tsquery` in Task 6 (keep `'simple'`). Do NOT invent an IMMUTABLE wrapper unless the plain fallback proves insufficient during verify. Record which branch you took in the commit message.
 
-- [ ] **Step 4: Apply the migration**
+- [x] **Step 4: Apply the migration**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -507,7 +507,7 @@ cd packages/db && bun run db:migrate
 
 Expected: `[✓] migrations applied`. If it fails on immutability, apply the Step 3 fallback and re-run.
 
-- [ ] **Step 5: Verify the objects exist** (sanity, tenant-agnostic):
+- [x] **Step 5: Verify the objects exist** (sanity, tenant-agnostic):
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -516,7 +516,7 @@ cd packages/db && bun -e "import { createDb } from './src/index.ts'; import { da
 
 Expected: both index names printed.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add packages/db/src/schema/packages.ts packages/db/drizzle/
@@ -534,7 +534,7 @@ git commit -m "feat(package-search): add directOnly, search_doc tsvector + GIN, 
 - Consumes: `createDb`, `packages`, `packageHotels`, `departures`, `providers` from `@cometkit/db`; `ulid`.
 - Produces: `export async function seedSearchBenchmark(db: Database, tenantId: string): Promise<{ providerId: string; packageIds: string[] }>` — inserts 1 provider, 1,000 packages (each with 1–2 hotels), 5,000 departures (5 per package) with varied dates/prices/statuses/durations. Idempotent per call by using a unique run suffix on titles/slugs; returns ids for cleanup.
 
-- [ ] **Step 1: Write the fixture** (no separate unit test — it is exercised by the benchmark int spec in Task 9; keep it pure data-insertion):
+- [x] **Step 1: Write the fixture** (no separate unit test — it is exercised by the benchmark int spec in Task 9; keep it pure data-insertion):
 
 ```ts
 import { ulid } from "ulid";
@@ -636,7 +636,7 @@ export async function seedSearchBenchmark(
 }
 ```
 
-- [ ] **Step 2: Typecheck the db package**
+- [x] **Step 2: Typecheck the db package**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -645,7 +645,7 @@ cd packages/db && bun run typecheck
 
 Expected: no errors.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add packages/db/src/fixtures/search-benchmark.ts
@@ -669,13 +669,13 @@ Maps tasks.md 2.1. Locked decision **(C)** lives here.
 - Consumes: `searchPackagesSchema`, `SearchParams`, `SearchResultDto`, `packagePublicUrl`, `Paginated` from `@cometkit/shared`; `DB`, `Database`, `tenants` from `@cometkit/db`; `TenantScopedDb`, `JwtAuthGuard`, `RolesGuard`, `Roles`, `ZodValidationPipe`.
 - Produces: `SearchService.search(params: SearchParams): Promise<Paginated<SearchResultDto>>`; `GET /search/packages`.
 
-- [ ] **Step 1: Add config** — in `apps/api/src/config/env.ts` add to `envSchema`:
+- [x] **Step 1: Add config** — in `apps/api/src/config/env.ts` add to `envSchema`:
 
 ```ts
   PUBLIC_BASE_DOMAIN: z.string().min(1).default("etawafsai.com"),
 ```
 
-- [ ] **Step 2: Write the service** — `apps/api/src/search/search.service.ts`. The query is one raw `db.execute(sql\`…\`)` with `LATERAL` for the earliest matching departure (which also enforces the departure `EXISTS`), plus json-aggregated hotels and provider join in the same round-trip. Occupancy column is chosen from a whitelist map (decision C uses `COALESCE(price_<occ>, price_quad)`).
+- [x] **Step 2: Write the service** — `apps/api/src/search/search.service.ts`. The query is one raw `db.execute(sql\`…\`)` with `LATERAL` for the earliest matching departure (which also enforces the departure `EXISTS`), plus json-aggregated hotels and provider join in the same round-trip. Occupancy column is chosen from a whitelist map (decision C uses `COALESCE(price_<occ>, price_quad)`).
 
 ```ts
 import { Inject, Injectable } from "@nestjs/common";
@@ -850,7 +850,7 @@ function monthEndIso(month: string): string {
 
 > If Task 4 took the unaccent fallback branch, remove `unaccent(...)` from the `plainto_tsquery('simple', unaccent(${...}))` line above so it reads `plainto_tsquery('simple', ${params.q ?? null})`.
 
-- [ ] **Step 3: Write the controller** — `apps/api/src/search/search.controller.ts`:
+- [x] **Step 3: Write the controller** — `apps/api/src/search/search.controller.ts`:
 
 ```ts
 import { Controller, Get, Query, UseGuards } from "@nestjs/common";
@@ -881,7 +881,7 @@ export class SearchController {
 }
 ```
 
-- [ ] **Step 4: Write the module + register it** — `apps/api/src/search/search.module.ts`:
+- [x] **Step 4: Write the module + register it** — `apps/api/src/search/search.module.ts`:
 
 ```ts
 import { Module } from "@nestjs/common";
@@ -904,7 +904,7 @@ import { SearchModule } from "./search/search.module";
     SearchModule,
 ```
 
-- [ ] **Step 5: Typecheck the API**
+- [x] **Step 5: Typecheck the API**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -913,7 +913,7 @@ cd apps/api && bun run typecheck
 
 Expected: no errors. (`ZodValidationPipe` on `@Query` returns the parsed/coerced `SearchParams`; confirm the pipe passes query objects through — it is already used on bodies; if it only supports `body`, validate in the service instead by calling `searchPackagesSchema.parse(query)`.)
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/api/src/search/ apps/api/src/config/env.ts apps/api/src/app.module.ts
@@ -932,7 +932,7 @@ Maps tasks.md 2.2. The query already wires full-text, hotel-name `ILIKE`, and `d
 **Interfaces:**
 - Consumes: `SearchService`, `TenantScopedDb`, `createDb`, schema tables, `DEFAULT_TENANT_SLUG`.
 
-- [ ] **Step 1: Write the failing integration spec** — `apps/api/src/search/search.service.int.spec.ts`. Follow the existing `packages.service.int.spec.ts` harness (dotenv load, default tenant lookup, a `ClsService` stub returning `tenantId`, `noopLogger`, self-cleaning rows). A `ConfigService` stub returns the base domain.
+- [x] **Step 1: Write the failing integration spec** — `apps/api/src/search/search.service.int.spec.ts`. Follow the existing `packages.service.int.spec.ts` harness (dotenv load, default tenant lookup, a `ClsService` stub returning `tenantId`, `noopLogger`, self-cleaning rows). A `ConfigService` stub returns the base domain.
 
 ```ts
 import { config } from "dotenv";
@@ -1040,7 +1040,7 @@ function searchDefaults(partial: Record<string, unknown>) {
 }
 ```
 
-- [ ] **Step 2: Run it (fails if the query is wrong)**
+- [x] **Step 2: Run it (fails if the query is wrong)**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -1049,7 +1049,7 @@ cd apps/api && bun run test:int -- search.service.int.spec.ts
 
 Expected: PASS if Task 6's query is correct. If it fails, load **systematic-debugging** and fix the query root cause (do NOT loosen the assertions).
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add apps/api/src/search/search.service.int.spec.ts
@@ -1065,7 +1065,7 @@ Maps tasks.md 4.2 (functional cases). Adds the remaining acceptance scenarios fr
 **Files:**
 - Modify: `apps/api/src/search/search.service.int.spec.ts` (append cases)
 
-- [ ] **Step 1: Append the failing specs** (inside the same `describe`, reusing `seedPackage`/`searchDefaults`):
+- [x] **Step 1: Append the failing specs** (inside the same `describe`, reusing `seedPackage`/`searchDefaults`):
 
 ```ts
 it("PRD combo: duration 9, maxPrice 30,000,000, September returns only qualifying packages", async () => {
@@ -1097,7 +1097,7 @@ it("falls back to priceQuad when the selected occupancy price is null", async ()
 });
 ```
 
-- [ ] **Step 2: Run to verify**
+- [x] **Step 2: Run to verify**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -1106,7 +1106,7 @@ cd apps/api && bun run test:int -- search.service.int.spec.ts
 
 Expected: PASS (all five acceptance scenarios). Debug via **systematic-debugging** on any failure.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add apps/api/src/search/search.service.int.spec.ts
@@ -1125,7 +1125,7 @@ Maps tasks.md 4.2 (performance). Locked design constraint: P95 < 500 ms at 1,000
 **Interfaces:**
 - Consumes: `seedSearchBenchmark` from `@cometkit/db` (Task 5), `SearchService`.
 
-- [ ] **Step 1: Write the benchmark spec** (soft P95 assertion + an EXPLAIN that must show index usage, not a full seq-scan of departures):
+- [x] **Step 1: Write the benchmark spec** (soft P95 assertion + an EXPLAIN that must show index usage, not a full seq-scan of departures):
 
 ```ts
 import { config } from "dotenv";
@@ -1202,13 +1202,13 @@ describe("SearchService benchmark (integration)", () => {
 
 > The `@cometkit/db/fixtures/search-benchmark` import path is illustrative — resolve it to however `@cometkit/db` re-exports (add `export * from "./fixtures/search-benchmark"` to `packages/db/src/index.ts`, OR import via a deep relative path). Prefer adding the barrel export in Task 5 if the spec needs it; keep the fixture out of the app's production bundle by importing it only in the spec.
 
-- [ ] **Step 2: Ensure the fixture is importable** — if needed, add to `packages/db/src/index.ts`:
+- [x] **Step 2: Ensure the fixture is importable** — if needed, add to `packages/db/src/index.ts`:
 
 ```ts
 export * from "./fixtures/search-benchmark";
 ```
 
-- [ ] **Step 3: Run the benchmark**
+- [x] **Step 3: Run the benchmark**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -1217,7 +1217,7 @@ cd apps/api && bun run test:int -- search.benchmark.int.spec.ts
 
 Expected: PASS. If P95 ≥ 500 ms or EXPLAIN shows a departures seq-scan, load **systematic-debugging**; add the covering index the plan warrants (design §1.3 / §6 permit adding indexes only where measured) and re-run. Record the observed P95 in the commit message.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add apps/api/src/search/search.benchmark.int.spec.ts packages/db/src/index.ts
@@ -1235,7 +1235,7 @@ git commit -m "test(package-search): 1k/5k benchmark with EXPLAIN sanity and P95
 - Consumes: `SearchParams`, `SearchResultDto`, `Paginated` from `@cometkit/shared`; shared `api` ky instance.
 - Produces: `useSearchPackages(params: Partial<SearchParams>)` → `useQuery<Paginated<SearchResultDto>>`, query key `["search", params]`.
 
-- [ ] **Step 1: Write the hook** — `apps/web/src/hooks/use-search.ts`:
+- [x] **Step 1: Write the hook** — `apps/web/src/hooks/use-search.ts`:
 
 ```ts
 "use client";
@@ -1265,7 +1265,7 @@ export function useSearchPackages(params: Partial<SearchParams>) {
 }
 ```
 
-- [ ] **Step 2: Typecheck web**
+- [x] **Step 2: Typecheck web**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -1274,7 +1274,7 @@ cd apps/web && bun run typecheck
 
 Expected: no errors.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add apps/web/src/hooks/use-search.ts
@@ -1297,7 +1297,7 @@ Maps tasks.md 3.1.
 - Consumes: `useSearchPackages` (Task 10); `formatWhatsappSummary`, `SearchResultDto`, `SearchParams` from `@cometkit/shared`; existing shadcn `ui` primitives (`Button`, `Card`, `Input`, `Sheet` if present — else a fixed-position panel), `readApiError`.
 - Produces: the `/dashboard/search` route. `result-card.tsx` exports `ResultCard` used by `page.tsx`; clipboard actions land in Task 12 but the card renders the two action buttons here (wired in Task 12).
 
-- [ ] **Step 1: Check available primitives** — confirm whether a `Sheet` primitive exists:
+- [x] **Step 1: Check available primitives** — confirm whether a `Sheet` primitive exists:
 
 ```bash
 ls apps/web/src/components/ui | grep -iE "sheet|dialog|input|checkbox|select"
@@ -1305,7 +1305,7 @@ ls apps/web/src/components/ui | grep -iE "sheet|dialog|input|checkbox|select"
 
 If `sheet` is absent, use a bottom-fixed panel toggled by state (mobile-first) rather than adding a dependency; if `dialog` exists it can back the panel. Use whatever `Input`/`Button`/`Card` exist (they do, per `packages/page.tsx`).
 
-- [ ] **Step 2: Write `result-card.tsx`** — compact card, mobile-first, two action buttons (handlers passed in from the page; implemented in Task 12):
+- [x] **Step 2: Write `result-card.tsx`** — compact card, mobile-first, two action buttons (handlers passed in from the page; implemented in Task 12):
 
 ```tsx
 "use client";
@@ -1358,7 +1358,7 @@ export function ResultCard({
 }
 ```
 
-- [ ] **Step 3: Write `search-filters.tsx`** — a bottom-sheet-style panel plus an active-filter chip row. Keep filters controlled by the parent's `params` state:
+- [x] **Step 3: Write `search-filters.tsx`** — a bottom-sheet-style panel plus an active-filter chip row. Keep filters controlled by the parent's `params` state:
 
 ```tsx
 "use client";
@@ -1419,7 +1419,7 @@ export function FilterSheet({
 }
 ```
 
-- [ ] **Step 4: Write `page.tsx`** — wire search box + chips + sheet + result list. Clipboard handlers are stubbed here and filled in Task 12:
+- [x] **Step 4: Write `page.tsx`** — wire search box + chips + sheet + result list. Clipboard handlers are stubbed here and filled in Task 12:
 
 ```tsx
 "use client";
@@ -1482,7 +1482,7 @@ export default function SearchPage() {
 
 (`readApiError` is imported for parity with house error handling; if the lint rule flags it as unused until Task 12, remove the import now and re-add it in Task 12.)
 
-- [ ] **Step 5: Typecheck + lint web**
+- [x] **Step 5: Typecheck + lint web**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -1491,7 +1491,7 @@ cd apps/web && bun run typecheck && bun run lint
 
 Expected: no errors.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/web/src/app/dashboard/search/ apps/web/src/lib/clipboard.ts
@@ -1510,7 +1510,7 @@ Maps tasks.md 3.2. Reuses `formatWhatsappSummary` (Task 2) and `dto.publicUrl` (
 - Create/fill: `apps/web/src/lib/clipboard.ts`
 - Modify: `apps/web/src/app/dashboard/search/page.tsx` (wire handlers + `role="alert"` feedback)
 
-- [ ] **Step 1: Write the clipboard util** — `apps/web/src/lib/clipboard.ts` with an `execCommand` fallback for older mobile browsers:
+- [x] **Step 1: Write the clipboard util** — `apps/web/src/lib/clipboard.ts` with an `execCommand` fallback for older mobile browsers:
 
 ```ts
 /**
@@ -1544,7 +1544,7 @@ export async function copyText(text: string): Promise<boolean> {
 }
 ```
 
-- [ ] **Step 2: Wire the handlers in `page.tsx`** — replace the stub handlers and add a transient status region:
+- [x] **Step 2: Wire the handlers in `page.tsx`** — replace the stub handlers and add a transient status region:
 
 ```tsx
 import { formatWhatsappSummary } from "@cometkit/shared";
@@ -1570,7 +1570,7 @@ And render the status near the actions:
 {copied && <p role="alert" className="font-mono text-xs text-muted-foreground">{copied}</p>}
 ```
 
-- [ ] **Step 3: Typecheck + lint**
+- [x] **Step 3: Typecheck + lint**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -1579,9 +1579,9 @@ cd apps/web && bun run typecheck && bun run lint
 
 Expected: no errors.
 
-- [ ] **Step 4: Manual mobile check (verify phase note)** — during verification, confirm copy works on Android Chrome (design §6). Not a blocking automated gate, but record the result.
+- [x] **Step 4: Manual mobile check (verify phase note)** — during verification, confirm copy works on Android Chrome (design §6). Not a blocking automated gate, but record the result.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/web/src/lib/clipboard.ts apps/web/src/app/dashboard/search/page.tsx
@@ -1596,7 +1596,7 @@ Maps tasks.md 4.3. Load **verification-before-completion** before claiming done.
 
 **Files:** none (gate only).
 
-- [ ] **Step 1: Full quality gate**
+- [x] **Step 1: Full quality gate**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -1605,7 +1605,7 @@ cd /c/Sobari/Ai/tawaf-sai/e-tawafsai && bun run verify
 
 Expected: typecheck + lint + unit tests all pass across `shared`, `db`, `api`, `web`. Fix any failure at its root (load **systematic-debugging**); do not weaken assertions.
 
-- [ ] **Step 2: Integration suite (needs local Postgres, seeded)**
+- [x] **Step 2: Integration suite (needs local Postgres, seeded)**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -1614,7 +1614,7 @@ cd apps/api && bun run db:migrate 2>/dev/null; bun run test:int
 
 Expected: all `*.int.spec.ts` pass, including `search.service.int.spec.ts` (5 acceptance scenarios) and `search.benchmark.int.spec.ts` (P95 < 500 ms, EXPLAIN sanity). Ensure `bun run db:seed` has been run at least once so `DEFAULT_TENANT_SLUG` exists.
 
-- [ ] **Step 3: Confirm and report** — record: verify result, int result, observed benchmark P95, and which unaccent branch (Task 4) shipped. No commit needed unless fixes were made.
+- [x] **Step 3: Confirm and report** — record: verify result, int result, observed benchmark P95, and which unaccent branch (Task 4) shipped. No commit needed unless fixes were made.
 
 ---
 
