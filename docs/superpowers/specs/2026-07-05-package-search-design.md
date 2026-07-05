@@ -2,6 +2,8 @@
 comet_change: package-search
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-07-05-package-search
+status: final
 ---
 
 # Technical Design: Package Search (C5)

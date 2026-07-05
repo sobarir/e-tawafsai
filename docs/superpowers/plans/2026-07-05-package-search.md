@@ -2,6 +2,7 @@
 change: package-search
 design-doc: docs/superpowers/specs/2026-07-05-package-search-design.md
 base-ref: e6f766749b59dab64463a62525e30e1c2a230af7
+archived-with: 2026-07-05-package-search
 ---
 
 # Package Search (C5) Implementation Plan
@@ -44,6 +45,7 @@ These resolve two under-specified points in the design so the plan is buildable;
 1. **`publicUrl` is computed server-side and carried on the DTO.** The design (§4) says the web "reuses `packagePublicUrl` client-side," but `AuthUser` (the only tenant handle the web has) exposes just `tenantId` — not `slug`/`customDomain` — and adding tenant fields to `/auth/me` is out of scope for this change. Resolution: `SearchService` calls the shared `packagePublicUrl` helper (single source of truth for decision E) and puts the result on `SearchResultDto.publicUrl: string`. The web copy-link action copies `dto.publicUrl`; the shared helper is still exercised (server + unit tests). This is additive to the design's DTO.
 2. **`formatWhatsappSummary` is `(dto)` not `(dto, ctx)`.** Because the DTO now carries `publicUrl` plus all provider fields, the formatter is fully self-contained and pure: `formatWhatsappSummary(dto: SearchResultDto): string`. It reads `dto.publicUrl` for the link line and `dto.providerBrandName`/`dto.ppiuLicenseNo` for the legality line. The web reuses it client-side unchanged.
 
+archived-with: 2026-07-05-package-search
 ---
 
 ## File Structure
@@ -70,6 +72,7 @@ These resolve two under-specified points in the design so the plan is buildable;
 - `apps/web/src/lib/clipboard.ts` — `copyText(text)` with `execCommand` fallback.
 - `page.tsx`, plus `search-filters.tsx` and `result-card.tsx` components.
 
+archived-with: 2026-07-05-package-search
 ---
 
 ## Task 1: Shared — search query schema + result DTO
@@ -225,6 +228,7 @@ git add packages/shared/src/search.ts packages/shared/src/search.spec.ts package
 git commit -m "feat(package-search): add search query schema and result DTO in shared"
 ```
 
+archived-with: 2026-07-05-package-search
 ---
 
 ## Task 2: Shared — WhatsApp summary formatter
@@ -370,6 +374,7 @@ git add packages/shared/src/search.ts packages/shared/src/search.spec.ts
 git commit -m "feat(package-search): add WhatsApp summary formatter with null-license branch"
 ```
 
+archived-with: 2026-07-05-package-search
 ---
 
 ## Task 3: Shared — public URL helper
@@ -450,6 +455,7 @@ git add packages/shared/src/search.ts packages/shared/src/search.spec.ts
 git commit -m "feat(package-search): add packagePublicUrl helper"
 ```
 
+archived-with: 2026-07-05-package-search
 ---
 
 ## Task 4: DB — `directOnly` column, full-text tsvector, GIN + departure indexes, migration
@@ -523,6 +529,7 @@ git add packages/db/src/schema/packages.ts packages/db/drizzle/
 git commit -m "feat(package-search): add directOnly, search_doc tsvector + GIN, departure search index"
 ```
 
+archived-with: 2026-07-05-package-search
 ---
 
 ## Task 5: DB — 1k/5k benchmark seed fixture
@@ -652,6 +659,7 @@ git add packages/db/src/fixtures/search-benchmark.ts
 git commit -m "feat(package-search): add 1k/5k benchmark seed fixture"
 ```
 
+archived-with: 2026-07-05-package-search
 ---
 
 ## Task 6: API — search module, endpoint, and the single query (structured filters + departure EXISTS + aggregation + occupancy fallback)
@@ -920,6 +928,7 @@ git add apps/api/src/search/ apps/api/src/config/env.ts apps/api/src/app.module.
 git commit -m "feat(package-search): add search endpoint with departure EXISTS query and occupancy fallback"
 ```
 
+archived-with: 2026-07-05-package-search
 ---
 
 ## Task 7: API — full-text + hotel-name + direct-only integration verified end-to-end
@@ -1056,6 +1065,7 @@ git add apps/api/src/search/search.service.int.spec.ts
 git commit -m "test(package-search): integration specs for hotel full-text and direct-only"
 ```
 
+archived-with: 2026-07-05-package-search
 ---
 
 ## Task 8: API — PRD acceptance combo, seats toggle, occupancy fallback specs
@@ -1113,6 +1123,7 @@ git add apps/api/src/search/search.service.int.spec.ts
 git commit -m "test(package-search): PRD combo, seats toggle, occupancy fallback integration specs"
 ```
 
+archived-with: 2026-07-05-package-search
 ---
 
 ## Task 9: API — seeded 1k/5k benchmark with EXPLAIN sanity + P95 budget
@@ -1224,6 +1235,7 @@ git add apps/api/src/search/search.benchmark.int.spec.ts packages/db/src/index.t
 git commit -m "test(package-search): 1k/5k benchmark with EXPLAIN sanity and P95 budget"
 ```
 
+archived-with: 2026-07-05-package-search
 ---
 
 ## Task 10: Web — search data hook
@@ -1281,6 +1293,7 @@ git add apps/web/src/hooks/use-search.ts
 git commit -m "feat(package-search): add useSearchPackages query hook"
 ```
 
+archived-with: 2026-07-05-package-search
 ---
 
 ## Task 11: Web — search screen (bottom-sheet filters, active chips, result cards at 380px)
@@ -1500,6 +1513,7 @@ git commit -m "feat(package-search): add mobile-first search screen with filters
 
 (`clipboard.ts` is created empty-then-filled in Task 12; if you prefer, defer its `git add` to Task 12.)
 
+archived-with: 2026-07-05-package-search
 ---
 
 ## Task 12: Web — clipboard actions (WhatsApp summary + public link) with mobile fallback
@@ -1588,6 +1602,7 @@ git add apps/web/src/lib/clipboard.ts apps/web/src/app/dashboard/search/page.tsx
 git commit -m "feat(package-search): clipboard actions for WhatsApp summary and public link"
 ```
 
+archived-with: 2026-07-05-package-search
 ---
 
 ## Task 13: Verification gate — `bun run verify` + `bun run test:int`
@@ -1616,6 +1631,7 @@ Expected: all `*.int.spec.ts` pass, including `search.service.int.spec.ts` (5 ac
 
 - [x] **Step 3: Confirm and report** — record: verify result, int result, observed benchmark P95, and which unaccent branch (Task 4) shipped. No commit needed unless fixes were made.
 
+archived-with: 2026-07-05-package-search
 ---
 
 ## Self-Review (performed against the delta spec + design doc)
