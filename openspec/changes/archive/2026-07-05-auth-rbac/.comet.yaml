@@ -17,6 +17,6 @@ verification_report: docs/superpowers/reports/2026-07-05-auth-rbac-verify.md
 branch_status: handled
 created_at: 2026-07-04
 verified_at: 2026-07-05
-archived: false
+archived: true
 handoff_context: openspec/changes/auth-rbac/.comet/handoff/design-context.json
 handoff_hash: a995b7bc1b5197e67933884d313effacc239ec65f7d35bd1f2cb751cbca9657f
