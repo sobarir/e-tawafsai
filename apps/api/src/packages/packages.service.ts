@@ -9,6 +9,7 @@ import {
   packageTags,
   packageFlyers,
   providers,
+  departures,
   type DbPackage,
   type DbPackageHotel,
   type Database,
@@ -107,8 +108,20 @@ export class PackagesService {
       .innerJoin(tags, eq(packageTags.tagId, tags.id))
       .where(eq(packageTags.packageId, id));
 
+    const deps = await this.db
+      .select()
+      .from(departures)
+      .where(and(eq(departures.tenantId, this.tenantDb.tenantId), eq(departures.packageId, id)));
+
+    // A published Package whose Departures are all full, departed, or cancelled
+    // is flagged for review.
+    const hasDepartures = deps.length > 0;
+    const allClosed = hasDepartures && deps.every((d) => ["full", "departed", "cancelled"].includes(d.status));
+    const needsReview = pkg.status === "published" && allClosed;
+
     return {
       ...pkg,
+      needsReview,
       hotels: hotels.map((h) => ({
         cityName: h.cityName,
         name: h.name,

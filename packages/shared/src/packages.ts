@@ -54,6 +54,7 @@ export interface PackageDto {
   departureCity: string | null;
   isFeatured: boolean;
   status: string;
+  needsReview: boolean;
   hotels: HotelInput[];
   tags: string[];
   flyers: string[];

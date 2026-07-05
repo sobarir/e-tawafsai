@@ -19,6 +19,7 @@ describe("PackagesPolicy.validatePublishReady", () => {
     departureCity: "Jakarta",
     isFeatured: false,
     status: "draft",
+    needsReview: false,
     hotels: [
       {
         cityName: "Makkah",
