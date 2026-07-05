@@ -57,6 +57,24 @@ async function main() {
       });
   }
 
+  await db
+    .insert(schema.providers)
+    .values({
+      id: ulid(),
+      tenantId: tenant.id,
+      name: "PT. Handoff Al-Amin",
+      brandName: "Al-Amin Umrah",
+      ppiuLicenseNo: "PPIU-999-2026",
+      accreditation: "A",
+      contactPerson: "Budi",
+      contactPhone: "62812345678",
+      isActive: true,
+      pricePublicationConsentAt: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .onConflictDoNothing();
+
   const starterTemplates = [
     {
       id: ulid(),

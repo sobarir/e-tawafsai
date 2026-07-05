@@ -36,6 +36,13 @@
       "when": 1783237716560,
       "tag": "0004_ancient_cable",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1783250734829,
+      "tag": "0005_chief_mesmero",
+      "breakpoints": true
     }
   ]
 }
