@@ -30,7 +30,7 @@ base-ref: 24ec16fa9e6ee319479d86d8cef6495dba6e47b2
 - Consumes: `useProviders` (to fetch list of provider options)
 - Produces: Updated `FilterSheet` component interface accepting `providers` list and using local buffer state.
 
-- [ ] **Step 1.1: Refactor FilterSheet to use local state buffer**
+- [x] **Step 1.1: Refactor FilterSheet to use local state buffer**
   Sync local filters copy when `open` changes:
   ```tsx
   const [local, setLocal] = useState<Filters>(filters);
@@ -44,7 +44,7 @@ base-ref: 24ec16fa9e6ee319479d86d8cef6495dba6e47b2
   ```
   On Apply button click, invoke `onChange(local)`.
 
-- [ ] **Step 1.2: Add General Section (Occupancy, Duration Max, and Date/Month range)**
+- [x] **Step 1.2: Add General Section (Occupancy, Duration Max, and Date/Month range)**
   Add inputs for:
   - **Occupancy**: Selector (dropdown or chips) next to Price input:
     ```tsx
@@ -84,7 +84,7 @@ base-ref: 24ec16fa9e6ee319479d86d8cef6495dba6e47b2
     </div>
     ```
 
-- [ ] **Step 1.3: Add Catalog Details Section (Product Type, Category, Airline, Departure City, and Provider)**
+- [x] **Step 1.3: Add Catalog Details Section (Product Type, Category, Airline, Departure City, and Provider)**
   Add inputs for:
   - **Product Type**: Dropdown (Umrah, Haji Khusus, Haji Furoda).
   - **Category**: Dropdown (Regular, Plus, Private VIP, Ramadan, Arbain, Other).
@@ -109,13 +109,13 @@ base-ref: 24ec16fa9e6ee319479d86d8cef6495dba6e47b2
     </label>
     ```
 
-- [ ] **Step 1.4: Add Hotel Criteria Section (Hotel City, Max Distance, Min Stars)**
+- [x] **Step 1.4: Add Hotel Criteria Section (Hotel City, Max Distance, Min Stars)**
   Add inputs for:
   - **Hotel City**: Dropdown/select (Semua, Makkah, Madinah).
   - **Max Distance (Meters)**: Number input.
   - **Min Stars**: Dropdown/select (Semua, 1 Star, 2 Stars, 3 Stars, 4 Stars, 5 Stars).
 
-- [ ] **Step 1.5: Apply Scroll Styling**
+- [x] **Step 1.5: Apply Scroll Styling**
   Ensure the container has `overflow-y-auto max-h-[80vh] px-1 py-2` styles applied to prevent layout overflow on mobile screens.
 
 ---
@@ -129,10 +129,10 @@ base-ref: 24ec16fa9e6ee319479d86d8cef6495dba6e47b2
 - Consumes: `providers` list from props.
 - Produces: Formatted Active Chips with human-readable descriptions.
 
-- [ ] **Step 2.1: Update ActiveChips to receive `providers` list**
+- [x] **Step 2.1: Update ActiveChips to receive `providers` list**
   Accept `providers?: (ProviderDto | StaffProviderDto)[]` parameter.
 
-- [ ] **Step 2.2: Map filter keys to Indonesian human-readable labels**
+- [x] **Step 2.2: Map filter keys to Indonesian human-readable labels**
   Format active chips dynamically:
   - `q`: "Cari: ..."
   - `maxPrice`: "Harga maks: Rp ..." (using local currency formatting or shorthand)
@@ -155,7 +155,7 @@ base-ref: 24ec16fa9e6ee319479d86d8cef6495dba6e47b2
 **Files:**
 - Modify: [page.tsx](file:///c:/Sobari/Ai/tawaf-sai/e-tawafsai/apps/web/src/app/dashboard/search/page.tsx)
 
-- [ ] **Step 3.1: Load Providers on Search Page**
+- [x] **Step 3.1: Load Providers on Search Page**
   Fetch active providers:
   ```tsx
   import { useProviders } from "@/hooks/use-providers";
@@ -164,8 +164,8 @@ base-ref: 24ec16fa9e6ee319479d86d8cef6495dba6e47b2
   const providers = providersData?.data ?? [];
   ```
 
-- [ ] **Step 3.2: Pass Providers to Filter Components**
+- [x] **Step 3.2: Pass Providers to Filter Components**
   Pass the `providers` list to both `<ActiveChips>` and `<FilterSheet>`.
 
-- [ ] **Step 3.3: Verify and run build quality checks**
+- [x] **Step 3.3: Verify and run build quality checks**
   Run `bun run verify` to confirm everything is safe and correctly compiled.
