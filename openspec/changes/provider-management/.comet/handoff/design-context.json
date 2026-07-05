@@ -1,0 +1,14 @@
+{
+  "change": "provider-management",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "51dd601f3adc6e06540dd01dc33e48e4d569d1c62debc4eb73d81037d881caea",
+  "files": [
+    { "path": "openspec/changes/provider-management/proposal.md", "sha256": "110c8a41c505e34c47d86a1bef194d16f87897cdf853bb27cafec744cda30b87" },
+    { "path": "openspec/changes/provider-management/design.md", "sha256": "2f56dcb39b46502c11c3357a2c6bee73e9a6d7bd9e6abb238c8dd331dd654fdb" },
+    { "path": "openspec/changes/provider-management/tasks.md", "sha256": "47860dea9e98f565c6b6dc3188b5a436c9134d65e059ac434810135714798e46" },
+    { "path": "openspec/changes/provider-management/specs/provider-management/spec.md", "sha256": "3737c8b752299e8c98fa4a988c66975f13bba2d02d21a8e624b79d737c8cd535" }
+  ]
+}
