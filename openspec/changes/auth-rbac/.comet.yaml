@@ -7,7 +7,7 @@ subagent_dispatch: null
 tdd_mode: tdd
 review_mode: off
 isolation: branch
-verify_mode: null
+verify_mode: full
 auto_transition: false
 base_ref: 2ac747b1e6f3f1cbac212ba2c6c6bb7a8fc138ad
 design_doc: docs/superpowers/specs/2026-07-05-auth-rbac-design.md
