@@ -1,0 +1,15 @@
+{
+  "change": "auth-rbac",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "a995b7bc1b5197e67933884d313effacc239ec65f7d35bd1f2cb751cbca9657f",
+  "files": [
+    { "path": "openspec/changes/auth-rbac/proposal.md", "sha256": "5419b316d0e0e4b894310107f80401b558399874505a5abfee716df2694d5831" },
+    { "path": "openspec/changes/auth-rbac/design.md", "sha256": "7a4f1389942ae19251611528b9a05873304cf3a8e75d1b689cac9c00b13799fc" },
+    { "path": "openspec/changes/auth-rbac/tasks.md", "sha256": "0f962a3e5e58dcec8bd35a222e56d02e05b3d65974474d70450d371be80664ba" },
+    { "path": "openspec/changes/auth-rbac/specs/authentication/spec.md", "sha256": "0166188e30618836f2ba82b852f0d0a5097a124f472e86c27bc3e97781b53d8e" },
+    { "path": "openspec/changes/auth-rbac/specs/user-management/spec.md", "sha256": "7b4075ff55bf7baf5c994933c5eead692246e3b1f1886c4c9915e23fee8a2742" }
+  ]
+}
