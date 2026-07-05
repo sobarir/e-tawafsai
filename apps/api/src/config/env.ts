@@ -13,6 +13,8 @@ export const envSchema = z.object({
   JWT_EXPIRES_IN: z.string().default("15m"),
   PORT: z.coerce.number().int().positive().default(3001),
   CORS_ORIGIN: z.string().default("http://localhost:3000"),
+  // Base domain for tenant public URLs (package-search reserves the scheme; C6 ships the route).
+  PUBLIC_BASE_DOMAIN: z.string().min(1).default("etawafsai.com"),
 });
 
 export type Env = z.infer<typeof envSchema>;

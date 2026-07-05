@@ -14,6 +14,7 @@ import { SettingsModule } from "./settings/settings.module";
 import { ProvidersModule } from "./providers/providers.module";
 import { PackagesModule } from "./packages/packages.module";
 import { DeparturesModule } from "./departures/departures.module";
+import { SearchModule } from "./search/search.module";
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { DeparturesModule } from "./departures/departures.module";
     ProvidersModule,
     PackagesModule,
     DeparturesModule,
+    SearchModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: AllExceptionsFilter }],
 })
