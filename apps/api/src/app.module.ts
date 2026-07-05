@@ -12,6 +12,7 @@ import { UsersModule } from "./users/users.module";
 import { HealthModule } from "./health/health.module";
 import { SettingsModule } from "./settings/settings.module";
 import { ProvidersModule } from "./providers/providers.module";
+import { PackagesModule } from "./packages/packages.module";
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { ProvidersModule } from "./providers/providers.module";
     HealthModule,
     SettingsModule,
     ProvidersModule,
+    PackagesModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: AllExceptionsFilter }],
 })
