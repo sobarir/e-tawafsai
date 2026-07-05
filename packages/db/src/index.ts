@@ -22,3 +22,7 @@ export { schema };
 // Test/benchmark seed fixture. Inert unless called; imported by the search
 // benchmark integration spec.
 export * from "./fixtures/search-benchmark";
+
+// One-time provider dedup script. Inert unless called (CLI guard); the merge
+// helpers are imported by the dedup integration spec.
+export * from "./scripts/dedup-providers";

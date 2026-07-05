@@ -13,9 +13,9 @@
 ## 3. Dedup migration (one-time cleanup)
 
 - [x] 3.1 Implement per-tenant duplicate clustering (transitive closure over normalized-name OR non-empty normalized-PPIU edges)
-- [ ] 3.2 Implement survivor selection (active first, then lowest ULID) and package repoint (`packages.providerId` losers→survivor), then delete losers — all in one transaction
-- [ ] 3.3 Normalize existing blank PPIUs to NULL as the first migration step
-- [ ] 3.4 Integration spec: seed a tenant with a name-dup and a PPIU-dup forming one cluster; assert one survivor, packages repointed with no orphans, active-preference honored
+- [x] 3.2 Implement survivor selection (active first, then lowest ULID) and package repoint (`packages.providerId` losers→survivor), then delete losers — all in one transaction
+- [x] 3.3 Normalize existing blank PPIUs to NULL as the first migration step
+- [x] 3.4 Integration spec: seed a tenant with a name-dup and a PPIU-dup forming one cluster; assert one survivor, packages repointed with no orphans, active-preference honored
 
 ## 4. DB unique constraints
 
