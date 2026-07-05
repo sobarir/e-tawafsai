@@ -2,7 +2,7 @@
  * Integration spec - exercises ProvidersService against the real database.
  * Requires DATABASE_URL (repo-root .env). Run with: bun run test:int
  */
-import { BadRequestException } from "@nestjs/common";
+import { BadRequestException, ConflictException } from "@nestjs/common";
 import { config } from "dotenv";
 import { resolve } from "node:path";
 import { ulid } from "ulid";
@@ -90,5 +90,51 @@ describe("ProvidersService (integration)", () => {
     const deactivated = await service.deactivate(created.id);
     expect(deactivated.provider.isActive).toBe(false);
     expect(deactivated.affectedPackages).toEqual([]);
+  });
+
+  it("rejects a create whose normalized name duplicates an existing provider", async () => {
+    const base = {
+      brandName: "Dup Co",
+      contactPerson: "A",
+      contactPhone: "628111",
+      accreditation: "A" as const,
+      defaultCommissionType: "flat_per_pax" as const,
+      defaultCommissionValue: 0,
+    };
+    const first = await service.create({ ...base, name: `PT Dup ${suffix}` });
+    createdIds.push(first.id);
+
+    await expect(
+      service.create({ ...base, name: `  pt dup ${suffix}  ` }), // case/space variant
+    ).rejects.toBeInstanceOf(ConflictException);
+  });
+
+  it("rejects a create whose normalized PPIU duplicates, and stores blank PPIU as null", async () => {
+    const base = {
+      brandName: "Ppiu Co",
+      contactPerson: "A",
+      contactPhone: "628111",
+      accreditation: "A" as const,
+      defaultCommissionType: "flat_per_pax" as const,
+      defaultCommissionValue: 0,
+    };
+    const withPpiu = await service.create({
+      ...base,
+      name: `PPIU One ${suffix}`,
+      ppiuLicenseNo: `LIC-${suffix}`,
+    });
+    createdIds.push(withPpiu.id);
+
+    await expect(
+      service.create({ ...base, name: `PPIU Two ${suffix}`, ppiuLicenseNo: `  LIC-${suffix}  ` }),
+    ).rejects.toBeInstanceOf(ConflictException);
+
+    const blank = await service.create({
+      ...base,
+      name: `PPIU Blank ${suffix}`,
+      ppiuLicenseNo: "   ",
+    });
+    createdIds.push(blank.id);
+    expect(blank.ppiuLicenseNo).toBeNull();
   });
 });

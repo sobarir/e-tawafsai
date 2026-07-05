@@ -30,11 +30,11 @@ export function planProviderMerges(rows: ProviderMergeInput[]): ProviderMergePla
   // Union-find over row indices.
   const parent = rows.map((_, i) => i);
   const find = (i: number): number => {
-    while (parent[i] !== i) {
-      parent[i] = parent[parent[i]];
-      i = parent[i];
+    let root = i;
+    while ((parent[root] ?? root) !== root) {
+      root = parent[root] ?? root;
     }
-    return i;
+    return root;
   };
   const union = (a: number, b: number) => {
     const ra = find(a);
@@ -59,12 +59,12 @@ export function planProviderMerges(rows: ProviderMergeInput[]): ProviderMergePla
     }
   });
 
-  // Group indices by cluster root.
-  const clusters = new Map<number, number[]>();
-  rows.forEach((_, i) => {
+  // Group rows by cluster root.
+  const clusters = new Map<number, ProviderMergeInput[]>();
+  rows.forEach((r, i) => {
     const root = find(i);
     const list = clusters.get(root) ?? [];
-    list.push(i);
+    list.push(r);
     clusters.set(root, list);
   });
 
@@ -73,15 +73,16 @@ export function planProviderMerges(rows: ProviderMergeInput[]): ProviderMergePla
     if (members.length < 2) continue;
     const sorted = [...members].sort((a, b) => {
       // Active first, then lowest ULID.
-      if (rows[a].isActive !== rows[b].isActive) return rows[a].isActive ? -1 : 1;
-      return rows[a].id < rows[b].id ? -1 : 1;
+      if (a.isActive !== b.isActive) return a.isActive ? -1 : 1;
+      return a.id < b.id ? -1 : 1;
     });
-    const survivorId = rows[sorted[0]].id;
+    const survivor = sorted[0];
+    if (!survivor) continue; // unreachable (length >= 2); satisfies strict indexing
     const loserIds = sorted
       .slice(1)
-      .map((i) => rows[i].id)
+      .map((r) => r.id)
       .sort();
-    plans.push({ survivorId, loserIds });
+    plans.push({ survivorId: survivor.id, loserIds });
   }
   return plans.sort((a, b) => (a.survivorId < b.survivorId ? -1 : 1));
 }

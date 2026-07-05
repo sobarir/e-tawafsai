@@ -1,7 +1,7 @@
 ## 1. Shared normalization
 
-- [ ] 1.1 Add a provider-key normalization helper in `packages/shared` (`normalizeProviderName` → `lower(trim)`, `normalizePpiu` → `trim`, empty → `null`) with unit spec covering case/whitespace/blank cases
-- [ ] 1.2 Export the helper from the shared package index
+- [x] 1.1 Add a provider-key normalization helper in `packages/shared` (`normalizeProviderName` → `lower(trim)`, `normalizePpiu` → `trim`, empty → `null`) with unit spec covering case/whitespace/blank cases
+- [x] 1.2 Export the helper from the shared package index
 
 ## 2. API enforcement (create/update pre-check)
 
@@ -12,7 +12,7 @@
 
 ## 3. Dedup migration (one-time cleanup)
 
-- [ ] 3.1 Implement per-tenant duplicate clustering (transitive closure over normalized-name OR non-empty normalized-PPIU edges)
+- [x] 3.1 Implement per-tenant duplicate clustering (transitive closure over normalized-name OR non-empty normalized-PPIU edges)
 - [ ] 3.2 Implement survivor selection (active first, then lowest ULID) and package repoint (`packages.providerId` losers→survivor), then delete losers — all in one transaction
 - [ ] 3.3 Normalize existing blank PPIUs to NULL as the first migration step
 - [ ] 3.4 Integration spec: seed a tenant with a name-dup and a PPIU-dup forming one cluster; assert one survivor, packages repointed with no orphans, active-preference honored

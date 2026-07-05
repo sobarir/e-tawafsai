@@ -1,12 +1,20 @@
-import { Inject, Injectable, NotFoundException, BadRequestException } from "@nestjs/common";
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+  ConflictException,
+} from "@nestjs/common";
 import { InjectPinoLogger, PinoLogger } from "nestjs-pino";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, ne, or, isNotNull, sql, type SQL } from "drizzle-orm";
 import { providers, type Provider } from "@cometkit/db";
-import type {
-  CreateProviderInput,
-  UpdateProviderInput,
-  ListProvidersQuery,
-  Paginated,
+import {
+  normalizeProviderName,
+  normalizePpiu,
+  type CreateProviderInput,
+  type UpdateProviderInput,
+  type ListProvidersQuery,
+  type Paginated,
 } from "@cometkit/shared";
 import { ulid } from "ulid";
 import { TenantScopedDb } from "../tenancy/tenant-scoped-db";
@@ -33,28 +41,72 @@ export class ProvidersService {
     return row as Provider | undefined;
   }
 
+  /**
+   * Throws ConflictException if the normalized name or PPIU collides with an
+   * existing provider in the tenant. `excludeId` skips the row being updated.
+   */
+  private async assertNoConflict(
+    name: string | undefined,
+    ppiu: string | null,
+    excludeId?: string,
+  ): Promise<void> {
+    const clauses: SQL[] = [];
+    if (name !== undefined) {
+      clauses.push(eq(sql`lower(trim(${providers.name}))`, normalizeProviderName(name)));
+    }
+    if (ppiu !== null) {
+      clauses.push(
+        and(isNotNull(providers.ppiuLicenseNo), eq(sql`trim(${providers.ppiuLicenseNo})`, ppiu)) as SQL,
+      );
+    }
+    if (clauses.length === 0) return;
+
+    const match = or(...clauses) as SQL;
+    const where = excludeId ? (and(ne(providers.id, excludeId), match) as SQL) : match;
+    const [existing] = await this.db.select(providers, where);
+    if (existing) {
+      throw new ConflictException(
+        `A provider with the same name or PPIU license already exists (id ${(existing as { id: string }).id})`,
+      );
+    }
+  }
+
+  /** postgres-js unique-violation → 409, as a concurrency backstop for the pre-check. */
+  private isUniqueViolation(err: unknown): boolean {
+    return typeof err === "object" && err !== null && (err as { code?: string }).code === "23505";
+  }
+
   async create(input: CreateProviderInput): Promise<Provider> {
     const id = ulid();
-    const [row] = await this.db.insertValues(providers, {
-      id,
-      name: input.name,
-      brandName: input.brandName,
-      ppiuLicenseNo: input.ppiuLicenseNo ?? null,
-      pihkLicenseNo: input.pihkLicenseNo ?? null,
-      accreditation: input.accreditation ?? "unknown",
-      contactPerson: input.contactPerson,
-      contactPhone: input.contactPhone,
-      logoUrl: input.logoUrl ?? null,
-      allowLogoOnPublicPages: input.allowLogoOnPublicPages ?? false,
-      defaultCommissionType: input.defaultCommissionType ?? "flat_per_pax",
-      defaultCommissionValue: input.defaultCommissionValue ?? 0,
-      commissionNotes: input.commissionNotes ?? null,
-      isActive: false,
-      pricePublicationConsentAt: null,
-    });
-    if (!row) throw new Error("Insert returned no row");
-    this.logger.info({ providerId: id }, "provider.created");
-    return row as Provider;
+    const ppiu = normalizePpiu(input.ppiuLicenseNo);
+    await this.assertNoConflict(input.name, ppiu);
+    try {
+      const [row] = await this.db.insertValues(providers, {
+        id,
+        name: input.name,
+        brandName: input.brandName,
+        ppiuLicenseNo: ppiu,
+        pihkLicenseNo: input.pihkLicenseNo ?? null,
+        accreditation: input.accreditation ?? "unknown",
+        contactPerson: input.contactPerson,
+        contactPhone: input.contactPhone,
+        logoUrl: input.logoUrl ?? null,
+        allowLogoOnPublicPages: input.allowLogoOnPublicPages ?? false,
+        defaultCommissionType: input.defaultCommissionType ?? "flat_per_pax",
+        defaultCommissionValue: input.defaultCommissionValue ?? 0,
+        commissionNotes: input.commissionNotes ?? null,
+        isActive: false,
+        pricePublicationConsentAt: null,
+      });
+      if (!row) throw new Error("Insert returned no row");
+      this.logger.info({ providerId: id }, "provider.created");
+      return row as Provider;
+    } catch (err) {
+      if (this.isUniqueViolation(err)) {
+        throw new ConflictException("A provider with the same name or PPIU license already exists");
+      }
+      throw err;
+    }
   }
 
   async list(query: ListProvidersQuery): Promise<Paginated<Provider>> {
