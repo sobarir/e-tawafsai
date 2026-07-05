@@ -2,7 +2,7 @@
 
 ## 1. Role model & data
 
-- [ ] 1.1 Change `USER_ROLES` to `["admin","staff"]` in `packages/shared`; update dependent types/DTOs; add `waNumber` and `isActive` to user schemas/DTOs
+- [x] 1.1 Change `USER_ROLES` to `["admin","staff"]` in `packages/shared`; update dependent types/DTOs; add `waNumber` and `isActive` to user schemas/DTOs
 - [ ] 1.2 Migration (hand-edited): `ALTER TYPE user_role RENAME VALUE 'user' → 'staff'`; add `is_active` (default true) and `wa_number` columns; change column default to `'staff'`; verify against local PG; update seeds (demo admin + demo staff in default tenant)
 - [ ] 1.3 Reduce registration to placeholder: remove `POST /register` account-creation + `AuthService.register`; keep web `/register` page as an inert access-request placeholder (no working create form)
 
