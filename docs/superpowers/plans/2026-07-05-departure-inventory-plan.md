@@ -25,7 +25,7 @@
 **Interfaces:**
 - Produces: `PaymentMilestone`, `CreateDepartureInput`, `UpdateDepartureInput`, `DepartureDto` interfaces.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
   Create `packages/shared/src/departures.spec.ts` to validate departure payload constraints:
   ```ts
   import { describe, expect, it } from "vitest";
@@ -65,11 +65,11 @@
   });
   ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
   Run: `bun run test departures.spec` in `packages/shared`
   Expected: FAIL with missing module error.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
   Create `packages/shared/src/departures.ts`:
   ```ts
   import * as z from "zod";
@@ -148,11 +148,11 @@
   export * from "./departures";
   ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
   Run: `bun run test departures.spec`
   Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
   Stage and commit Task 1 files.
 
 ---
@@ -164,7 +164,7 @@
 - Modify: `packages/db/src/schema/index.ts`
 - Modify: `packages/db/src/seed.ts`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
   Create `apps/api/src/departures/departures.service.int.spec.ts` asserting schema table definitions exist:
   ```ts
   import { describe, expect, it } from "vitest";
@@ -177,11 +177,11 @@
   });
   ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
   Run: `bun run test:int departures.service.int.spec` in `apps/api`
   Expected: FAIL with exports check.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
   Create `packages/db/src/schema/departures.ts`:
   ```ts
   import { pgTable, text, timestamp, integer, pgEnum, check } from "drizzle-orm/pg-core";
@@ -230,7 +230,7 @@
   Expose both tables in `packages/db/src/schema/index.ts`.
   Update seed script `packages/db/src/seed.ts` to insert a mock departure for the seeded package.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
   Generate and apply migration:
   `bun run db:generate`
   `bun run db:migrate`
@@ -238,7 +238,7 @@
   Run test: `bun run test:int departures.service.int.spec` in `apps/api`
   Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
   Stage and commit migrations, seed modifications, and schema files.
 
 ---
@@ -251,23 +251,23 @@
 - Create: `apps/api/src/departures/departures.module.ts`
 - Modify: `apps/api/src/app.module.ts`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
   Add test assertions in `apps/api/src/departures/departures.service.int.spec.ts` for atomic inventory mutations, checking constraints under concurrency, and manual adjustment audits.
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
   Run: `bun run test:int departures.service.int.spec`
   Expected: FAIL with controller/service imports missing.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
   Create `apps/api/src/departures/departures.service.ts` using SQL updates for seat counts and transactional allotment changes.
   Create controller endpoints.
   Register `DeparturesModule` in `app.module.ts`.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
   Run: `bun run test:int departures.service.int.spec`
   Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
   Stage and commit Task 3 API module files.
 
 ---
@@ -279,21 +279,21 @@
 - Modify: `apps/api/src/departures/departures.service.ts`
 - Modify: `apps/api/src/packages/packages.service.ts`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
   Add unit tests verifying status lifecycle changes (`open` → `almost_full` → `full` → `departed`) and the package `needsReview` computed flag.
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
   Run tests.
   Expected: FAIL.
 
-- [ ] **Step 3: Write minimal implementation**
+- [x] **Step 3: Write minimal implementation**
   Add daily Cron job that sets past departures to `departed`. Add inline self-healing on queries. Integrate computed review status in `packages.service.ts`.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
   Run: `bun run verify`
   Expected: PASS
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
   Stage and commit scheduler and status automation files.
 
 ---
@@ -306,12 +306,12 @@
 - Modify: `apps/web/src/app/dashboard/packages/[id]/page.tsx`
 - Modify: `apps/web/src/app/dashboard/page.tsx`
 
-- [ ] **Step 1: Write the hook, components, and pages**
+- [x] **Step 1: Write the hook, components, and pages**
   Implement TanStack Query hooks in `use-departures.ts`. Add departures table list and creation modal in `packages/[id]/page.tsx`. Embed widgets in dashboard page.
 
-- [ ] **Step 2: Verify lint and compilation**
+- [x] **Step 2: Verify lint and compilation**
   Run: `bun run verify` in workspace root.
   Expected: PASS
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
   Stage and commit Web UI files.
