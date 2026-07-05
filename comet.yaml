@@ -1,0 +1,4 @@
+# Comet project config (read by comet-guard project_config_value).
+# This repo is a bun monorepo — the guard's npm fallback does not apply.
+build_command: bun run build
+verify_command: bun run verify
