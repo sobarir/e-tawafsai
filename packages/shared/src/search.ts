@@ -69,6 +69,20 @@ export interface SearchResultDto {
   publicUrl: string; // server-computed via packagePublicUrl (build-time decision 1)
 }
 
+/**
+ * Canonical public URL for a package. Locked decision (E): host is the
+ * tenant's custom domain when set, otherwise `{tenant.slug}.{baseDomain}`.
+ * C6 implements the actual `/paket/{slug}` route (cross-change contract).
+ */
+export function packagePublicUrl(
+  tenant: { slug: string; customDomain: string | null },
+  slug: string,
+  baseDomain: string,
+): string {
+  const host = tenant.customDomain ?? `${tenant.slug}.${baseDomain}`;
+  return `https://${host}/paket/${slug}`;
+}
+
 function formatIdr(amount: number): string {
   return "Rp " + amount.toLocaleString("id-ID");
 }

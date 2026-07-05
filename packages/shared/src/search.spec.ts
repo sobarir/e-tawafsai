@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { searchPackagesSchema, formatWhatsappSummary } from "./search";
+import { searchPackagesSchema, formatWhatsappSummary, packagePublicUrl } from "./search";
 import type { SearchResultDto } from "./search";
 
 const baseDto: SearchResultDto = {
@@ -88,5 +88,25 @@ describe("formatWhatsappSummary", () => {
     expect(out).toContain("Diselenggarakan oleh Barokah Travel");
     expect(out).not.toContain("PPIU SK");
     expect(out).not.toContain("—");
+  });
+});
+
+describe("packagePublicUrl", () => {
+  it("uses the custom domain when the tenant has one", () => {
+    const url = packagePublicUrl(
+      { slug: "barokah", customDomain: "barokahtravel.co.id" },
+      "umrah-reguler-9-hari",
+      "etawafsai.com",
+    );
+    expect(url).toBe("https://barokahtravel.co.id/paket/umrah-reguler-9-hari");
+  });
+
+  it("falls back to the slug subdomain of the base domain", () => {
+    const url = packagePublicUrl(
+      { slug: "barokah", customDomain: null },
+      "umrah-reguler-9-hari",
+      "etawafsai.com",
+    );
+    expect(url).toBe("https://barokah.etawafsai.com/paket/umrah-reguler-9-hari");
   });
 });
