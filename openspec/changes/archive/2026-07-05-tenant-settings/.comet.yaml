@@ -17,6 +17,6 @@ verification_report: docs/superpowers/reports/2026-07-05-tenant-settings-verify.
 branch_status: handled
 created_at: 2026-07-04
 verified_at: 2026-07-05
-archived: false
+archived: true
 handoff_context: openspec/changes/tenant-settings/.comet/handoff/design-context.json
 handoff_hash: f739ec440a94a90beced40f98f359a623e08b7f5b0309b98a84dbd61c8b26dc4

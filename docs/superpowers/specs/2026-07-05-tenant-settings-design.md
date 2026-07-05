@@ -2,6 +2,8 @@
 comet_change: tenant-settings
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-07-05-tenant-settings
+status: final
 ---
 
 # Design Doc: tenant-settings
@@ -67,6 +69,8 @@ export const messageTemplates = pgTable("message_templates", {
 ]);
 ```
 
+archived-with: 2026-07-05-tenant-settings
+status: final
 ---
 
 ## 2. Contracts & Validation (shared)
@@ -80,6 +84,8 @@ export const messageTemplates = pgTable("message_templates", {
 * `doc_checklist` -> `{customerName}`, `{checklistItems}`
 * `testimonial_ask` -> `{customerName}`, `{packageName}`
 
+archived-with: 2026-07-05-tenant-settings
+status: final
 ---
 
 ## 3. Caching & Operations
@@ -90,6 +96,8 @@ When retrieving a tenant's settings, if the corresponding `tenant_settings` row 
 ### In-Process Hot-Key Cache
 We will cache the `almostFullThreshold` in-memory with a 60-second TTL to avoid database overhead on hot request paths (e.g. status evaluation during reservations).
 
+archived-with: 2026-07-05-tenant-settings
+status: final
 ---
 
 ## 4. Gating & Security

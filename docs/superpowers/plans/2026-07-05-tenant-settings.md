@@ -2,6 +2,7 @@
 change: tenant-settings
 design-doc: docs/superpowers/specs/2026-07-05-tenant-settings-design.md
 base-ref: 32a180ad4cf324684684aa823bcdf11f92449a08
+archived-with: 2026-07-05-tenant-settings
 ---
 
 # tenant-settings Implementation Plan
@@ -20,6 +21,7 @@ base-ref: 32a180ad4cf324684684aa823bcdf11f92449a08
 - API endpoints are protected using `@Roles("admin")` fresh RBAC checking.
 - Next.js web client uses `proxy.ts` routing gate instead of middleware.
 
+archived-with: 2026-07-05-tenant-settings
 ---
 
 ## Tasks
@@ -100,6 +102,7 @@ base-ref: 32a180ad4cf324684684aa823bcdf11f92449a08
   git commit -m "feat(tenant-settings): add shared settings and template validation schemas"
   ```
 
+archived-with: 2026-07-05-tenant-settings
 ---
 
 ### Task 2: Database Schema & Seeding
@@ -198,6 +201,7 @@ base-ref: 32a180ad4cf324684684aa823bcdf11f92449a08
   git commit -m "feat(tenant-settings): add tables, run migrations, and seed starter templates"
   ```
 
+archived-with: 2026-07-05-tenant-settings
 ---
 
 ### Task 3: Backend Settings Service & Controller
@@ -362,6 +366,7 @@ base-ref: 32a180ad4cf324684684aa823bcdf11f92449a08
   git commit -m "feat(tenant-settings): settings backend endpoints with admin roles guard"
   ```
 
+archived-with: 2026-07-05-tenant-settings
 ---
 
 ### Task 4: Backend Message Templates Endpoints
@@ -454,6 +459,7 @@ base-ref: 32a180ad4cf324684684aa823bcdf11f92449a08
   git commit -m "feat(tenant-settings): add message templates REST endpoints"
   ```
 
+archived-with: 2026-07-05-tenant-settings
 ---
 
 ### Task 5: Web UI Admin Settings Management
@@ -502,6 +508,7 @@ base-ref: 32a180ad4cf324684684aa823bcdf11f92449a08
   git commit -m "feat(tenant-settings): settings UI management panels"
   ```
 
+archived-with: 2026-07-05-tenant-settings
 ---
 
 ### Task 6: Message Templates Editor UI
@@ -550,6 +557,7 @@ base-ref: 32a180ad4cf324684684aa823bcdf11f92449a08
   git commit -m "feat(tenant-settings): message templates editor UI with validation warnings"
   ```
 
+archived-with: 2026-07-05-tenant-settings
 ---
 
 ### Task 7: Caching, Integration, and Verification
