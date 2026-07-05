@@ -7,6 +7,8 @@ import { DB } from "../database/database.module";
 
 @Injectable()
 export class SettingsService {
+  private readonly thresholdCache = new Map<string, { value: number; expiresAt: number }>();
+
   constructor(@Inject(DB) private readonly db: Database) {}
 
   async getSettings(tenantId: string) {
@@ -95,6 +97,8 @@ export class SettingsService {
       );
     }
 
+    this.thresholdCache.delete(tenantId);
+
     return this.getSettings(tenantId);
   }
 
@@ -131,5 +135,26 @@ export class SettingsService {
     return this.db.query.messageTemplates.findFirst({
       where: (table, { and }) => and(eq(table.tenantId, tenantId), eq(table.key, key)),
     });
+  }
+
+  async getAlmostFullThreshold(tenantId: string): Promise<number> {
+    const cached = this.thresholdCache.get(tenantId);
+    const now = Date.now();
+    if (cached && cached.expiresAt > now) {
+      return cached.value;
+    }
+
+    const { tenantSettings } = await import("@cometkit/db");
+    const settings = await this.db.query.tenantSettings.findFirst({
+      where: eq(tenantSettings.tenantId, tenantId),
+    });
+
+    const value = settings?.almostFullThreshold ?? 5;
+    this.thresholdCache.set(tenantId, {
+      value,
+      expiresAt: now + 60 * 1000,
+    });
+
+    return value;
   }
 }

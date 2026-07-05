@@ -47,4 +47,25 @@ describe("SettingsService", () => {
     expect(templates[0]?.key).toBe("greeting");
     expect(mockDb.query.messageTemplates.findMany).toHaveBeenCalled();
   });
+
+  it("caches getAlmostFullThreshold for 60 seconds", async () => {
+    const mockDb = {
+      query: {
+        tenantSettings: {
+          findFirst: vi.fn().mockResolvedValue({
+            almostFullThreshold: 7,
+          }),
+        },
+      },
+    };
+    const service = new SettingsService(mockDb as unknown as Database);
+
+    // Call twice
+    const t1 = await service.getAlmostFullThreshold("tenant-1");
+    const t2 = await service.getAlmostFullThreshold("tenant-1");
+
+    expect(t1).toBe(7);
+    expect(t2).toBe(7);
+    expect(mockDb.query.tenantSettings.findFirst).toHaveBeenCalledTimes(1); // cached
+  });
 });
