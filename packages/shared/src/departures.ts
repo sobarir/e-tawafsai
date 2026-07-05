@@ -68,3 +68,8 @@ export interface InventoryAdjustmentDto {
   actorId: string;
   createdAt: string;
 }
+
+export const adjustInventorySchema = z.object({
+  delta: z.number().int(),
+  reason: z.string().min(1),
+});
