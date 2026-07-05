@@ -71,9 +71,17 @@ export class ProvidersService {
     }
   }
 
-  /** postgres-js unique-violation → 409, as a concurrency backstop for the pre-check. */
+  /**
+   * postgres-js unique-violation → 409, as a concurrency backstop for the
+   * pre-check. Drizzle wraps the driver error, so the SQLSTATE `23505` may sit
+   * on the error itself or on its `cause`.
+   */
   private isUniqueViolation(err: unknown): boolean {
-    return typeof err === "object" && err !== null && (err as { code?: string }).code === "23505";
+    const code = (e: unknown): string | undefined =>
+      typeof e === "object" && e !== null ? (e as { code?: string }).code : undefined;
+    if (code(err) === "23505") return true;
+    const cause = typeof err === "object" && err !== null ? (err as { cause?: unknown }).cause : undefined;
+    return code(cause) === "23505";
   }
 
   async create(input: CreateProviderInput): Promise<Provider> {

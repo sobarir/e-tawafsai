@@ -1,0 +1,2 @@
+CREATE UNIQUE INDEX "providers_tenant_name_unique" ON "providers" USING btree ("tenant_id",lower(btrim("name")));--> statement-breakpoint
+CREATE UNIQUE INDEX "providers_tenant_ppiu_unique" ON "providers" USING btree ("tenant_id",btrim("ppiu_license_no")) WHERE "providers"."ppiu_license_no" is not null;

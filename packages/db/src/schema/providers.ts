@@ -1,4 +1,5 @@
-import { boolean, integer, pgEnum, pgTable, text, varchar, timestamp } from "drizzle-orm/pg-core";
+import { boolean, integer, pgEnum, pgTable, text, varchar, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 import { ACCREDITATIONS, COMMISSION_TYPES } from "@cometkit/shared";
 import { timestamps, ulidPk } from "../columns";
 import { tenantOwned } from "./tenants";
@@ -24,7 +25,15 @@ export const providers = pgTable("providers", {
   isActive: boolean("is_active").notNull().default(false),
   pricePublicationConsentAt: timestamp("price_publication_consent_at"),
   ...timestamps,
-});
+}, (t) => [
+  // Per-tenant uniqueness on the normalized name and the normalized PPIU.
+  // Blank/NULL PPIUs are exempt (partial index), so drafts without a license
+  // never collide. Normalization is enforced on write (service + dedup).
+  uniqueIndex("providers_tenant_name_unique").on(t.tenantId, sql`lower(btrim(${t.name}))`),
+  uniqueIndex("providers_tenant_ppiu_unique")
+    .on(t.tenantId, sql`btrim(${t.ppiuLicenseNo})`)
+    .where(sql`${t.ppiuLicenseNo} is not null`),
+]);
 
 export type Provider = typeof providers.$inferSelect;
 export type NewProvider = typeof providers.$inferInsert;

@@ -19,10 +19,10 @@
 
 ## 4. DB unique constraints
 
-- [ ] 4.1 Add expression unique index `UNIQUE (tenant_id, lower(trim(name)))` on `providers`
-- [ ] 4.2 Add partial expression unique index `UNIQUE (tenant_id, trim(ppiu_license_no)) WHERE ppiu_license_no IS NOT NULL`
-- [ ] 4.3 Generate the migration and sequence it AFTER the dedup cleanup (same transaction / same migration run)
-- [ ] 4.4 Integration spec: constraint rejects a direct duplicate insert; allows blank-PPIU and cross-tenant rows
+- [x] 4.1 Add expression unique index `UNIQUE (tenant_id, lower(trim(name)))` on `providers`
+- [x] 4.2 Add partial expression unique index `UNIQUE (tenant_id, trim(ppiu_license_no)) WHERE ppiu_license_no IS NOT NULL`
+- [x] 4.3 Generate the migration and sequence it AFTER the dedup cleanup (documented runbook: dedup → migrate)
+- [x] 4.4 Integration spec: constraint rejects a direct duplicate insert; allows blank-PPIU rows
 
 ## 5. Verify
 
