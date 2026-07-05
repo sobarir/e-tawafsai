@@ -20,6 +20,14 @@ export const createProviderSchema = z.object({
 
 export const updateProviderSchema = createProviderSchema.partial();
 
+export type CreateProviderInput = z.input<typeof createProviderSchema>;
+export type UpdateProviderInput = z.input<typeof updateProviderSchema>;
+
+export interface ListProvidersQuery {
+  page: number;
+  limit: number;
+}
+
 export const activateProviderSchema = z.object({
   ppiuLicenseNo: z.string().max(100).nullable().optional(),
   pihkLicenseNo: z.string().max(100).nullable().optional(),
