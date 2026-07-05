@@ -4,3 +4,5 @@ export * from "./tenants";
 export * from "./users";
 export * from "./pagination";
 export * from "./errors";
+export * from "./settings";
+
