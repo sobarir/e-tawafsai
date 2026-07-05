@@ -42,7 +42,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     // Scoped by the active tenant: a user whose tenant changed resolves to
     // undefined -> 401 (same spirit as the existing role-freshness behavior).
     const user = await this.users.findById(payload.sub);
-    if (!user) {
+    if (!user || !user.isActive) {
       throw new UnauthorizedException();
     }
     return {

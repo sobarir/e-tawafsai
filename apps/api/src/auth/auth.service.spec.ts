@@ -61,4 +61,15 @@ describe("AuthService", () => {
       service.login({ email: demoUser.email, password: "wrong-password" }),
     ).rejects.toBeInstanceOf(UnauthorizedException);
   });
+
+  it("rejects login for a deactivated user", async () => {
+    usersMock.findByEmail.mockResolvedValue({
+      ...demoUser,
+      isActive: false,
+    });
+
+    await expect(
+      service.login({ email: demoUser.email, password: "password123" }),
+    ).rejects.toBeInstanceOf(UnauthorizedException);
+  });
 });

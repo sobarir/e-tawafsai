@@ -12,7 +12,7 @@
 - [x] 2.2 Document the staff-DTO seam convention in shared (distinct staff response types + viewer-role mappers); generic stripping helper deferred to `provider-management`
 - [x] 2.3 User administration endpoints: list/create/update within tenant; replace hard delete with deactivate/reactivate (`isActive`); `canDeactivateUser` self-guard in `users.policy.ts`
 - [x] 2.4 httpOnly-cookie session: set JWT cookie on login (`Set-Cookie`), cookie extractor in `jwt.strategy` (Bearer header fallback), `POST /auth/logout` clears cookie, credentialed CORS locked to web origin
-- [ ] 2.5 Inactive enforcement: `login` rejects inactive users (standard 401 envelope); `jwt.strategy.validate` rejects `!isActive`
+- [x] 2.5 Inactive enforcement: `login` rejects inactive users (standard 401 envelope); `jwt.strategy.validate` rejects `!isActive`
 
 ## 3. Web UI
 

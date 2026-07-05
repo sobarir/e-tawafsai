@@ -22,7 +22,7 @@ export class AuthService {
 
   async login(input: LoginInput): Promise<AuthResponse> {
     const user = await this.users.findByEmail(input.email);
-    if (!user) {
+    if (!user || !user.isActive) {
       throw new UnauthorizedException("Invalid email or password");
     }
 
