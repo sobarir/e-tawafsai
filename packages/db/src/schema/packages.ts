@@ -25,6 +25,7 @@ export const packages = pgTable("packages", {
   flightRoute: varchar("flight_route", { length: 255 }),
   departureCity: varchar("departure_city", { length: 120 }),
   isFeatured: boolean("is_featured").notNull().default(false),
+  directOnly: boolean("direct_only").notNull().default(false),
   hasBeenPublished: boolean("has_been_published").notNull().default(false),
   status: statusEnum("status").notNull().default("draft"),
   ...timestamps,

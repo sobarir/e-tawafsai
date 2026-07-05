@@ -78,6 +78,13 @@
       "when": 1783255712681,
       "tag": "0010_smart_chronomancer",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1783260001432,
+      "tag": "0011_reflective_zodiak",
+      "breakpoints": true
     }
   ]
 }
