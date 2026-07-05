@@ -6,6 +6,7 @@ import { formatWhatsappSummary } from "@cometkit/shared";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSearchPackages } from "@/hooks/use-search";
+import { useProviders } from "@/hooks/use-providers";
 import { copyText } from "@/lib/clipboard";
 import { ResultCard } from "./result-card";
 import { ActiveChips, FilterSheet } from "./search-filters";
@@ -14,6 +15,8 @@ export default function SearchPage() {
   const [filters, setFilters] = useState<Partial<SearchParams>>({});
   const [sheetOpen, setSheetOpen] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
+  const { data: providersData } = useProviders(1, 100);
+  const providers = providersData?.data ?? [];
   const { data, isPending, error } = useSearchPackages(filters);
 
   const removeFilter = (key: keyof Partial<SearchParams>) => {
@@ -58,7 +61,7 @@ export default function SearchPage() {
         </Button>
       </div>
 
-      <ActiveChips filters={filters} onRemove={removeFilter} />
+      <ActiveChips filters={filters} onRemove={removeFilter} providers={providers} />
 
       {error && (
         <p role="alert" className="text-sm text-destructive">
@@ -83,7 +86,7 @@ export default function SearchPage() {
         )}
       </div>
 
-      <FilterSheet open={sheetOpen} filters={filters} onChange={setFilters} onClose={() => setSheetOpen(false)} />
+      <FilterSheet open={sheetOpen} filters={filters} onChange={setFilters} onClose={() => setSheetOpen(false)} providers={providers} />
     </main>
   );
 }
