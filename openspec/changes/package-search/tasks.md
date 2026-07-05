@@ -7,8 +7,8 @@
 
 ## 2. API
 
-- [ ] 2.1 Search endpoint: single Drizzle query with departure-level EXISTS predicates + aggregation (next departure, price-from, seats left)
-- [ ] 2.2 Full-text integration combinable with structured filters; direct-only handling per design decision
+- [x] 2.1 Search endpoint: single Drizzle query with departure-level EXISTS predicates + aggregation (next departure, price-from, seats left)
+- [x] 2.2 Full-text integration combinable with structured filters; direct-only handling per design decision
 
 ## 3. Web UI
 

@@ -131,4 +131,34 @@ describe("SearchService (integration)", () => {
     expect(all.data.map((r) => r.id)).toContain(direct);
     expect(all.data.map((r) => r.id)).not.toContain(notDirect);
   });
+
+  it("PRD combo: duration 9, maxPrice 30,000,000, September returns only qualifying packages", async () => {
+    const good = await seedPackage({ title: `PrdGood ${suffix}`, duration: 9, priceQuad: 28_000_000, depDate: new Date(Date.UTC(2026, 8, 15)) });
+    const pricey = await seedPackage({ title: `PrdPricey ${suffix}`, duration: 9, priceQuad: 35_000_000, depDate: new Date(Date.UTC(2026, 8, 15)) });
+    const long = await seedPackage({ title: `PrdLong ${suffix}`, duration: 12, priceQuad: 28_000_000, depDate: new Date(Date.UTC(2026, 8, 15)) });
+    const october = await seedPackage({ title: `PrdOctober ${suffix}`, duration: 9, priceQuad: 28_000_000, depDate: new Date(Date.UTC(2026, 9, 15)) });
+    const res = await service.search(makeParams({
+      durationMin: 9, durationMax: 9, maxPrice: 30_000_000, monthFrom: "2026-09", monthTo: "2026-09",
+    }));
+    const ids = res.data.map((r) => r.id);
+    expect(ids).toContain(good);
+    expect(ids).not.toContain(pricey);
+    expect(ids).not.toContain(long);
+    expect(ids).not.toContain(october);
+  });
+
+  it("excludes a package whose only matching departure has zero seats when the toggle is on", async () => {
+    const full = await seedPackage({ title: `SeatsZero ${suffix}`, seatBooked: 45, depDate: new Date(Date.UTC(2026, 8, 12)) });
+    const on = await service.search(makeParams({ seatsAvailableOnly: true, q: `SeatsZero ${suffix}` }));
+    expect(on.data.map((r) => r.id)).not.toContain(full);
+    const off = await service.search(makeParams({ seatsAvailableOnly: false, q: `SeatsZero ${suffix}` }));
+    expect(off.data.map((r) => r.id)).toContain(full);
+  });
+
+  it("falls back to priceQuad when the selected occupancy price is null", async () => {
+    // priceTriple null, priceQuad within budget, triple selected -> qualifies via fallback.
+    const hit = await seedPackage({ title: `OccFallback ${suffix}`, priceQuad: 29_000_000, priceTriple: null, depDate: new Date(Date.UTC(2026, 8, 12)) });
+    const res = await service.search(makeParams({ occupancy: "triple", maxPrice: 30_000_000, q: `OccFallback ${suffix}` }));
+    expect(res.data.map((r) => r.id)).toContain(hit);
+  });
 });
