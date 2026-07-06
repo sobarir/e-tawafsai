@@ -1,8 +1,9 @@
-import { boolean, integer, pgEnum, pgTable, text, varchar, primaryKey, unique, index } from "drizzle-orm/pg-core";
+import { boolean, integer, pgEnum, pgTable, text, varchar, primaryKey, unique, index, uniqueIndex } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 import { PRODUCT_TYPES, PACKAGE_CATEGORIES, PACKAGE_STATUSES } from "@cometkit/shared";
 import { timestamps, ulidPk, ulidRef } from "../columns";
 import { tenantOwned } from "./tenants";
-import { providers } from "./providers";
+import { providers, commissionTypeEnum } from "./providers";
 
 export const productTypeEnum = pgEnum("product_type", PRODUCT_TYPES);
 export const categoryEnum = pgEnum("category", PACKAGE_CATEGORIES);
@@ -18,6 +19,7 @@ export const packages = pgTable("packages", {
   title: varchar("title", { length: 255 }).notNull(),
   slug: varchar("slug", { length: 255 }).notNull(),
   category: categoryEnum("category").notNull().default("regular"),
+  categoryId: ulidRef("category_id").references(() => packageCategories.id),
   plusDestination: varchar("plus_destination", { length: 120 }),
   durationDays: integer("duration_days"),
   description: text("description"),
@@ -32,6 +34,28 @@ export const packages = pgTable("packages", {
 }, (table) => [
   unique("packages_tenant_slug_idx").on(table.tenantId, table.slug),
 ]);
+
+export const packageCategories = pgTable("package_categories", {
+  id: ulidPk(),
+  ...tenantOwned(),
+  providerId: ulidRef("provider_id")
+    .notNull()
+    .references(() => providers.id),
+  productType: productTypeEnum("product_type").notNull().default("umrah"),
+  name: varchar("name", { length: 120 }).notNull(),
+  commissionType: commissionTypeEnum("commission_type").notNull().default("flat_per_pax"),
+  commissionValue: integer("commission_value").notNull().default(0),
+  ...timestamps,
+}, (table) => [
+  // Per-(tenant, provider, productType) uniqueness on the normalized name,
+  // mirroring the providers normalized-name idiom.
+  uniqueIndex("package_categories_scope_name_idx")
+    .on(table.tenantId, table.providerId, table.productType, sql`lower(btrim(${table.name}))`),
+  index("package_categories_provider_idx").on(table.providerId),
+]);
+
+export type DbPackageCategory = typeof packageCategories.$inferSelect;
+export type NewDbPackageCategory = typeof packageCategories.$inferInsert;
 
 export const packageHotels = pgTable("package_hotels", {
   id: ulidPk(),
