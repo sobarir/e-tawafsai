@@ -16,9 +16,9 @@
 
 ## 3. API — categories module (apps/api)
 
-- [ ] 3.1 Create categories Nest module: service + controller, `@UseGuards(JwtAuthGuard, RolesGuard)` + `@Roles("admin")`, tenant-scoped, surfaced under providers
-- [ ] 3.2 Implement list (by `providerId` + optional `productType`), create (seed commission from provider default when omitted), update, delete
-- [ ] 3.3 Enforce uniqueness pre-check (`409 Conflict`) and in-use delete guard (`409 Conflict`)
+- [x] 3.1 Create categories Nest module: service + controller, `@UseGuards(JwtAuthGuard, RolesGuard)` + `@Roles("admin")`, tenant-scoped, surfaced under providers
+- [x] 3.2 Implement list (by `providerId` + optional `productType`), create (seed commission from provider default when omitted), update, delete
+- [x] 3.3 Enforce uniqueness pre-check (`409 Conflict`) and in-use delete guard (`409 Conflict`)
 - [x] 3.4 Typed `toCategoryDto` mapper (admin) + staff-safe mapper stripping commission
 - [x] 3.5 Category policy pure functions in `categories.policy.ts` (scope/ownership decisions)
 
