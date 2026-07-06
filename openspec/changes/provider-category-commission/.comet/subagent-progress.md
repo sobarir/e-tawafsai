@@ -14,7 +14,20 @@ Branch base (merge-base): 9e438324540cf894811babf145df30003b0bc403
 ## Minor findings deferred to final review
 - Task 4 remove(): raw DB.$count not tenant-filtered (over-inclusive only, per brief) — add clarifying comment if revisited.
 
-## Current Task
+## Stage: DONE — build loop complete (final review clean; update-scope Important fixed in 1909842)
+- Final review: ready-to-merge with ONE Important finding to close.
+- Important: packages.service.update() only re-validates category scope when input.categoryId truthy; a PATCH changing providerId/productType WITHOUT categoryId leaves a wrong-provider categoryId unvalidated. Fix: re-validate effective (input??existing) categoryId when provider/productType change. Direct-API-only, data-quality (no privacy leak). Fixing before merge.
+- All accepted Minors triaged as fast-follows (no action).
+
+## Deferred Minor findings (for final-review triage)
+- Task 4: raw DB.$count in remove() not tenant-filtered (over-inclusive only, per brief).
+- Task 5: cosmetic redundant categoryId key in findOne return (harmless).
+- Task 7: draft resync skip on concurrent edit; stale categoryDrafts keys not pruned; staff fires GET /categories (returns staff DTO). All harmless.
+- Task 8: CATEGORY_LABELS partly dead (fallback covers it); search category list hardcoded to umrah (Phase 1 permitted).
+- Task 9: backfill int-spec had no named script (moot — runner superseded); N+1 in one-time migration; dead defensive fallback.
+- Task 10: in-place 0016 edit heals fresh/dev only (no released env exists on branch); migrate-cutover test covers 2/6 enum values + doesn't run the DROP.
+
+## Current Task (last)
 
 - Plan task text: "Task 10: Cutover — drop the `category` enum column + remove all `category` references"
 - Mapped OpenSpec tasks: 1.1, 2.4 (+ completes 1.5 PackageDto category removal)
