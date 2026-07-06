@@ -773,7 +773,7 @@ Add an optional "First departure (optional)" card to the Create Package form (ad
 - Consumes: `DepartureFormFields` / `DepartureFormFieldsHandle` (Task 4), `useCreateDeparture` (already imported at line 24), `api` / `readApiError`, `createPackage.mutateAsync`.
 - Produces: package creation optionally creates exactly one departure. No new exports.
 
-- [ ] **Step 1: Add a ref for the inline departure fields**
+- [x] **Step 1: Add a ref for the inline departure fields**
 
 In `PackageDetailPage`, near the other `useState`/refs (after the tag state, ~line 78), add:
 
@@ -781,7 +781,7 @@ In `PackageDetailPage`, near the other `useState`/refs (after the tag state, ~li
   const inlineDepartureRef = useRef<DepartureFormFieldsHandle>(null);
 ```
 
-- [ ] **Step 2: Post the inline departure after package creation**
+- [x] **Step 2: Post the inline departure after package creation**
 
 In `handleFormSubmit`, in the `if (isNew)` branch, after the flyers and tags follow-up loops and **before** `router.push(...)` (currently ~lines 166-175), insert the inline-departure follow-up:
 
@@ -807,7 +807,7 @@ In `handleFormSubmit`, in the `if (isNew)` branch, after the flyers and tags fol
 
 (The surrounding `try { ... } catch (err) { setError(await readApiError(err)); }` already wraps this block, so a failed departure post surfaces the field-level error near the create action while the package persists as a draft — Task 5's error requirement is met by the existing catch.)
 
-- [ ] **Step 3: Render the "First departure (optional)" card**
+- [x] **Step 3: Render the "First departure (optional)" card**
 
 In the create/edit `<form onSubmit={handleFormSubmit}>` (inside `PackageDetailPage`), add a new `Card` after the "Inclusions & Exclusions" card and **before** the submit-button block (currently ~line 561, right before `{isAdmin && (<div className="flex justify-end">...`). Gate it on `isAdmin && isNew`:
 
@@ -827,7 +827,7 @@ In the create/edit `<form onSubmit={handleFormSubmit}>` (inside `PackageDetailPa
             )}
 ```
 
-- [ ] **Step 4: Typecheck and lint the web package**
+- [x] **Step 4: Typecheck and lint the web package**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -836,11 +836,11 @@ cd apps/web && bun run typecheck && bun run lint
 
 Expected: PASS.
 
-- [ ] **Step 5: Manual smoke check (optional but recommended)**
+- [x] **Step 5: Manual smoke check (optional but recommended)**
 
 With `bun run dev` running, as an admin: open `/dashboard/packages/new`, fill required package fields, enter a departure date + quad price in the "First departure (optional)" card, submit. Expected: redirect to the new package detail page showing exactly one departure with the entered prices. Repeat leaving the departure card empty → package created with zero departures, no error. Enter a triple discount above the triple normal → field-level error shown near the create action, no departure created (package still created as draft).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/web/src/app/dashboard/packages/[id]/page.tsx

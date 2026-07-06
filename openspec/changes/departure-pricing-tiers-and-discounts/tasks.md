@@ -24,9 +24,9 @@
 
 ## 5. Web — inline first departure on create (apps/web)
 
-- [ ] 5.1 Add an optional "First departure (optional)" block to the Create Package form with date, return date, seats, DP, and the full quad/triple/double normal & discounted matrix (admin-only, only when `isNew`)
-- [ ] 5.2 On submit, when a departure date is present, POST one departure using the created package id after `createPackage` succeeds (same follow-up pattern as flyers/tags); skip cleanly when empty
-- [ ] 5.3 Surface departure validation/creation errors via `readApiError` near the create action
+- [x] 5.1 Add an optional "First departure (optional)" block to the Create Package form with date, return date, seats, DP, and the full quad/triple/double normal & discounted matrix (admin-only, only when `isNew`)
+- [x] 5.2 On submit, when a departure date is present, POST one departure using the created package id after `createPackage` succeeds (same follow-up pattern as flyers/tags); skip cleanly when empty
+- [x] 5.3 Surface departure validation/creation errors via `readApiError` near the create action
 
 ## 6. Verify
 
