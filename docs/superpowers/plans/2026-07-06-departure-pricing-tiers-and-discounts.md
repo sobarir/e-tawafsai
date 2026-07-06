@@ -57,7 +57,7 @@ Add the three nullable discount columns to the `departures` table, then generate
 - Consumes: nothing (first task).
 - Produces: DB columns `price_quad_discount`, `price_triple_discount`, `price_double_discount` (all `integer`, nullable). The inferred `DbDeparture` type (`typeof departures.$inferSelect`) now carries `priceQuadDiscount: number | null`, `priceTripleDiscount: number | null`, `priceDoubleDiscount: number | null`. Task 3 relies on these property names.
 
-- [ ] **Step 1: Add the three columns to the schema**
+- [x] **Step 1: Add the three columns to the schema**
 
 In `packages/db/src/schema/departures.ts`, insert three lines immediately after the existing `priceDouble` column (line 23):
 
@@ -71,7 +71,7 @@ In `packages/db/src/schema/departures.ts`, insert three lines immediately after 
   dpAmount: integer("dp_amount").notNull(),
 ```
 
-- [ ] **Step 2: Generate the migration**
+- [x] **Step 2: Generate the migration**
 
 Run (from repo root):
 
@@ -82,7 +82,7 @@ cd packages/db && bun run db:generate
 
 Expected: drizzle-kit prints a new migration file name (e.g. `0014_<name>.sql`) and reports 3 columns added to `departures`. Open the generated `.sql` and confirm it contains three `ALTER TABLE "departures" ADD COLUMN ...` statements for `price_quad_discount`, `price_triple_discount`, `price_double_discount`, all `integer` with no `NOT NULL` and no default.
 
-- [ ] **Step 3: Apply the migration**
+- [x] **Step 3: Apply the migration**
 
 Run (from repo root, needs local Postgres running):
 
@@ -93,7 +93,7 @@ cd packages/db && bun run db:migrate
 
 Expected: drizzle-kit applies the migration with no error. (No `db:seed` needed — additive nullable columns require no reseed.)
 
-- [ ] **Step 4: Typecheck the db package**
+- [x] **Step 4: Typecheck the db package**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -102,7 +102,7 @@ cd packages/db && bun run typecheck
 
 Expected: PASS (no type errors).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add packages/db/src/schema/departures.ts packages/db/drizzle

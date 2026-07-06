@@ -1,7 +1,7 @@
 ## 1. Schema & migration (packages/db)
 
-- [ ] 1.1 Add `priceQuadDiscount`, `priceTripleDiscount`, `priceDoubleDiscount` (nullable integer) to the `departures` table in `packages/db/src/schema/departures.ts`
-- [ ] 1.2 Run `bun run db:generate` to emit the migration, then `bun run db:migrate` to apply it
+- [x] 1.1 Add `priceQuadDiscount`, `priceTripleDiscount`, `priceDoubleDiscount` (nullable integer) to the `departures` table in `packages/db/src/schema/departures.ts`
+- [x] 1.2 Run `bun run db:generate` to emit the migration, then `bun run db:migrate` to apply it
 
 ## 2. Shared contract (packages/shared)
 
