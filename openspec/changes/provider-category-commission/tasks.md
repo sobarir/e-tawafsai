@@ -1,9 +1,9 @@
 ## 1. Shared contracts (packages/shared)
 
 - [ ] 1.1 Retire `PACKAGE_CATEGORIES` as a persisted enum; keep the six values as an exported `LEGACY_CATEGORY_NAMES` seed constant only
-- [ ] 1.2 Add category request schemas (`createCategorySchema`, `updateCategorySchema`) with `name`, `commissionType`, `commissionValue` (reuse `COMMISSION_TYPES`)
-- [ ] 1.3 Add `CategoryDto` (admin, includes commission) and a staff-safe category shape (no commission); export `productType`/`providerId` scope fields
-- [ ] 1.4 Update `createPackageSchema`/`updatePackageSchema` to use `categoryId` (ULID) instead of `category`; update `publishPackageSchema` to require `categoryId`
+- [x] 1.2 Add category request schemas (`createCategorySchema`, `updateCategorySchema`) with `name`, `commissionType`, `commissionValue` (reuse `COMMISSION_TYPES`)
+- [x] 1.3 Add `CategoryDto` (admin, includes commission) and a staff-safe category shape (no commission); export `productType`/`providerId` scope fields
+- [x] 1.4 Update `createPackageSchema`/`updatePackageSchema` to use `categoryId` (ULID) instead of `category`; update `publishPackageSchema` to require `categoryId`
 - [ ] 1.5 Update `PackageDto` (`category: string` → `categoryId: string` + resolved `categoryName`); update `search.ts` category filter field to reference categories
 
 ## 2. Database schema (packages/db)

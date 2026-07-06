@@ -5,17 +5,26 @@ Branch: feature/20260706/provider-category-commission
 Plan: docs/superpowers/plans/2026-07-06-provider-category-commission.md
 Branch base (merge-base): 9e438324540cf894811babf145df30003b0bc403
 
+## Completed
+- Task 1 (OpenSpec 2.1, 2.2): complete — commit d242c38, review clean.
+- Task 2 (OpenSpec 1.2, 1.3, 1.4): complete — commit 211887f, review clean.
+  - OpenSpec 1.1 (retire PACKAGE_CATEGORIES) deferred to Task 10 cutover.
+  - OpenSpec 1.5 search-filter half deferred to Task 6.
+
+## Carry-forward notes for later tasks
+- TASK 5: tighten `PackageDto.categoryId`/`categoryName` from optional back to required `string | null` (or populate them in the mapper) — they were made optional in Task 2 to keep api typecheck green.
+
 ## Current Task
 
-- Plan task text: "Task 1: `package_categories` schema + nullable `packages.category_id` (additive migration)"
-- Mapped OpenSpec tasks: 2.1, 2.2 (db schema + additive migration)
-- Stage: spec-review + quality-review
-- Task BASE commit (for review-package): 9e438324540cf894811babf145df30003b0bc403
-- Implementation commit: d242c387a3cef388f23c6f11df8b92e811e98acd
-- Changed files: packages/db/src/schema/packages.ts, drizzle/0015_flawless_red_shift.sql (+meta)
-- RED/GREEN evidence: N/A for schema-only task — verify 12/12 PASS; migration additive-only (no drops)
+- Plan task text: "Task 3: Category policy (pure functions) + unit spec"
+- Mapped OpenSpec tasks: 3.5 (categories.policy.ts) + 3.4 (partial: DTO mappers toCategoryDto/toStaffCategoryDto)
+- Stage: implementing
+- Task BASE commit (for review-package): (set after progress commit)
+- Implementation commit: (pending)
+- Changed files: (pending)
+- RED/GREEN evidence: (pending — TDD applies: categories.policy.spec.ts)
 - Reviews passed: none
 - Review-fix round: 0 / 3
 
 ## Notes
-- `category` enum column is intentionally KEPT alongside `category_id` through Tasks 1–9; removed only in Task 10 (cutover). Reviewers should not flag the retained enum as dead code before Task 10.
+- `category` enum column/field intentionally KEPT alongside `categoryId` through Tasks 1–9; removed only in Task 10 (cutover). Do not flag retained enum/field as dead code before Task 10.
