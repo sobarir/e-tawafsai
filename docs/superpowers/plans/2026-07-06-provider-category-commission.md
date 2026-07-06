@@ -41,7 +41,7 @@ base-ref: a1db2b5ac43c9f5be098d380ebcf6f5c0bd255a2
 **Interfaces:**
 - Produces: `package_categories` table with `{ id, tenantId, providerId, productType, name, commissionType, commissionValue, createdAt, updatedAt }`; `DbPackageCategory` / `NewDbPackageCategory` types; `packages.categoryId` (nullable `char(26)`).
 
-- [ ] **Step 1: Add the table and FK column to the schema**
+- [x] **Step 1: Add the table and FK column to the schema**
 
 In `packages/db/src/schema/packages.ts`, import `commissionTypeEnum` from `./providers` and add, after the existing enums/table imports:
 
@@ -90,24 +90,24 @@ import { sql } from "drizzle-orm";
 
 Note: `packageCategories` is declared after `packages`, but `packages.categoryId.references(() => packageCategories.id)` uses a thunk, so forward reference is fine.
 
-- [ ] **Step 2: Confirm the barrel exports the new symbols**
+- [x] **Step 2: Confirm the barrel exports the new symbols**
 
 Check `packages/db/src/schema/index.ts` (and `packages/db/src/index.ts`). If it re-exports `./schema/packages` with `export *`, no change is needed. If tables are listed explicitly, add `packageCategories`, `DbPackageCategory`, `NewDbPackageCategory`. Verify with:
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH"; grep -n "packageHotels\|packages" packages/db/src/schema/index.ts packages/db/src/index.ts`
 Expected: shows how existing package symbols are exported; mirror that for the new ones.
 
-- [ ] **Step 3: Generate the additive migration**
+- [x] **Step 3: Generate the additive migration**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH"; cd packages/db && bun run db:generate`
 Expected: a new `drizzle/00NN_*.sql` that CREATEs `package_categories` and ADDs `packages.category_id` (nullable), with the unique + provider indexes. It must NOT drop `category`.
 
-- [ ] **Step 4: Typecheck**
+- [x] **Step 4: Typecheck**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH"; bun run verify`
 Expected: PASS (purely additive; no consumers changed yet).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add packages/db/src/schema/packages.ts packages/db/src/schema/index.ts packages/db/drizzle
@@ -127,7 +127,7 @@ git commit -m "feat(db): add package_categories table and nullable packages.cate
 **Interfaces:**
 - Produces: `LEGACY_CATEGORY_NAMES`; `createCategorySchema`, `updateCategorySchema`, `CreateCategoryInput`, `UpdateCategoryInput`; `CategoryDto` (admin, with commission), `StaffCategoryDto` (no commission). `createPackageSchema`/`updatePackageSchema` gain optional `categoryId`; `publishPackageSchema` requires `categoryId`; `PackageDto` gains `categoryId: string | null` and `categoryName: string | null`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `packages/shared/src/categories.spec.ts`:
 
@@ -166,12 +166,12 @@ describe("category schemas", () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH"; cd packages/shared && bunx vitest run src/categories.spec.ts`
 Expected: FAIL — cannot find module `./categories`.
 
-- [ ] **Step 3: Create the categories contract**
+- [x] **Step 3: Create the categories contract**
 
 Create `packages/shared/src/categories.ts`:
 
@@ -218,12 +218,12 @@ export interface CategoryDto {
 export type StaffCategoryDto = Omit<CategoryDto, "commissionType" | "commissionValue">;
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH"; cd packages/shared && bunx vitest run src/categories.spec.ts`
 Expected: PASS.
 
-- [ ] **Step 5: Wire `categoryId` into package schemas + DTO**
+- [x] **Step 5: Wire `categoryId` into package schemas + DTO**
 
 In `packages/shared/src/packages.ts`:
 - Add to `createPackageSchema` (keep `category` for now): `categoryId: z.string().length(26).nullable().optional(),`
@@ -231,12 +231,12 @@ In `packages/shared/src/packages.ts`:
 - In `PackageDto`, add: `categoryId: string | null;` and `categoryName: string | null;` (keep `category: string;` for now).
 - Export categories from the barrel: in `packages/shared/src/index.ts` add `export * from "./categories";` (verify the barrel style first with `grep -n "export" packages/shared/src/index.ts`).
 
-- [ ] **Step 6: Typecheck the whole repo**
+- [x] **Step 6: Typecheck the whole repo**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH"; bun run verify`
 Expected: PASS (categoryId is additive/optional; publish now needs categoryId but no caller constructs publish bodies in shared/db). If the API publish path fails to typecheck, it is because `publishPackageSchema` dropped `category`; that is handled in Task 5 — if `bun run verify` is red here solely on the API publish controller/service referencing `category`, temporarily keep `category` optional in `publishPackageSchema` too and remove it in Task 5. Prefer keeping verify green: add `category: z.enum(PACKAGE_CATEGORIES).optional()` back to publish if needed, then tighten in Task 5.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add packages/shared/src
@@ -254,7 +254,7 @@ git commit -m "feat(shared): add category contracts, LEGACY_CATEGORY_NAMES, pack
 **Interfaces:**
 - Produces: `normalizeCategoryName(name: string): string`; `categoryMatchesScope(cat, providerId, productType): boolean`; `toCategoryDto(row): CategoryDto`; `toStaffCategoryDto(row): StaffCategoryDto`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `apps/api/src/categories/categories.policy.spec.ts`:
 
@@ -302,12 +302,12 @@ describe("categories.policy", () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH"; cd apps/api && bunx vitest run src/categories/categories.policy.spec.ts`
 Expected: FAIL — cannot find `./categories.policy`.
 
-- [ ] **Step 3: Implement the policy**
+- [x] **Step 3: Implement the policy**
 
 Create `apps/api/src/categories/categories.policy.ts`:
 
@@ -349,12 +349,12 @@ export function toStaffCategoryDto(row: DbPackageCategory): StaffCategoryDto {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH"; cd apps/api && bunx vitest run src/categories/categories.policy.spec.ts`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/api/src/categories/categories.policy.ts apps/api/src/categories/categories.policy.spec.ts
@@ -376,7 +376,7 @@ git commit -m "feat(api): add categories policy (scope, normalize, DTO mappers)"
 - Consumes: `TenantScopedDb`, `ProvidersService` (or a raw provider read) for the commission seed; `packageCategories`, `packages`, `providers` tables; policy helpers from Task 3.
 - Produces: `CategoriesService` with `list(providerId, productType?)`, `findById(id)`, `create(input)`, `update(id, input)`, `remove(id)`; `CategoriesController` at route `categories`.
 
-- [ ] **Step 1: Write the failing integration test**
+- [x] **Step 1: Write the failing integration test**
 
 Create `apps/api/src/categories/categories.service.int.spec.ts` following the pattern in `apps/api/src/packages/packages.service.int.spec.ts` (same bootstrap/teardown; rows are self-cleaned). Cover:
 
@@ -394,12 +394,12 @@ Create `apps/api/src/categories/categories.service.int.spec.ts` following the pa
 // 7. list(providerId, "umrah") returns only that scope; tenant isolation holds.
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH"; cd apps/api && bun run test:int -- categories.service.int` (needs local Postgres; run `db:migrate` first)
 Expected: FAIL — module not found.
 
-- [ ] **Step 3: Implement the service**
+- [x] **Step 3: Implement the service**
 
 Create `apps/api/src/categories/categories.service.ts` (mirrors `ProvidersService` uniqueness idiom, `TenantScopedDb` for tenant-owned writes, raw `DB` only where a cross-table count is needed):
 
@@ -505,7 +505,7 @@ export class CategoriesService {
 }
 ```
 
-- [ ] **Step 4: Implement the controller (route order: static before parameterized)**
+- [x] **Step 4: Implement the controller (route order: static before parameterized)**
 
 Create `apps/api/src/categories/categories.controller.ts`. List is readable by any authenticated user (staff-safe DTO); create/update/delete are `@Roles("admin")`:
 
@@ -565,7 +565,7 @@ export class CategoriesController {
 }
 ```
 
-- [ ] **Step 5: Module + registration**
+- [x] **Step 5: Module + registration**
 
 Create `apps/api/src/categories/categories.module.ts`:
 
@@ -584,12 +584,12 @@ export class CategoriesModule {}
 
 Register it in `apps/api/src/app.module.ts` (add `CategoriesModule` to the `imports` array — verify the existing import list and mirror it).
 
-- [ ] **Step 6: Run integration + verify**
+- [x] **Step 6: Run integration + verify**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH"; cd apps/api && bun run test:int -- categories.service.int`
 Expected: PASS. Then `bun run verify` (from repo root) → PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add apps/api/src/categories apps/api/src/app.module.ts
@@ -610,16 +610,16 @@ git commit -m "feat(api): categories CRUD module (admin-guarded, uniqueness + de
 - Consumes: `packageCategories` table, `CategoriesService.findById` (or a direct read), policy `categoryMatchesScope`.
 - Produces: package create/update persist `categoryId`; `findOne` resolves `categoryName` via join; publish validation keys on `categoryId`.
 
-- [ ] **Step 1: Update the publish policy test (Red)**
+- [x] **Step 1: Update the publish policy test (Red)**
 
 In `packages/api/src/packages/packages.policy.spec.ts`, change the category assertion to key on `categoryId`. Expected new behavior: `validatePublishReady` pushes `"category"` when `pkg.categoryId` is null. Update or add a test asserting a package with `categoryId: null` yields a `"category"` error and one with a set `categoryId` does not.
 
-- [ ] **Step 2: Run it (Red)**
+- [x] **Step 2: Run it (Red)**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH"; cd apps/api && bunx vitest run src/packages/packages.policy.spec.ts`
 Expected: FAIL on the category assertion.
 
-- [ ] **Step 3: Update the policy (Green)**
+- [x] **Step 3: Update the policy (Green)**
 
 In `packages.policy.ts`, replace the `if (!pkg.category)` block with:
 
@@ -629,7 +629,7 @@ In `packages.policy.ts`, replace the `if (!pkg.category)` block with:
     }
 ```
 
-- [ ] **Step 4: Persist `categoryId` + validate scope in the service**
+- [x] **Step 4: Persist `categoryId` + validate scope in the service**
 
 In `packages.service.ts`:
 - `create`: set `categoryId: input.categoryId ?? null` (remove the `category: input.category ?? "regular"` line only in Task 9 cutover — for now set BOTH `categoryId` and keep `category` default via the column default; do not pass `category` explicitly if you keep the DB default). When `input.categoryId` is provided, load the category and throw `BadRequestException("category")` if `!categoryMatchesScope(cat, providerId, productType)`.
@@ -638,17 +638,17 @@ In `packages.service.ts`:
 
 Add a small private helper `assertCategoryScope(categoryId, providerId, productType)` that loads the category via `tenantDb.select(packageCategories, eq(...id))` and throws `BadRequestException("category")` on mismatch/not-found.
 
-- [ ] **Step 5: Extend the integration spec**
+- [x] **Step 5: Extend the integration spec**
 
 In `packages.service.int.spec.ts` add: (a) publishing a package with `categoryId: null` is blocked with a `category` field error; (b) assigning a `categoryId` whose category belongs to another provider/productType is rejected; (c) a package with a valid in-scope `categoryId` publishes (given other fields valid).
 
-- [ ] **Step 6: Run tests + verify**
+- [x] **Step 6: Run tests + verify**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH"; cd apps/api && bunx vitest run src/packages/ && bun run test:int -- packages.service.int`
 Then repo-root `bun run verify`.
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add apps/api/src/packages
@@ -667,7 +667,7 @@ git commit -m "feat(api): packages persist categoryId with scope validation; pub
 **Interfaces:**
 - Produces: search reads `pc.name as category` via LEFT JOIN; the `category` filter matches `pc.name`.
 
-- [ ] **Step 1: Update the raw SQL join + filter**
+- [x] **Step 1: Update the raw SQL join + filter**
 
 In `search.service.ts`:
 - In the `filters` SQL, replace `and (${params.category ?? null}::text is null or p.category = ${params.category ?? null})` with a name match against the joined category:
@@ -675,20 +675,20 @@ In `search.service.ts`:
 - In the main `select`, replace `p.category` with `pc.name as category`, and add `left join package_categories pc on pc.id = p.category_id` to the FROM/JOIN chain (place it alongside the existing provider join `pr`).
 - In the row mapper, `category: r.category` becomes `category: r.category ?? null`.
 
-- [ ] **Step 2: Allow null category in the search DTO**
+- [x] **Step 2: Allow null category in the search DTO**
 
 In `packages/shared/src/search.ts`, change the result `category: string;` to `category: string | null;` (line ~62). Leave the `params.category` filter field as `z.string().optional()` — a free-text/name value now (drop the `z.enum(PACKAGE_CATEGORIES)` at line ~36; replace with `z.string().max(120).optional()`).
 
-- [ ] **Step 3: Update / add the integration assertion**
+- [x] **Step 3: Update / add the integration assertion**
 
 In `search.service.int.spec.ts`, adjust any fixture that set `category: "regular"` to instead create a `package_categories` row (name e.g. "Regular") and set the package's `category_id`; assert filtering by category name returns the expected package. Follow the existing fixture/seed helper in that spec.
 
-- [ ] **Step 4: Run + verify**
+- [x] **Step 4: Run + verify**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH"; cd apps/api && bun run test:int -- search.service.int` then repo-root `bun run verify`.
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/api/src/search packages/shared/src/search.ts
@@ -707,20 +707,20 @@ git commit -m "feat(api): search joins package_categories and filters by categor
 - Consumes: shared `CategoryDto`, `CreateCategoryInput`, `UpdateCategoryInput`; the shared `api` ky instance.
 - Produces: `useCategories(providerId, productType)`, `useCreateCategory()`, `useUpdateCategory()`, `useDeleteCategory()` with query key `["categories", providerId, productType]`; a category-management section on the provider page.
 
-- [ ] **Step 1: Create the hook (mirror `use-users.ts`)**
+- [x] **Step 1: Create the hook (mirror `use-users.ts`)**
 
 Create `apps/web/src/hooks/use-categories.ts` following the `use-users.ts` structure: `categoriesKeys = { all: ["categories"], list: (providerId, productType) => ["categories", { providerId, productType }] }`. `useCategories` calls `api.get("categories", { searchParams: { providerId, productType } }).json<CategoryDto[]>()` with `enabled: !!providerId`. Mutations POST `categories`, PATCH `categories/${id}`, DELETE `categories/${id}`, each invalidating `categoriesKeys.all` on success.
 
-- [ ] **Step 2: Add the management section to the provider page**
+- [x] **Step 2: Add the management section to the provider page**
 
 In `apps/web/src/app/dashboard/providers/[id]/page.tsx`, add an admin-only ("Commission Settings"-adjacent) card "Categories". For the provider being edited, group categories by product type (Phase 1: `umrah`). Each category row shows name + commission (type/value) editable inline; a "New category" control creates one with commission **prefilled from the provider default** (`defaultCommissionType`/`defaultCommissionValue` already in local state on this page). Wire create/update/delete to the hook. Surface the in-use delete `409` via `readApiError()` in a `role="alert"` block near the action. Copy: sentence case, buttons say what they do ("Add category", "Save", "Delete"). Match the existing shadcn/`select`/`Input` styling used elsewhere on the page.
 
-- [ ] **Step 3: Typecheck + lint**
+- [x] **Step 3: Typecheck + lint**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH"; bun run verify`
 Expected: PASS.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add apps/web/src/hooks/use-categories.ts "apps/web/src/app/dashboard/providers/[id]/page.tsx"
@@ -738,7 +738,7 @@ git commit -m "feat(web): category management on provider page + use-categories 
 **Interfaces:**
 - Consumes: `useCategories` (Task 7).
 
-- [ ] **Step 1: Replace the hardcoded category `<select>` in the package form**
+- [x] **Step 1: Replace the hardcoded category `<select>` in the package form**
 
 In `apps/web/src/app/dashboard/packages/[id]/page.tsx`:
 - Replace `const [category, setCategory] = useState("regular")` with `const [categoryId, setCategoryId] = useState<string>("")`.
@@ -746,16 +746,16 @@ In `apps/web/src/app/dashboard/packages/[id]/page.tsx`:
 - On load of an existing package, set `categoryId` from `pkg.categoryId ?? ""`.
 - In the submit payload (line ~158), send `categoryId: categoryId || null` instead of `category`.
 
-- [ ] **Step 2: Update the search filter control**
+- [x] **Step 2: Update the search filter control**
 
 In `apps/web/src/app/dashboard/search/search-filters.tsx`, replace the fixed category options with distinct category names. Since categories are per-provider, populate the name list from the tenant's categories: fetch via a lightweight call (e.g. reuse `useCategories` when a provider is chosen, otherwise a distinct-names source). Minimal approach for Phase 1: when a provider filter is selected, list that provider's category names; otherwise keep a free-text/select seeded from `LEGACY_CATEGORY_NAMES`. The filter value sent is the category **name** string (matches the Task 6 server filter).
 
-- [ ] **Step 3: Typecheck + lint**
+- [x] **Step 3: Typecheck + lint**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH"; bun run verify`
 Expected: PASS.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add "apps/web/src/app/dashboard/packages/[id]/page.tsx" apps/web/src/app/dashboard/search/search-filters.tsx
@@ -776,34 +776,34 @@ git commit -m "feat(web): data-driven category dropdown in package form + search
 **Interfaces:**
 - Produces: `backfillCategories(db): Promise<{ created: number; repointed: number }>` (idempotent); CLI runner; `db:backfill-categories` script.
 
-- [ ] **Step 1: Write the failing integration test**
+- [x] **Step 1: Write the failing integration test**
 
 Create `backfill-categories.int.spec.ts` mirroring `apps/api/src/providers/dedup-providers.int.spec.ts` / the db int-spec harness. Assertions:
 - Given a tenant with a provider (default commission `flat_per_pax`/500000) and packages having `category='regular'`, `category_id=null`: after `backfillCategories(db)`, a `package_categories` row `{name:'Regular', productType:'umrah', commissionType:'flat_per_pax', commissionValue:500000}` exists and every package has a non-null `category_id` pointing to it.
 - The six `LEGACY_CATEGORY_NAMES` exist for that provider under `umrah`.
 - Re-running `backfillCategories(db)` is a no-op (same counts; no duplicate rows).
 
-- [ ] **Step 2: Run it (Red)**
+- [x] **Step 2: Run it (Red)**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH"; cd packages/db && bun run db:migrate && bunx vitest run src/scripts/backfill-categories.int.spec.ts`
 Expected: FAIL — module not found.
 
-- [ ] **Step 3: Implement the backfill logic**
+- [x] **Step 3: Implement the backfill logic**
 
 Create `packages/db/src/scripts/backfill-categories.ts`. Per tenant, in one transaction: (1) for each distinct `(provider_id, product_type, category)` in `packages` where `category_id is null`, upsert a category (name = legacy display for that enum value, commission seeded from the provider default) using `onConflictDoNothing` against the unique index; (2) seed the six `LEGACY_CATEGORY_NAMES` under `umrah` + any product type the provider has packages in, same seed commission; (3) `update packages set category_id = <matching category id>` by joining on `(provider_id, product_type, lower(btrim(name)) = lower(legacy display))`. Map legacy enum → display name via a local record: `{ regular:"Regular", plus:"Plus", private_vip:"Private VIP", ramadan:"Ramadan", arbain:"Arbain", other:"Other" }`. Log `{ event: "category.backfill.tenant", tenantId, created, repointed }` and a final count of packages still null (expected 0). Idempotent via `onConflictDoNothing` + `where category_id is null`.
 
 Create `packages/db/src/category-backfill-runner.ts` mirroring `dedup-providers-runner.ts` (createDb → `backfillCategories(db)` → log → exit). Add to `packages/db/package.json` scripts: `"db:backfill-categories": "bun src/category-backfill-runner.ts"`.
 
-- [ ] **Step 4: Update the seed**
+- [x] **Step 4: Update the seed**
 
 In `packages/db/src/seed.ts`, before inserting demo packages, insert demo `package_categories` for the demo provider(s) under `umrah` (at least "Regular"), then set demo packages' `categoryId` to the matching category instead of `category: "regular"` (keep `category` too until cutover, or drop now if the column already has a default). Ensure seed remains idempotent (the recent seed idempotency fix pattern).
 
-- [ ] **Step 5: Run the test + end-to-end**
+- [x] **Step 5: Run the test + end-to-end**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH"; cd packages/db && bunx vitest run src/scripts/backfill-categories.int.spec.ts && bun run db:migrate && bun src/category-backfill-runner.ts && bun run db:seed`
 Expected: PASS; runner logs 0 packages with null category_id.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add packages/db/src/scripts/backfill-categories.ts packages/db/src/category-backfill-runner.ts packages/db/src/scripts/backfill-categories.int.spec.ts packages/db/package.json packages/db/src/seed.ts
@@ -825,31 +825,31 @@ git commit -m "feat(db): idempotent category backfill runner + seed demo categor
 **Interfaces:**
 - Produces: `category` fully removed; `categoryId`/`categoryName` are the only category surface.
 
-- [ ] **Step 1: Find every remaining reference**
+- [x] **Step 1: Find every remaining reference**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH"; grep -rn "PACKAGE_CATEGORIES\|\.category\b\|category:" packages apps --include=*.ts --include=*.tsx | grep -v categoryId | grep -v categoryName | grep -v package_categories`
 Expected: a finite list — resolve each (remove or switch to categoryId/categoryName).
 
-- [ ] **Step 2: Remove from schema + shared**
+- [x] **Step 2: Remove from schema + shared**
 
 - `packages/db/src/schema/packages.ts`: delete the `category: categoryEnum(...)` column and the `export const categoryEnum` (and its `PACKAGE_CATEGORIES` import).
 - `packages/shared/src/packages.ts`: remove `PACKAGE_CATEGORIES`; remove `category` from `createPackageSchema`, `updatePackageSchema` (already using categoryId), any leftover in `publishPackageSchema`, and remove `category: string` from `PackageDto`.
 
-- [ ] **Step 3: Remove from API + fixtures**
+- [x] **Step 3: Remove from API + fixtures**
 
 Delete the `category` field from `packages.service.ts` create/update/findOne DTO, and any `p.category` still in `search.service.ts`. Fix `packages/db/src/fixtures/search-benchmark.ts` and any spec still setting `category:` to use `categoryId`.
 
-- [ ] **Step 4: Generate the cutover migration**
+- [x] **Step 4: Generate the cutover migration**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH"; cd packages/db && bun run db:generate`
 Expected: a migration that `ALTER TABLE packages DROP COLUMN category` and `DROP TYPE category`. Confirm it does NOT touch `category_id`.
 
-- [ ] **Step 5: Full verify + end-to-end**
+- [x] **Step 5: Full verify + end-to-end**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH"; bun run verify` (repo root), then `cd packages/db && bun run db:migrate && bun src/category-backfill-runner.ts && bun run db:seed`, then `cd apps/api && bun run test:int`.
 Expected: all PASS; no dangling `category` references (re-run the Step 1 grep → empty).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add -A
