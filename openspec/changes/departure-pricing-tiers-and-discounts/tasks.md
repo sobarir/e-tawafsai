@@ -30,4 +30,21 @@
 
 ## 6. Verify
 
-- [ ] 6.1 Run `bun run verify` (typecheck + lint + test) and `bun run test:int` for the departures integration path; confirm all green
+- [x] 6.1 Run `bun run verify` (typecheck + lint + test) and `bun run test:int` for the departures integration path; confirm all green
+
+## Review notes (accepted non-critical findings)
+
+Final whole-branch review: ✅ ready to merge, no Critical/Important findings; cross-layer
+field consistency confirmed (db → shared → api → web), no regressions to inventory/status/
+schedule. Accepted minor items (no fix in this change):
+
+- Inline-create is non-atomic (departure POSTed after package creation) — a failing departure
+  leaves the package as a draft and a resubmit could create a second package. Design-accepted:
+  identical to the existing flyers/tags follow-up pattern in the same handler.
+- Reusable numeric inputs (seatTotal/dpAmount/priceQuad) dropped the HTML `required` attribute;
+  a cleared field coerces to 0 and the server rejects it. Low impact; from the plan template.
+- Shared spec has two near-duplicate positive cases and lacks explicit equality/absent-normal
+  edge tests; the `> ` comparison handles both correctly. Test-hygiene only.
+- Pre-existing (not introduced here): int specs hardcode `ppiuLicenseNo: "PPIU-Test"`, which
+  races under parallel `test:int`; run with `--no-file-parallelism`. Follow-up: suffix it like
+  other fixture fields.

@@ -9,16 +9,12 @@
 
 ## Current Task
 
-- Plan task text: "## Task 5: Web — inline first departure on package create (apps/web)"
-- OpenSpec mapped tasks: tasks.md group 5 (5.1, 5.2, 5.3)
-- Stage: implementing
-- Task base commit: (set on dispatch)
-- Implementation commit: (pending)
-- Changed files: (pending)
-- RED/GREEN evidence: (n/a for UI wiring — verify typecheck + lint)
-- Review stages passed: none
-- Unresolved feedback: none
-- Review-fix round: 0 / 3
+- Stage: done (subagent dispatch loop complete)
+- All implementation tasks (1-5) complete and dual-reviewed; tasks.md 1.1-6.1 verified.
+- Final whole-branch review: ✅ ready to merge, no Critical/Important (round 1/3).
+- Verify gate: round 1 failed on a lint unused-var (departures.spec.ts:23); fixed in 48b51a8.
+  Round 2: `bun run verify` exit 0 (12/12 turbo tasks); `bun run test:int` exit 0 (35/35).
+- Next: comet-build exit checks + guard build --apply → transition to verify phase.
 
 ## Completed
 - Task 1: complete (8b70c10..827dee6, review clean, tasks 1.1/1.2 verified)

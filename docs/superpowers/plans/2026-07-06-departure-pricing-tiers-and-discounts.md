@@ -855,7 +855,7 @@ Run the full quality gate and the integration path; confirm all green.
 
 **Files:** none (verification only).
 
-- [ ] **Step 1: Run the full workspace gate**
+- [x] **Step 1: Run the full workspace gate**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -864,7 +864,7 @@ cd "C:/Sobari/Ai/tawaf-sai/e-tawafsai" && bun run verify
 
 Expected: PASS — `turbo run typecheck lint test` green across all packages (db, shared, api, web), including the extended `departures.spec.ts`.
 
-- [ ] **Step 2: Run the departures integration path**
+- [x] **Step 2: Run the departures integration path**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -873,7 +873,7 @@ cd apps/api && bun run test:int
 
 Expected: PASS — all `departures.service.int.spec.ts` tests green, including the discount persist/round-trip and schema-level rejection cases.
 
-- [ ] **Step 3: Final commit (if any verification-driven fixes were made)**
+- [x] **Step 3: Final commit (if any verification-driven fixes were made)**
 
 ```bash
 git add -A
