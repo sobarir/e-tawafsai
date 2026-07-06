@@ -129,7 +129,7 @@ Extend the request schema with the three discount fields and a cross-field `supe
 
 > **Zod 4 gotcha (critical):** `superRefine` returns a `ZodEffects`, which has **no `.partial()` method**. You MUST apply `.partial()` to the plain object schema, not to the refined one. Define a base object, then export the create schema as `base.superRefine(fn)` and the update schema as `base.partial().superRefine(fn)`. Do not chain `.superRefine(...).partial()`.
 
-- [ ] **Step 1: Write the failing unit tests**
+- [x] **Step 1: Write the failing unit tests**
 
 Replace the body of `packages/shared/src/departures.spec.ts` with (keeps the two existing cases, adds three discount cases):
 
@@ -193,7 +193,7 @@ describe("Departure schema validation", () => {
 });
 ```
 
-- [ ] **Step 2: Run the spec to verify it fails**
+- [x] **Step 2: Run the spec to verify it fails**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -202,7 +202,7 @@ cd packages/shared && bun run test
 
 Expected: FAIL — the discount cases fail because the schema does not yet define the discount fields or the refine (the above-normal case currently passes validation, and the field-error assertion is unmet).
 
-- [ ] **Step 3: Extend the schema (base object + fields + refine)**
+- [x] **Step 3: Extend the schema (base object + fields + refine)**
 
 In `packages/shared/src/departures.ts`, replace the current `createDepartureSchema` / `updateDepartureSchema` block (lines 13-37) with:
 
@@ -268,7 +268,7 @@ export const updateDepartureSchema = departureBaseSchema.partial().superRefine(e
 
 Leave `CreateDepartureInput` / `UpdateDepartureInput` (`z.input<...>`) as they are — they resolve against the refined schemas automatically.
 
-- [ ] **Step 4: Add the three fields to `DepartureDto`**
+- [x] **Step 4: Add the three fields to `DepartureDto`**
 
 In the same file, in the `DepartureDto` interface, insert the three fields right after `priceDouble`:
 
@@ -282,7 +282,7 @@ In the same file, in the `DepartureDto` interface, insert the three fields right
   dpAmount: number;
 ```
 
-- [ ] **Step 5: Run the spec to verify it passes**
+- [x] **Step 5: Run the spec to verify it passes**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -291,7 +291,7 @@ cd packages/shared && bun run test
 
 Expected: PASS — all five cases green.
 
-- [ ] **Step 6: Typecheck the shared package**
+- [x] **Step 6: Typecheck the shared package**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -300,7 +300,7 @@ cd packages/shared && bun run typecheck
 
 Expected: PASS.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add packages/shared/src/departures.ts packages/shared/src/departures.spec.ts

@@ -5,10 +5,10 @@
 
 ## 2. Shared contract (packages/shared)
 
-- [ ] 2.1 Add the three discounted fields to `createDepartureSchema` (`z.number().int().positive().nullable().optional()`) in `packages/shared/src/departures.ts`
-- [ ] 2.2 Add a `superRefine` enforcing each discounted price `≤` its normal counterpart when both are present, emitting a field-level error on the discount path
-- [ ] 2.3 Add the three fields to the `DepartureDto` interface
-- [ ] 2.4 Add/extend unit spec (`departures.spec.ts`) covering: valid matrix accepted, discount-above-normal rejected, discounts omitted accepted
+- [x] 2.1 Add the three discounted fields to `createDepartureSchema` (`z.number().int().positive().nullable().optional()`) in `packages/shared/src/departures.ts`
+- [x] 2.2 Add a `superRefine` enforcing each discounted price `≤` its normal counterpart when both are present, emitting a field-level error on the discount path
+- [x] 2.3 Add the three fields to the `DepartureDto` interface
+- [x] 2.4 Add/extend unit spec (`departures.spec.ts`) covering: valid matrix accepted, discount-above-normal rejected, discounts omitted accepted
 
 ## 3. API (apps/api/src/departures)
 
