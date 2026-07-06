@@ -13,6 +13,7 @@ import { HealthModule } from "./health/health.module";
 import { SettingsModule } from "./settings/settings.module";
 import { ProvidersModule } from "./providers/providers.module";
 import { PackagesModule } from "./packages/packages.module";
+import { CategoriesModule } from "./categories/categories.module";
 import { DeparturesModule } from "./departures/departures.module";
 import { SearchModule } from "./search/search.module";
 
@@ -47,6 +48,7 @@ import { SearchModule } from "./search/search.module";
     SettingsModule,
     ProvidersModule,
     PackagesModule,
+    CategoriesModule,
     DeparturesModule,
     SearchModule,
   ],
