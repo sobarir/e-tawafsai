@@ -16,15 +16,16 @@ Branch base (merge-base): 9e438324540cf894811babf145df30003b0bc403
 
 ## Current Task
 
-- Plan task text: "Task 9: Backfill runner + seed update"
-- Mapped OpenSpec tasks: 2.3, 2.5, 6.3
-- Stage: spec-review + quality-review
-- Task BASE commit (for review-package): 4c0290b7a60682f4442c1e80697f9bda6d5374a4
-- Implementation commit: b67816e
-- Changed files: (pending)
-- RED/GREEN evidence: int RED->GREEN 3/3; idempotent created:6/repointed:2 then 0/0; e2e 0 null category_id; verify 12/12
-- Reviews passed: none
-- Review-fix round: 0 / 3
+- Plan task text: "Task 10: Cutover — drop the `category` enum column + remove all `category` references"
+- Mapped OpenSpec tasks: 1.1, 2.4 (+ completes 1.5 PackageDto category removal)
+- Stage: spec-review + quality-review (DATA-SAFETY escalation likely)
+- Task BASE commit (for review-package): accac01e84419d0a31caebc95183e1768584537a
+- Implementation commit: c54b829 + fix 11f3100 (migration now atomic backfill-then-drop)
+- Changed files: cutover across schema/shared/api/fixtures/specs + migration 0016; DELETED backfill runner/script/int-spec
+- RED/GREEN evidence: verify 12/12; int 46; grep clean; e2e 0 null (fresh DB)
+- CONCERN: implementer deleted the Task 9 backfill runner + db:backfill-categories script + int spec, reasoning it reads the now-dropped packages.category. Risk: on a production upgrade with existing package data, dropping category without first backfilling loses category data (category_id stays null). Plan mandated retaining the runner + non-destructive migration → plan conflict → escalate to user.
+- Reviews passed: spec ❌ (migration safety) + CRITICAL data-loss → user chose FIX option A (fold backfill into migration SQL)
+- Review-fix round: 1 / 3 (fix: rewrite migration 0016 to backfill category_id from category in SQL before dropping; runner stays deleted, superseded by SQL)
 
 ## Notes
 - `category` enum column/field intentionally KEPT alongside `categoryId` through Tasks 1–9; removed only in Task 10 (cutover). Do not flag retained enum/field as dead code before Task 10.
