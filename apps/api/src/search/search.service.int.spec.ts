@@ -81,7 +81,6 @@ describe("SearchService (integration)", () => {
       productType: "umrah",
       title: opts.title,
       slug: `${opts.title.toLowerCase().replace(/\s+/g, "-")}-${suffix}`,
-      category: "regular",
       categoryId: opts.categoryId ?? null,
       durationDays: opts.duration ?? 9,
       description: "paket",
@@ -203,7 +202,7 @@ describe("SearchService (integration)", () => {
     pkgIds.push(id);
     await db.insert(packages).values({
       id, tenantId, providerId, productType: "umrah", title: `PriceFrom ${suffix}`,
-      slug: `pricefrom-${suffix}`, category: "regular", durationDays: 9, description: "paket",
+      slug: `pricefrom-${suffix}`, durationDays: 9, description: "paket",
       airline: "Saudia", departureCity: "Jakarta", directOnly: false, status: "published", hasBeenPublished: true,
     });
     const mkDep = (depDate: Date, priceQuad: number) => ({
@@ -247,7 +246,7 @@ describe("SearchService (integration)", () => {
     pkgIds.push(far3Id);
     await db.insert(packages).values({
       id: far3Id, tenantId, providerId, productType: "umrah", title: `HotelFar ${suffix}`,
-      slug: `hotelfar-${suffix}`, category: "regular", durationDays: 9, description: "paket",
+      slug: `hotelfar-${suffix}`, durationDays: 9, description: "paket",
       airline: "Saudia", departureCity: "Jakarta", directOnly: false, status: "published", hasBeenPublished: true,
     });
     await db.insert(packageHotels).values({ id: ulid(), packageId: far3Id, cityName: "Makkah", name: `Far Hotel ${suffix}`, stars: 3, distanceM: 900, isPelataran: false });

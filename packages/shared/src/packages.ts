@@ -1,14 +1,12 @@
 import * as z from "zod";
 
 export const PRODUCT_TYPES = ["umrah", "haji_khusus", "haji_furoda"] as const;
-export const PACKAGE_CATEGORIES = ["regular", "plus", "private_vip", "ramadan", "arbain", "other"] as const;
 export const PACKAGE_STATUSES = ["draft", "published", "archived"] as const;
 
 export const createPackageSchema = z.object({
   title: z.string().min(1).max(255),
   providerId: z.string().length(26),
   productType: z.enum(PRODUCT_TYPES).default("umrah"),
-  category: z.enum(PACKAGE_CATEGORIES).default("regular"),
   categoryId: z.string().length(26).nullable().optional(),
   plusDestination: z.string().max(120).nullable().optional(),
   durationDays: z.number().int().positive().nullable().optional(),
@@ -46,7 +44,6 @@ export interface PackageDto {
   productType: string;
   title: string;
   slug: string;
-  category: string;
   categoryId: string | null;
   categoryName: string | null;
   plusDestination: string | null;

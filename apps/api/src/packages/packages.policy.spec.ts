@@ -10,7 +10,6 @@ describe("PackagesPolicy.validatePublishReady", () => {
     productType: "umrah",
     title: "Umrah Pack",
     slug: "umrah-pack",
-    category: "regular",
     categoryId: "cat_1",
     categoryName: "Regular",
     plusDestination: null,
@@ -66,7 +65,7 @@ describe("PackagesPolicy.validatePublishReady", () => {
     expect(errorsNoLicense).toContain("provider (PPIU License Required)");
   });
 
-  it("requires categoryId, not the legacy category field", () => {
+  it("requires categoryId to publish", () => {
     const noCategoryId = { ...basePkg, categoryId: null } as unknown as PackageDto;
     const errors = PackagesPolicy.validatePublishReady(noCategoryId, true, "PPIU-123");
     expect(errors).toContain("category");

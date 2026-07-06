@@ -67,7 +67,6 @@ describe("DeparturesService (integration)", () => {
       productType: "umrah",
       title: `Umrah Package ${suffix}`,
       slug: `umrah-package-${suffix}`,
-      category: "regular",
       status: "draft",
       hasBeenPublished: false,
     });
@@ -260,7 +259,6 @@ describe("DeparturesService (integration)", () => {
       productType: "umrah",
       title: `Needs Review Package`,
       slug: `needs-review-${suffix}`,
-      category: "regular",
       status: "published",
       hasBeenPublished: true,
     });

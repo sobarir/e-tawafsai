@@ -69,7 +69,6 @@ export class PackagesService {
         productType,
         title: input.title,
         slug,
-        category: input.category ?? "regular",
         categoryId,
         plusDestination: input.plusDestination ?? null,
         durationDays: input.durationDays ?? null,

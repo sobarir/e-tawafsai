@@ -26,7 +26,3 @@ export * from "./fixtures/search-benchmark";
 // One-time provider dedup script. Inert unless called (CLI guard); the merge
 // helpers are imported by the dedup integration spec.
 export * from "./scripts/dedup-providers";
-
-// One-time package-category backfill script. Inert unless called (CLI
-// guard); the backfill helper is imported by its integration spec.
-export * from "./scripts/backfill-categories";

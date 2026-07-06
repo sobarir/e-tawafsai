@@ -1,12 +1,11 @@
 import { boolean, integer, pgEnum, pgTable, text, varchar, primaryKey, unique, index, uniqueIndex } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
-import { PRODUCT_TYPES, PACKAGE_CATEGORIES, PACKAGE_STATUSES } from "@cometkit/shared";
+import { PRODUCT_TYPES, PACKAGE_STATUSES } from "@cometkit/shared";
 import { timestamps, ulidPk, ulidRef } from "../columns";
 import { tenantOwned } from "./tenants";
 import { providers, commissionTypeEnum } from "./providers";
 
 export const productTypeEnum = pgEnum("product_type", PRODUCT_TYPES);
-export const categoryEnum = pgEnum("category", PACKAGE_CATEGORIES);
 export const statusEnum = pgEnum("status", PACKAGE_STATUSES);
 
 export const packages = pgTable("packages", {
@@ -18,7 +17,6 @@ export const packages = pgTable("packages", {
   productType: productTypeEnum("product_type").notNull().default("umrah"),
   title: varchar("title", { length: 255 }).notNull(),
   slug: varchar("slug", { length: 255 }).notNull(),
-  category: categoryEnum("category").notNull().default("regular"),
   categoryId: ulidRef("category_id").references(() => packageCategories.id),
   plusDestination: varchar("plus_destination", { length: 120 }),
   durationDays: integer("duration_days"),

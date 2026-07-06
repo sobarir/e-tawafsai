@@ -12,8 +12,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "bun src/seed.ts",
-    "db:dedup-providers": "bun src/dedup-providers-runner.ts",
-    "db:backfill-categories": "bun src/category-backfill-runner.ts"
+    "db:dedup-providers": "bun src/dedup-providers-runner.ts"
   },
   "dependencies": {
     "dotenv": "^17.4.2",

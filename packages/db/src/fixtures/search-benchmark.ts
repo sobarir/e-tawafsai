@@ -41,7 +41,6 @@ export async function seedSearchBenchmark(
       productType: "umrah",
       title: `Bench Umrah ${suffix} ${i}`,
       slug: `bench-umrah-${suffix}-${i}`,
-      category: i % 3 === 0 ? "plus" : "regular",
       durationDays: duration,
       description: `Paket umrah nyaman dekat Masjidil Haram ${i}`,
       airline: i % 2 === 0 ? "Saudia" : "Garuda Indonesia",

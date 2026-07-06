@@ -82,7 +82,7 @@ export default function PackagesPage() {
                 <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground block">
                   Category
                 </span>
-                <span className="font-medium capitalize">{pkg.category}</span>
+                <span className="font-medium">{pkg.categoryName ?? "Not set"}</span>
               </div>
               <div>
                 <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground block">

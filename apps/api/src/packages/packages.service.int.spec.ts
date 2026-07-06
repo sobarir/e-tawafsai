@@ -152,7 +152,6 @@ describe("PackagesService (integration)", () => {
       durationDays: 9,
       airline: "Garuda Indonesia",
       departureCity: "Jakarta",
-      category: "regular",
       categoryId,
     });
     await expect(service.publish(pkg.id)).rejects.toBeInstanceOf(BadRequestException);

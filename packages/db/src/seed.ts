@@ -225,7 +225,6 @@ async function main() {
         productType: "umrah",
         title: "Paket Umrah Akbar 9 Hari",
         slug: "paket-umrah-akbar-9-hari",
-        category: "regular",
         categoryId: demoCategory?.id,
         durationDays: 9,
         description: "Paket Umrah Al-Amin Akbar regular 9 hari hemat dan lengkap.",
