@@ -2,6 +2,8 @@
 comet_change: departure-pricing-tiers-and-discounts
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-07-06-departure-pricing-tiers-and-discounts
+status: final
 ---
 
 # Departure Pricing Tiers & Discounts — Technical Design

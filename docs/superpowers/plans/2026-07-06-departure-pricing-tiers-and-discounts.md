@@ -2,6 +2,7 @@
 change: departure-pricing-tiers-and-discounts
 design-doc: docs/superpowers/specs/2026-07-06-departure-pricing-tiers-and-discounts-design.md
 base-ref: 6baf334ba9ef39bb7368b93f783c731c71291078
+archived-with: 2026-07-06-departure-pricing-tiers-and-discounts
 ---
 
 # Departure Pricing Tiers & Discounts Implementation Plan
@@ -28,6 +29,7 @@ base-ref: 6baf334ba9ef39bb7368b93f783c731c71291078
 - **Zod 4 idioms:** `z.number().int()`, `ctx.addIssue({ code: "custom", ... })`, `z.input<...>`.
 - **Copy:** sentence case, plain verbs; error messages state what is wrong.
 
+archived-with: 2026-07-06-departure-pricing-tiers-and-discounts
 ---
 
 ## File Structure
@@ -43,6 +45,7 @@ base-ref: 6baf334ba9ef39bb7368b93f783c731c71291078
 | `apps/web/src/app/dashboard/packages/[id]/departure-form-fields.tsx` | Reusable departure entry fields + local state + payload assembly | Create |
 | `apps/web/src/app/dashboard/packages/[id]/page.tsx` | Package detail page: `DeparturesSection` (edit) + Create Package form (inline create) | Modify — consume `DepartureFormFields` in both places |
 
+archived-with: 2026-07-06-departure-pricing-tiers-and-discounts
 ---
 
 ## Task 1: Schema & migration (packages/db)
@@ -109,6 +112,7 @@ git add packages/db/src/schema/departures.ts packages/db/drizzle
 git commit -m "feat(db): add nullable discount price columns to departures"
 ```
 
+archived-with: 2026-07-06-departure-pricing-tiers-and-discounts
 ---
 
 ## Task 2: Shared contract + unit spec (packages/shared)
@@ -307,6 +311,7 @@ git add packages/shared/src/departures.ts packages/shared/src/departures.spec.ts
 git commit -m "feat(shared): add departure discount fields with discount<=normal refine"
 ```
 
+archived-with: 2026-07-06-departure-pricing-tiers-and-discounts
 ---
 
 ## Task 3: API mapper + payloads + integration spec (apps/api)
@@ -459,6 +464,7 @@ git add apps/api/src/departures/departures.service.ts apps/api/src/departures/de
 git commit -m "feat(api): map and persist departure discount fields"
 ```
 
+archived-with: 2026-07-06-departure-pricing-tiers-and-discounts
 ---
 
 ## Task 4: Web — reusable `DepartureFormFields` + editor wiring (apps/web)
@@ -760,6 +766,7 @@ git add apps/web/src/app/dashboard/packages/[id]/departure-form-fields.tsx apps/
 git commit -m "feat(web): reusable departure fields with discount matrix in editor"
 ```
 
+archived-with: 2026-07-06-departure-pricing-tiers-and-discounts
 ---
 
 ## Task 5: Web — inline first departure on package create (apps/web)
@@ -847,6 +854,7 @@ git add apps/web/src/app/dashboard/packages/[id]/page.tsx
 git commit -m "feat(web): optional inline first departure on package create"
 ```
 
+archived-with: 2026-07-06-departure-pricing-tiers-and-discounts
 ---
 
 ## Task 6: Verify
@@ -882,6 +890,7 @@ git commit -m "chore(verify): departure pricing tiers & discounts gate green"
 
 (Skip if there is nothing to commit.)
 
+archived-with: 2026-07-06-departure-pricing-tiers-and-discounts
 ---
 
 ## Self-Review
