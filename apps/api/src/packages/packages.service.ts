@@ -5,6 +5,7 @@ import { PinoLogger, InjectPinoLogger } from "nestjs-pino";
 import {
   packages,
   packageHotels,
+  packageCategories,
   tags,
   packageTags,
   packageFlyers,
@@ -12,6 +13,7 @@ import {
   departures,
   type DbPackage,
   type DbPackageHotel,
+  type DbPackageCategory,
   type Database,
 } from "@cometkit/db";
 import {
@@ -22,6 +24,7 @@ import {
 } from "@cometkit/shared";
 import { TenantScopedDb } from "../tenancy/tenant-scoped-db";
 import { PackagesPolicy } from "./packages.policy";
+import { categoryMatchesScope } from "../categories/categories.policy";
 import { DB } from "../database/database.module";
 
 function slugify(text: string): string {
@@ -50,6 +53,12 @@ export class PackagesService {
 
     const id = ulid();
     const slug = await this.generateUniqueSlug(input.title);
+    const productType = input.productType ?? "umrah";
+    const categoryId = input.categoryId ?? null;
+
+    if (categoryId) {
+      await this.assertCategoryScope(categoryId, input.providerId, productType);
+    }
 
     const [created] = await this.db
       .insert(packages)
@@ -57,10 +66,11 @@ export class PackagesService {
         id,
         tenantId: this.tenantDb.tenantId,
         providerId: input.providerId,
-        productType: input.productType ?? "umrah",
+        productType,
         title: input.title,
         slug,
         category: input.category ?? "regular",
+        categoryId,
         plusDestination: input.plusDestination ?? null,
         durationDays: input.durationDays ?? null,
         description: input.description ?? null,
@@ -119,8 +129,25 @@ export class PackagesService {
     const allClosed = hasDepartures && deps.every((d) => ["full", "departed", "cancelled"].includes(d.status));
     const needsReview = pkg.status === "published" && allClosed;
 
+    let categoryName: string | null = null;
+    if (pkg.categoryId) {
+      const [categoryRow] = await this.db
+        .select({ name: packageCategories.name })
+        .from(packageCategories)
+        .where(
+          and(
+            eq(packageCategories.tenantId, this.tenantDb.tenantId),
+            eq(packageCategories.id, pkg.categoryId),
+          ),
+        )
+        .limit(1);
+      categoryName = categoryRow?.name ?? null;
+    }
+
     return {
       ...pkg,
+      categoryId: pkg.categoryId,
+      categoryName,
       needsReview,
       hotels: hotels.map((h) => ({
         cityName: h.cityName,
@@ -159,6 +186,12 @@ export class PackagesService {
 
     if (!existing) {
       throw new NotFoundException("Package not found");
+    }
+
+    if (input.categoryId) {
+      const providerId = input.providerId ?? existing.providerId;
+      const productType = input.productType ?? existing.productType;
+      await this.assertCategoryScope(input.categoryId, providerId, productType);
     }
 
     const updateData: Partial<DbPackage> = {
@@ -287,6 +320,25 @@ export class PackagesService {
       .where(and(eq(packages.providerId, providerId), eq(packages.status, "published")));
 
     this.logger.info({ providerId }, "packages.cascade_unpublished");
+  }
+
+  /**
+   * Loads the category (tenant-scoped) and throws BadRequestException("category")
+   * when it does not exist or does not belong to the package's provider + productType.
+   */
+  private async assertCategoryScope(
+    categoryId: string,
+    providerId: string,
+    productType: string,
+  ): Promise<void> {
+    const [category] = (await this.tenantDb.select(
+      packageCategories,
+      eq(packageCategories.id, categoryId),
+    )) as DbPackageCategory[];
+
+    if (!category || !categoryMatchesScope(category, providerId, productType)) {
+      throw new BadRequestException("category");
+    }
   }
 
   private async generateUniqueSlug(title: string): Promise<string> {

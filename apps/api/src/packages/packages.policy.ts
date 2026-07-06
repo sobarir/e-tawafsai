@@ -17,7 +17,7 @@ export class PackagesPolicy {
     if (!pkg.departureCity) {
       errors.push("departureCity");
     }
-    if (!pkg.category) {
+    if (!pkg.categoryId) {
       errors.push("category");
     }
 

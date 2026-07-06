@@ -47,10 +47,8 @@ export interface PackageDto {
   title: string;
   slug: string;
   category: string;
-  /** Optional for now: not yet populated by every producer of PackageDto (wired in a later task). */
-  categoryId?: string | null;
-  /** Optional for now: not yet populated by every producer of PackageDto (wired in a later task). */
-  categoryName?: string | null;
+  categoryId: string | null;
+  categoryName: string | null;
   plusDestination: string | null;
   durationDays: number | null;
   description: string | null;

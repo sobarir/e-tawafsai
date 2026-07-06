@@ -4,7 +4,14 @@ import { resolve } from "node:path";
 import { ulid } from "ulid";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { ClsService } from "nestjs-cls";
-import { createDb, tenants, providers, packages, type Database } from "@cometkit/db";
+import {
+  createDb,
+  tenants,
+  providers,
+  packages,
+  packageCategories,
+  type Database,
+} from "@cometkit/db";
 import { eq, inArray } from "drizzle-orm";
 import { DEFAULT_TENANT_SLUG } from "@cometkit/shared";
 import { TenantScopedDb } from "../tenancy/tenant-scoped-db";
@@ -25,7 +32,43 @@ describe("PackagesService (integration)", () => {
   let providerId: string;
   const createdPackageIds: string[] = [];
   const createdProviderIds: string[] = [];
+  const createdCategoryIds: string[] = [];
   const suffix = ulid().toLowerCase();
+
+  async function createProvider(): Promise<string> {
+    const id = ulid();
+    await db.insert(providers).values({
+      id,
+      tenantId,
+      name: `PT. Provider ${suffix}-${id.slice(-6)}`,
+      brandName: "Brand",
+      ppiuLicenseNo: `PPIU-${id.slice(-6)}`,
+      accreditation: "A",
+      contactPerson: "Budi",
+      contactPhone: "62812345678",
+      isActive: true,
+      pricePublicationConsentAt: new Date(),
+    });
+    createdProviderIds.push(id);
+    return id;
+  }
+
+  async function createCategory(
+    forProviderId: string,
+    productType: string,
+    name: string,
+  ): Promise<string> {
+    const id = ulid();
+    await db.insert(packageCategories).values({
+      id,
+      tenantId,
+      providerId: forProviderId,
+      productType: productType as never,
+      name,
+    });
+    createdCategoryIds.push(id);
+    return id;
+  }
 
   beforeAll(async () => {
     const url = process.env.DATABASE_URL;
@@ -39,21 +82,7 @@ describe("PackagesService (integration)", () => {
     tenantId = tenant.id;
 
     // Create a helper active provider for package associations
-    const pId = ulid();
-    await db.insert(providers).values({
-      id: pId,
-      tenantId,
-      name: `PT. Provider ${suffix}`,
-      brandName: "Brand",
-      ppiuLicenseNo: "PPIU-Test",
-      accreditation: "A",
-      contactPerson: "Budi",
-      contactPhone: "62812345678",
-      isActive: true,
-      pricePublicationConsentAt: new Date(),
-    });
-    providerId = pId;
-    createdProviderIds.push(pId);
+    providerId = await createProvider();
 
     const cls = { get: () => tenantId } as unknown as ClsService;
     const scoped = new TenantScopedDb(db, cls);
@@ -61,8 +90,12 @@ describe("PackagesService (integration)", () => {
   });
 
   afterAll(async () => {
+    // Packages reference categories via categoryId — delete packages first.
     if (createdPackageIds.length > 0) {
       await db.delete(packages).where(inArray(packages.id, createdPackageIds));
+    }
+    if (createdCategoryIds.length > 0) {
+      await db.delete(packageCategories).where(inArray(packageCategories.id, createdCategoryIds));
     }
     if (createdProviderIds.length > 0) {
       await db.delete(providers).where(inArray(providers.id, createdProviderIds));
@@ -101,6 +134,8 @@ describe("PackagesService (integration)", () => {
   });
 
   it("enforces publish validation rules and deactivation cascade", async () => {
+    const categoryId = await createCategory(providerId, "umrah", `Regular ${suffix}`);
+
     // 1. Create a draft package
     const pkg = await service.create({
       title: "Umrah Exclusive",
@@ -118,6 +153,7 @@ describe("PackagesService (integration)", () => {
       airline: "Garuda Indonesia",
       departureCity: "Jakarta",
       category: "regular",
+      categoryId,
     });
     await expect(service.publish(pkg.id)).rejects.toBeInstanceOf(BadRequestException);
 
@@ -145,5 +181,95 @@ describe("PackagesService (integration)", () => {
 
     const checkPkg = await service.findOne(pkg.id);
     expect(checkPkg.status).toBe("draft");
+  });
+
+  it("blocks publish with a category field error when categoryId is unset", async () => {
+    const localProviderId = await createProvider();
+    const pkg = await service.create({
+      title: "Category Required Pack",
+      providerId: localProviderId,
+      productType: "umrah",
+    });
+    createdPackageIds.push(pkg.id);
+
+    await service.update(pkg.id, {
+      durationDays: 9,
+      airline: "Garuda Indonesia",
+      departureCity: "Jakarta",
+    });
+    await service.addHotel(pkg.id, {
+      cityName: "Makkah",
+      name: "Hilton Suites Makkah",
+      stars: 5,
+      distanceM: 50,
+      isPelataran: false,
+    });
+
+    // categoryId is still null -> publish is blocked specifically on "category"
+    await expect(service.publish(pkg.id)).rejects.toMatchObject({
+      message: expect.stringContaining("category"),
+    });
+  });
+
+  it("rejects a categoryId that belongs to another provider or productType", async () => {
+    const localProviderId = await createProvider();
+    const otherProviderId = await createProvider();
+    const otherProviderCategoryId = await createCategory(otherProviderId, "umrah", `Other Provider ${suffix}`);
+    const otherProductTypeCategoryId = await createCategory(localProviderId, "haji_furoda", `Other Product ${suffix}`);
+
+    // Wrong provider scope, on create
+    await expect(
+      service.create({
+        title: "Cross Provider Category Pack",
+        providerId: localProviderId,
+        productType: "umrah",
+        categoryId: otherProviderCategoryId,
+      }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+
+    // Wrong productType scope, on update
+    const pkg = await service.create({
+      title: "Cross ProductType Category Pack",
+      providerId: localProviderId,
+      productType: "umrah",
+    });
+    createdPackageIds.push(pkg.id);
+
+    await expect(
+      service.update(pkg.id, { categoryId: otherProductTypeCategoryId }),
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it("publishes a package with a valid in-scope categoryId", async () => {
+    const localProviderId = await createProvider();
+    const categoryId = await createCategory(localProviderId, "umrah", `In Scope ${suffix}`);
+
+    const pkg = await service.create({
+      title: "In Scope Category Pack",
+      providerId: localProviderId,
+      productType: "umrah",
+      categoryId,
+    });
+    createdPackageIds.push(pkg.id);
+
+    await service.update(pkg.id, {
+      durationDays: 9,
+      airline: "Garuda Indonesia",
+      departureCity: "Jakarta",
+    });
+    await service.addHotel(pkg.id, {
+      cityName: "Makkah",
+      name: "Hilton Suites Makkah",
+      stars: 5,
+      distanceM: 50,
+      isPelataran: false,
+    });
+
+    const published = await service.publish(pkg.id);
+    expect(published.status).toBe("published");
+
+    const detail = await service.findOne(pkg.id);
+    expect(detail.categoryId).toBe(categoryId);
+    expect(detail.categoryName).toBe(`In Scope ${suffix}`);
   });
 });
