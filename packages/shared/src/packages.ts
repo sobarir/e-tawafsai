@@ -9,6 +9,7 @@ export const createPackageSchema = z.object({
   providerId: z.string().length(26),
   productType: z.enum(PRODUCT_TYPES).default("umrah"),
   category: z.enum(PACKAGE_CATEGORIES).default("regular"),
+  categoryId: z.string().length(26).nullable().optional(),
   plusDestination: z.string().max(120).nullable().optional(),
   durationDays: z.number().int().positive().nullable().optional(),
   description: z.string().nullable().optional(),
@@ -24,7 +25,7 @@ export const publishPackageSchema = z.object({
   durationDays: z.number().int().positive(),
   airline: z.string().min(1).max(120),
   departureCity: z.string().min(1).max(120),
-  category: z.enum(PACKAGE_CATEGORIES),
+  categoryId: z.string().length(26),
 });
 
 export type CreatePackageInput = z.input<typeof createPackageSchema>;
@@ -46,6 +47,10 @@ export interface PackageDto {
   title: string;
   slug: string;
   category: string;
+  /** Optional for now: not yet populated by every producer of PackageDto (wired in a later task). */
+  categoryId?: string | null;
+  /** Optional for now: not yet populated by every producer of PackageDto (wired in a later task). */
+  categoryName?: string | null;
   plusDestination: string | null;
   durationDays: number | null;
   description: string | null;
