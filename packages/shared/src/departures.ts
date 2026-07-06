@@ -10,7 +10,7 @@ export interface PaymentMilestone {
   daysBeforeDeparture: number;
 }
 
-export const createDepartureSchema = z.object({
+const departureBaseSchema = z.object({
   packageId: z.string().length(26),
   departureType: z.enum(DEPARTURE_TYPES).default("fixed_date"),
   departureDate: z.string().datetime(),
@@ -20,6 +20,9 @@ export const createDepartureSchema = z.object({
   priceQuad: z.number().int().positive(),
   priceTriple: z.number().int().positive().nullable().optional(),
   priceDouble: z.number().int().positive().nullable().optional(),
+  priceQuadDiscount: z.number().int().positive().nullable().optional(),
+  priceTripleDiscount: z.number().int().positive().nullable().optional(),
+  priceDoubleDiscount: z.number().int().positive().nullable().optional(),
   dpAmount: z.number().int().positive(),
   paymentSchedule: z.array(
     z.object({
@@ -31,7 +34,39 @@ export const createDepartureSchema = z.object({
   notes: z.string().nullable().optional(),
 });
 
-export const updateDepartureSchema = createDepartureSchema.partial();
+// Each discounted price, when both it and its normal counterpart are present,
+// must not exceed the normal price. Emits a field-level error on the discount path.
+const enforceDiscountBounds = (
+  val: {
+    priceQuad?: number | null;
+    priceTriple?: number | null;
+    priceDouble?: number | null;
+    priceQuadDiscount?: number | null;
+    priceTripleDiscount?: number | null;
+    priceDoubleDiscount?: number | null;
+  },
+  ctx: z.RefinementCtx,
+) => {
+  const pairs: Array<[keyof typeof val, keyof typeof val]> = [
+    ["priceQuadDiscount", "priceQuad"],
+    ["priceTripleDiscount", "priceTriple"],
+    ["priceDoubleDiscount", "priceDouble"],
+  ];
+  for (const [discountKey, normalKey] of pairs) {
+    const discount = val[discountKey];
+    const normal = val[normalKey];
+    if (typeof discount === "number" && typeof normal === "number" && discount > normal) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Discounted price must not exceed the normal price",
+        path: [discountKey],
+      });
+    }
+  }
+};
+
+export const createDepartureSchema = departureBaseSchema.superRefine(enforceDiscountBounds);
+export const updateDepartureSchema = departureBaseSchema.partial().superRefine(enforceDiscountBounds);
 
 export type CreateDepartureInput = z.input<typeof createDepartureSchema>;
 export type UpdateDepartureInput = z.input<typeof updateDepartureSchema>;
@@ -51,6 +86,9 @@ export interface DepartureDto {
   priceQuad: number;
   priceTriple: number | null;
   priceDouble: number | null;
+  priceQuadDiscount: number | null;
+  priceTripleDiscount: number | null;
+  priceDoubleDiscount: number | null;
   dpAmount: number;
   paymentSchedule: PaymentMilestone[];
   status: string;
