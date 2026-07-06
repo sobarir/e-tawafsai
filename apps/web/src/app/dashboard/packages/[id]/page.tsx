@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
-import { useState, useEffect, type FormEvent } from "react";
+import { useState, useEffect, useRef, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -27,6 +27,7 @@ import {
 } from "@/hooks/use-departures";
 import { useProviders } from "@/hooks/use-providers";
 import { api, readApiError } from "@/lib/api";
+import { DepartureFormFields, type DepartureFormFieldsHandle } from "./departure-form-fields";
 
 export default function PackageDetailPage() {
   const router = useRouter();
@@ -732,11 +733,7 @@ function DeparturesSection({ packageId, isAdmin }: { packageId: string; isAdmin:
 
   // Create state
   const [showAddForm, setShowAddForm] = useState(false);
-  const [depDate, setDepDate] = useState("");
-  const [retDate, setRetDate] = useState("");
-  const [seatTotal, setSeatTotal] = useState(45);
-  const [priceQuad, setPriceQuad] = useState(35000000);
-  const [dpAmount, setDpAmount] = useState(5000000);
+  const formRef = useRef<DepartureFormFieldsHandle>(null);
   const [error, setError] = useState<string | null>(null);
 
   // Adjust state
@@ -759,32 +756,15 @@ function DeparturesSection({ packageId, isAdmin }: { packageId: string; isAdmin:
   const handleAddDeparture = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (!depDate || !retDate) {
-      setError("Departure and return dates are required.");
+    const payload = formRef.current?.buildPayload();
+    if (!payload) {
+      setError("Departure date is required.");
       return;
     }
-
     try {
-      await createMutation.mutateAsync({
-        packageId,
-        departureType: "fixed_date",
-        departureDate: new Date(depDate).toISOString(),
-        returnDate: new Date(retDate).toISOString(),
-        seatTotal,
-        currency: "IDR",
-        priceQuad,
-        dpAmount,
-        paymentSchedule: [
-          { name: "DP", amount: dpAmount, daysBeforeDeparture: 60 },
-          { name: "Pelunasan", amount: priceQuad - dpAmount, daysBeforeDeparture: 30 }
-        ],
-      });
+      await createMutation.mutateAsync({ packageId, ...payload });
+      formRef.current?.reset();
       setShowAddForm(false);
-      setDepDate("");
-      setRetDate("");
-      setSeatTotal(45);
-      setPriceQuad(35000000);
-      setDpAmount(5000000);
       void refetch();
     } catch (err) {
       setError(await readApiError(err));
@@ -855,74 +835,14 @@ function DeparturesSection({ packageId, isAdmin }: { packageId: string; isAdmin:
 
         {showAddForm && (
           <form onSubmit={handleAddDeparture} className="mb-6 border p-4 rounded-lg bg-muted/40 space-y-4">
-            <h3 className="font-mono text-sm font-bold uppercase tracking-wider">New Departure Slot</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-1.5">
-                <Label htmlFor="depDate" className="text-xs">Departure Date</Label>
-                <Input
-                  id="depDate"
-                  type="date"
-                  value={depDate}
-                  onChange={(e) => setDepDate(e.target.value)}
-                  className="h-8 text-xs"
-                  required
-                />
-              </div>
-              <div className="grid gap-1.5">
-                <Label htmlFor="retDate" className="text-xs">Return Date</Label>
-                <Input
-                  id="retDate"
-                  type="date"
-                  value={retDate}
-                  onChange={(e) => setRetDate(e.target.value)}
-                  className="h-8 text-xs"
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-3 gap-4">
-              <div className="grid gap-1.5">
-                <Label htmlFor="seatTotalInput" className="text-xs">Total Seats</Label>
-                <Input
-                  id="seatTotalInput"
-                  type="number"
-                  value={seatTotal}
-                  onChange={(e) => setSeatTotal(Number(e.target.value))}
-                  className="h-8 text-xs"
-                  required
-                />
-              </div>
-              <div className="grid gap-1.5">
-                <Label htmlFor="priceQuadInput" className="text-xs">Quad Price (Rp)</Label>
-                <Input
-                  id="priceQuadInput"
-                  type="number"
-                  value={priceQuad}
-                  onChange={(e) => setPriceQuad(Number(e.target.value))}
-                  className="h-8 text-xs"
-                  required
-                />
-              </div>
-              <div className="grid gap-1.5">
-                <Label htmlFor="dpAmountInput" className="text-xs">DP Amount (Rp)</Label>
-                <Input
-                  id="dpAmountInput"
-                  type="number"
-                  value={dpAmount}
-                  onChange={(e) => setDpAmount(Number(e.target.value))}
-                  className="h-8 text-xs"
-                  required
-                />
-              </div>
-            </div>
-
+            <h3 className="font-mono text-sm font-bold uppercase tracking-wider">New departure slot</h3>
+            <DepartureFormFields ref={formRef} />
             <div className="flex justify-end gap-2 pt-2 border-t">
-              <Button type="button" variant="outline" size="sm" onClick={() => setShowAddForm(false)}>
+              <Button type="button" variant="outline" size="sm" onClick={() => { formRef.current?.reset(); setShowAddForm(false); }}>
                 Cancel
               </Button>
               <Button type="submit" size="sm">
-                Create Schedule
+                Create schedule
               </Button>
             </div>
           </form>
@@ -1037,6 +957,21 @@ function DeparturesSection({ packageId, isAdmin }: { packageId: string; isAdmin:
                       <span className="text-[10px] text-muted-foreground uppercase font-mono block">Pricing & Schedule</span>
                       <div className="flex flex-wrap gap-x-4 mt-0.5 text-muted-foreground font-mono">
                         <span>Base: <strong className="text-foreground">Rp {dep.priceQuad.toLocaleString("id-ID")}</strong></span>
+                        {dep.priceQuadDiscount != null && (
+                          <span>Quad disc: <strong className="text-foreground">Rp {dep.priceQuadDiscount.toLocaleString("id-ID")}</strong></span>
+                        )}
+                        {dep.priceTriple != null && (
+                          <span>Triple: <strong className="text-foreground">Rp {dep.priceTriple.toLocaleString("id-ID")}</strong></span>
+                        )}
+                        {dep.priceTripleDiscount != null && (
+                          <span>Triple disc: <strong className="text-foreground">Rp {dep.priceTripleDiscount.toLocaleString("id-ID")}</strong></span>
+                        )}
+                        {dep.priceDouble != null && (
+                          <span>Double: <strong className="text-foreground">Rp {dep.priceDouble.toLocaleString("id-ID")}</strong></span>
+                        )}
+                        {dep.priceDoubleDiscount != null && (
+                          <span>Double disc: <strong className="text-foreground">Rp {dep.priceDoubleDiscount.toLocaleString("id-ID")}</strong></span>
+                        )}
                         <span>DP: <strong className="text-foreground">Rp {dep.dpAmount.toLocaleString("id-ID")}</strong></span>
                         {dep.paymentSchedule.map((milestone, mIdx) => (
                           <span key={mIdx}>
