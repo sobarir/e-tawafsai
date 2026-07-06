@@ -323,7 +323,7 @@ Extend the DTO mapper, the create payload, and the partial-update payload with t
 
 > **Note:** the integration spec calls `service.create(...)` directly with a typed `CreateDepartureInput`, so the `discount <= normal` refine (which lives in the Zod pipe, not the service) is **not** exercised by a plain service call. To assert rejection at the schema level, call `createDepartureSchema.safeParse(...)` in the spec. Persistence/round-trip is asserted through the service.
 
-- [ ] **Step 1: Write the failing integration assertions**
+- [x] **Step 1: Write the failing integration assertions**
 
 In `apps/api/src/departures/departures.service.int.spec.ts`, add these two `it` blocks inside the existing `describe("DeparturesService (integration)", ...)` block (after the "creates a departure under a package" test). Also add the import for the schema at the top (extend the existing `@cometkit/shared` import):
 
@@ -383,7 +383,7 @@ Then add:
   });
 ```
 
-- [ ] **Step 2: Run the integration spec to verify it fails**
+- [x] **Step 2: Run the integration spec to verify it fails**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -392,7 +392,7 @@ cd apps/api && bun run test:int
 
 Expected: FAIL — `dep.priceQuadDiscount` is `undefined` (mapper does not map it yet) and the create payload does not persist the columns. (The schema-level rejection case may already pass because Task 2 shipped the refine; the persistence test is the one that fails here.)
 
-- [ ] **Step 3: Extend `mapToDto`**
+- [x] **Step 3: Extend `mapToDto`**
 
 In `apps/api/src/departures/departures.service.ts`, inside `mapToDto` (around lines 45-47), insert the three discount mappings after `priceDouble`:
 
@@ -406,7 +406,7 @@ In `apps/api/src/departures/departures.service.ts`, inside `mapToDto` (around li
       dpAmount: dep.dpAmount,
 ```
 
-- [ ] **Step 4: Extend the create payload**
+- [x] **Step 4: Extend the create payload**
 
 In the `create` method (around lines 78-81), insert the three fields after `priceDouble`:
 
@@ -420,7 +420,7 @@ In the `create` method (around lines 78-81), insert the three fields after `pric
         dpAmount: input.dpAmount,
 ```
 
-- [ ] **Step 5: Extend the partial-update payload**
+- [x] **Step 5: Extend the partial-update payload**
 
 In the `update` method (around lines 161-163), insert the three conditional assignments after the `priceDouble` line:
 
@@ -434,7 +434,7 @@ In the `update` method (around lines 161-163), insert the three conditional assi
     if (input.dpAmount !== undefined) payload.dpAmount = input.dpAmount;
 ```
 
-- [ ] **Step 6: Run the integration spec to verify it passes**
+- [x] **Step 6: Run the integration spec to verify it passes**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -443,7 +443,7 @@ cd apps/api && bun run test:int
 
 Expected: PASS — all departure integration tests green, including the two new ones.
 
-- [ ] **Step 7: Typecheck the api package**
+- [x] **Step 7: Typecheck the api package**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -452,7 +452,7 @@ cd apps/api && bun run typecheck
 
 Expected: PASS.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add apps/api/src/departures/departures.service.ts apps/api/src/departures/departures.service.int.spec.ts

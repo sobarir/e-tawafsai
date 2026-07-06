@@ -12,9 +12,9 @@
 
 ## 3. API (apps/api/src/departures)
 
-- [ ] 3.1 Extend `toDepartureDto` to map the three discount columns (mirroring `priceTriple`/`priceDouble`, `?? null`)
-- [ ] 3.2 Extend the create payload and the partial-update payload in `departures.service.ts` to carry the three fields
-- [ ] 3.3 Extend the integration spec (`departures.service.int.spec.ts`) to assert the discount fields persist and round-trip, and that an above-normal discount is rejected
+- [x] 3.1 Extend `toDepartureDto` to map the three discount columns (mirroring `priceTriple`/`priceDouble`, `?? null`)
+- [x] 3.2 Extend the create payload and the partial-update payload in `departures.service.ts` to carry the three fields
+- [x] 3.3 Extend the integration spec (`departures.service.int.spec.ts`) to assert the discount fields persist and round-trip, and that an above-normal discount is rejected
 
 ## 4. Web — departure editor (apps/web)
 
