@@ -16,13 +16,13 @@ Branch base (merge-base): 9e438324540cf894811babf145df30003b0bc403
 
 ## Current Task
 
-- Plan task text: "Task 8: Web — package form category dropdown + search filter"
-- Mapped OpenSpec tasks: 5.3, 5.4
+- Plan task text: "Task 9: Backfill runner + seed update"
+- Mapped OpenSpec tasks: 2.3, 2.5, 6.3
 - Stage: spec-review + quality-review
-- Task BASE commit (for review-package): 9b6bdbaf03423b045a5180ff4395b82f99337a0c
-- Implementation commit: ee82efa
+- Task BASE commit (for review-package): 4c0290b7a60682f4442c1e80697f9bda6d5374a4
+- Implementation commit: b67816e
 - Changed files: (pending)
-- RED/GREEN evidence: N/A — no web component-test harness; gate is `bun run verify` (typecheck+lint) green
+- RED/GREEN evidence: int RED->GREEN 3/3; idempotent created:6/repointed:2 then 0/0; e2e 0 null category_id; verify 12/12
 - Reviews passed: none
 - Review-fix round: 0 / 3
 
