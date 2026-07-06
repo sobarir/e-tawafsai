@@ -166,11 +166,44 @@ async function main() {
 
   // Seed demo package
   const [provider] = await db
-    .select({ id: schema.providers.id })
+    .select({
+      id: schema.providers.id,
+      defaultCommissionType: schema.providers.defaultCommissionType,
+      defaultCommissionValue: schema.providers.defaultCommissionValue,
+    })
     .from(schema.providers)
     .where(eq(schema.providers.name, "PT. Handoff Al-Amin"));
 
   if (provider) {
+    // Demo package category: idempotent upsert by the (tenant, provider,
+    // productType, normalized name) unique index, then look up its id so the
+    // demo package can be repointed at it (mirrors the backfill script's
+    // seed step, at data-seed scale).
+    await db
+      .insert(schema.packageCategories)
+      .values({
+        id: ulid(),
+        tenantId: tenant.id,
+        providerId: provider.id,
+        productType: "umrah",
+        name: "Regular",
+        commissionType: provider.defaultCommissionType,
+        commissionValue: provider.defaultCommissionValue,
+      })
+      .onConflictDoNothing();
+
+    const [demoCategory] = await db
+      .select({ id: schema.packageCategories.id })
+      .from(schema.packageCategories)
+      .where(
+        and(
+          eq(schema.packageCategories.tenantId, tenant.id),
+          eq(schema.packageCategories.providerId, provider.id),
+          eq(schema.packageCategories.productType, "umrah"),
+          eq(schema.packageCategories.name, "Regular"),
+        ),
+      );
+
     // Idempotent: reuse the existing demo package id when re-seeding so the
     // departure FK below never points at a freshly generated (unsaved) id.
     const [existingPackage] = await db
@@ -193,6 +226,7 @@ async function main() {
         title: "Paket Umrah Akbar 9 Hari",
         slug: "paket-umrah-akbar-9-hari",
         category: "regular",
+        categoryId: demoCategory?.id,
         durationDays: 9,
         description: "Paket Umrah Al-Amin Akbar regular 9 hari hemat dan lengkap.",
         airline: "Saudi Arabian Airlines",

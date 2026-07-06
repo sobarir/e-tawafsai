@@ -6,5 +6,5 @@
     "types": ["node"]
   },
   "include": ["src"],
-  "exclude": ["src/seed.ts", "src/dedup-providers-runner.ts"]
+  "exclude": ["src/seed.ts", "src/dedup-providers-runner.ts", "src/category-backfill-runner.ts"]
 }
