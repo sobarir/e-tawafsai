@@ -78,6 +78,9 @@ export default function PackageDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  // Optional inline first departure (create-time only)
+  const inlineDepartureRef = useRef<DepartureFormFieldsHandle>(null);
+
   const isAdmin = me?.role === "admin";
 
   useEffect(() => {
@@ -172,6 +175,11 @@ export default function PackageDetailPage() {
         // Save selected tags
         for (const tName of selectedTags) {
           await api.post("packages/tags", { json: { name: tName } });
+        }
+        // Optional inline first departure: skip cleanly when no date was entered.
+        const departurePayload = inlineDepartureRef.current?.buildPayload();
+        if (departurePayload) {
+          await api.post("departures", { json: { packageId: created.id, ...departurePayload } });
         }
         router.push(`/dashboard/packages/${created.id}`);
       } else {
@@ -559,6 +567,20 @@ export default function PackageDetailPage() {
                 )}
               </CardContent>
             </Card>
+
+            {isAdmin && isNew && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>First departure (optional)</CardTitle>
+                  <CardDescription>
+                    Add the first departure schedule now, or leave empty and add departures later. Enter a departure date to include it.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <DepartureFormFields ref={inlineDepartureRef} />
+                </CardContent>
+              </Card>
+            )}
 
             {isAdmin && (
               <div className="flex justify-end">
