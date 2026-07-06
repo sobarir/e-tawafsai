@@ -16,13 +16,13 @@ Branch base (merge-base): 9e438324540cf894811babf145df30003b0bc403
 
 ## Current Task
 
-- Plan task text: "Task 6: Search service joins categories + filters by category name"
-- Mapped OpenSpec tasks: 4.2 (+ completes 1.5 search-filter half)
+- Plan task text: "Task 7: Web — categories hook + provider-page management UI"
+- Mapped OpenSpec tasks: 5.1, 5.2
 - Stage: spec-review + quality-review
-- Task BASE commit (for review-package): 385198c82923f14374c61393126210a29763e9f1
-- Implementation commit: a4efd30
+- Task BASE commit (for review-package): 66c50c1ac7e73517a2319f01f3116dc294735627
+- Implementation commit: f35524c
 - Changed files: (pending)
-- RED/GREEN evidence: search int RED->GREEN 10/10; verify 12/12; removed dead PACKAGE_CATEGORIES import in search.ts
+- RED/GREEN evidence: N/A — no web component-test harness; gate is `bun run verify` (typecheck+lint) green
 - Reviews passed: none
 - Review-fix round: 0 / 3
 
