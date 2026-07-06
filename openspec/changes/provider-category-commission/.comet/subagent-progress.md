@@ -18,11 +18,11 @@ Branch base (merge-base): 9e438324540cf894811babf145df30003b0bc403
 
 - Plan task text: "Task 3: Category policy (pure functions) + unit spec"
 - Mapped OpenSpec tasks: 3.5 (categories.policy.ts) + 3.4 (partial: DTO mappers toCategoryDto/toStaffCategoryDto)
-- Stage: implementing
-- Task BASE commit (for review-package): (set after progress commit)
-- Implementation commit: (pending)
-- Changed files: (pending)
-- RED/GREEN evidence: (pending — TDD applies: categories.policy.spec.ts)
+- Stage: spec-review + quality-review
+- Task BASE commit (for review-package): afa08c8c6ad3cf64fc3879b5f6763fde76e078b6
+- Implementation commit: 3c6f8c8
+- Changed files: apps/api/src/categories/categories.policy.ts + .spec.ts
+- RED/GREEN evidence: categories.policy.spec.ts RED (module not found) -> GREEN 3/3; verify 12/12
 - Reviews passed: none
 - Review-fix round: 0 / 3
 
