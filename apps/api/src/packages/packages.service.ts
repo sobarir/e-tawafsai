@@ -187,10 +187,17 @@ export class PackagesService {
       throw new NotFoundException("Package not found");
     }
 
-    if (input.categoryId) {
-      const providerId = input.providerId ?? existing.providerId;
-      const productType = input.productType ?? existing.productType;
-      await this.assertCategoryScope(input.categoryId, providerId, productType);
+    const effectiveCategoryId =
+      input.categoryId !== undefined ? input.categoryId : existing.categoryId;
+    const effectiveProviderId = input.providerId ?? existing.providerId;
+    const effectiveProductType = input.productType ?? existing.productType;
+
+    if (effectiveCategoryId) {
+      await this.assertCategoryScope(
+        effectiveCategoryId,
+        effectiveProviderId,
+        effectiveProductType,
+      );
     }
 
     const updateData: Partial<DbPackage> = {

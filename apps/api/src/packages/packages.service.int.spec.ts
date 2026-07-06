@@ -239,6 +239,55 @@ describe("PackagesService (integration)", () => {
     ).rejects.toBeInstanceOf(BadRequestException);
   });
 
+  it("rejects an update that changes providerId without a categoryId, leaving a stale out-of-scope category", async () => {
+    const providerA = await createProvider();
+    const providerB = await createProvider();
+    const categoryA = await createCategory(providerA, "umrah", `Provider A Category ${suffix}`);
+    await createCategory(providerB, "umrah", `Provider B Category ${suffix}`);
+
+    // Package created under provider A with provider A's category - valid at creation time.
+    const pkg = await service.create({
+      title: "Provider Switch Pack",
+      providerId: providerA,
+      productType: "umrah",
+      categoryId: categoryA,
+    });
+    createdPackageIds.push(pkg.id);
+
+    // Switching providerId to B WITHOUT sending categoryId must re-validate the
+    // existing categoryId (still categoryA, which belongs to provider A) against
+    // the new effective provider (B) - and reject it.
+    await expect(
+      service.update(pkg.id, { providerId: providerB }),
+    ).rejects.toMatchObject({
+      message: expect.stringContaining("category"),
+    });
+
+    // The package must remain untouched by the rejected update.
+    const untouched = await service.findOne(pkg.id);
+    expect(untouched.providerId).toBe(providerA);
+    expect(untouched.categoryId).toBe(categoryA);
+  });
+
+  it("allows unrelated field updates on a package whose category is still in scope", async () => {
+    const localProviderId = await createProvider();
+    const categoryId = await createCategory(localProviderId, "umrah", `Stable Scope ${suffix}`);
+
+    const pkg = await service.create({
+      title: "Stable Scope Pack",
+      providerId: localProviderId,
+      productType: "umrah",
+      categoryId,
+    });
+    createdPackageIds.push(pkg.id);
+
+    // Update a field unrelated to provider/productType/category - the existing
+    // categoryId is still in-scope for the unchanged provider, so this succeeds.
+    const updated = await service.update(pkg.id, { durationDays: 12 });
+    expect(updated.durationDays).toBe(12);
+    expect(updated.categoryId).toBe(categoryId);
+  });
+
   it("publishes a package with a valid in-scope categoryId", async () => {
     const localProviderId = await createProvider();
     const categoryId = await createCategory(localProviderId, "umrah", `In Scope ${suffix}`);
