@@ -1,0 +1,14 @@
+{
+  "change": "departure-pricing-tiers-and-discounts",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "6b2eb4f0189e5e4ae885e0c1d3668884b18cca1b187f6a9efb8ced442041bdd9",
+  "files": [
+    { "path": "openspec/changes/departure-pricing-tiers-and-discounts/proposal.md", "sha256": "7157cbe47348b8e96d43423accd50fad48941a09185173be8b00669127a9fa1b" },
+    { "path": "openspec/changes/departure-pricing-tiers-and-discounts/design.md", "sha256": "35cb77797d38e6a3a0dbf85b7b87a835a179a54fd215391043a189559576f9b4" },
+    { "path": "openspec/changes/departure-pricing-tiers-and-discounts/tasks.md", "sha256": "234de5cf0c8f3d18d46e443810c4b5791b63626532fd4f995e59a6e5db04f76e" },
+    { "path": "openspec/changes/departure-pricing-tiers-and-discounts/specs/departure-inventory/spec.md", "sha256": "02f424e8ced0e643dc79bc71af6a6dcfdd076c8eb3444b00ddc10a59ed40153d" }
+  ]
+}
