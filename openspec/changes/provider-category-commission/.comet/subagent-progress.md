@@ -16,16 +16,15 @@ Branch base (merge-base): 9e438324540cf894811babf145df30003b0bc403
 
 ## Current Task
 
-- Plan task text: "Task 5: Packages service maps `categoryId` + scope validation; publish requires category"
-- Mapped OpenSpec tasks: 4.1
+- Plan task text: "Task 6: Search service joins categories + filters by category name"
+- Mapped OpenSpec tasks: 4.2 (+ completes 1.5 search-filter half)
 - Stage: spec-review + quality-review
-- Task BASE commit (for review-package): e180474cf063018e5ad40f962cfb87596e97027c
-- Implementation commit: 6dd5607
+- Task BASE commit (for review-package): 385198c82923f14374c61393126210a29763e9f1
+- Implementation commit: a4efd30
 - Changed files: (pending)
-- RED/GREEN evidence: policy RED->GREEN 4/4; int 5/5; verify 12/12; PackageDto tightened to required
+- RED/GREEN evidence: search int RED->GREEN 10/10; verify 12/12; removed dead PACKAGE_CATEGORIES import in search.ts
 - Reviews passed: none
 - Review-fix round: 0 / 3
-- Also resolve Task 2 carry-forward: populate categoryId/categoryName in findOne mapper; tighten PackageDto to required `string | null` if it keeps verify green.
 
 ## Notes
 - `category` enum column/field intentionally KEPT alongside `categoryId` through Tasks 1–9; removed only in Task 10 (cutover). Do not flag retained enum/field as dead code before Task 10.
