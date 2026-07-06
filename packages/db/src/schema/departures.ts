@@ -21,6 +21,9 @@ export const departures = pgTable("departures", {
   priceQuad: integer("price_quad").notNull(),
   priceTriple: integer("price_triple"),
   priceDouble: integer("price_double"),
+  priceQuadDiscount: integer("price_quad_discount"),
+  priceTripleDiscount: integer("price_triple_discount"),
+  priceDoubleDiscount: integer("price_double_discount"),
   dpAmount: integer("dp_amount").notNull(),
   paymentSchedule: text("payment_schedule").notNull(), // JSON string representing PaymentMilestone[]
   status: departureStatusEnum("status").default("open").notNull(),
