@@ -63,6 +63,19 @@ export class CategoriesService {
     }
   }
 
+  /**
+   * postgres-js unique-violation → 409, as a concurrency backstop for the
+   * pre-check. Drizzle wraps the driver error, so the SQLSTATE `23505` may sit
+   * on the error itself or on its `cause`.
+   */
+  private isUniqueViolation(err: unknown): boolean {
+    const code = (e: unknown): string | undefined =>
+      typeof e === "object" && e !== null ? (e as { code?: string }).code : undefined;
+    if (code(err) === "23505") return true;
+    const cause = typeof err === "object" && err !== null ? (err as { cause?: unknown }).cause : undefined;
+    return code(cause) === "23505";
+  }
+
   async create(input: CreateCategoryInput): Promise<DbPackageCategory> {
     const productType = input.productType ?? "umrah";
     // Seed commission from the provider default when omitted.
@@ -70,22 +83,29 @@ export class CategoriesService {
     if (!provider) throw new NotFoundException("Provider not found");
     await this.assertNoNameConflict(input.providerId, productType, input.name);
 
-    const [row] = await this.tenantDb.insertValues(packageCategories, {
-      id: ulid(),
-      providerId: input.providerId,
-      productType,
-      name: input.name,
-      commissionType:
-        input.commissionType ?? (provider as { defaultCommissionType: string }).defaultCommissionType,
-      commissionValue:
-        input.commissionValue ?? (provider as { defaultCommissionValue: number }).defaultCommissionValue,
-    });
-    if (!row) throw new Error("Insert returned no row");
-    this.logger.info(
-      { categoryId: (row as DbPackageCategory).id, providerId: input.providerId },
-      "category.created",
-    );
-    return row as DbPackageCategory;
+    try {
+      const [row] = await this.tenantDb.insertValues(packageCategories, {
+        id: ulid(),
+        providerId: input.providerId,
+        productType,
+        name: input.name,
+        commissionType: input.commissionType ?? provider.defaultCommissionType,
+        commissionValue: input.commissionValue ?? provider.defaultCommissionValue,
+      });
+      if (!row) throw new Error("Insert returned no row");
+      this.logger.info(
+        { categoryId: (row as DbPackageCategory).id, providerId: input.providerId },
+        "category.created",
+      );
+      return row as DbPackageCategory;
+    } catch (err) {
+      if (this.isUniqueViolation(err)) {
+        throw new ConflictException(
+          `A category named "${input.name}" already exists for this provider and product type`,
+        );
+      }
+      throw err;
+    }
   }
 
   async update(id: string, input: UpdateCategoryInput): Promise<DbPackageCategory> {
@@ -94,10 +114,19 @@ export class CategoriesService {
     if (input.name && normalizeCategoryName(input.name) !== normalizeCategoryName(existing.name)) {
       await this.assertNoNameConflict(existing.providerId, existing.productType, input.name, id);
     }
-    const [row] = await this.tenantDb.update(packageCategories, { ...input }, eq(packageCategories.id, id));
-    if (!row) throw new NotFoundException("Category not found");
-    this.logger.info({ categoryId: id }, "category.updated");
-    return row as DbPackageCategory;
+    try {
+      const [row] = await this.tenantDb.update(packageCategories, { ...input }, eq(packageCategories.id, id));
+      if (!row) throw new NotFoundException("Category not found");
+      this.logger.info({ categoryId: id }, "category.updated");
+      return row as DbPackageCategory;
+    } catch (err) {
+      if (this.isUniqueViolation(err)) {
+        throw new ConflictException(
+          `A category named "${input.name}" already exists for this provider and product type`,
+        );
+      }
+      throw err;
+    }
   }
 
   async remove(id: string): Promise<void> {
