@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import type { SearchParams, ProviderDto, StaffProviderDto } from "@cometkit/shared";
+import { LEGACY_CATEGORY_NAMES } from "@cometkit/shared";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useCategories } from "@/hooks/use-categories";
 
 type Filters = Partial<SearchParams>;
 
@@ -123,6 +125,14 @@ export function FilterSheet({
       setLocal(filters);
     }
   }, [open, filters]);
+
+  // Phase 1: category options are the selected provider's admin-defined
+  // category names; with no provider chosen yet, fall back to the legacy
+  // seed names so the control still offers a sensible default list.
+  const { data: providerCategories } = useCategories(local.providerId ?? "", "umrah");
+  const categoryOptions: string[] = local.providerId
+    ? (providerCategories ?? []).map((c) => c.name)
+    : [...LEGACY_CATEGORY_NAMES];
 
   if (!open) return null;
 
@@ -249,16 +259,15 @@ export function FilterSheet({
               <span className="text-xs font-medium text-foreground">Kategori Paket</span>
               <select
                 value={local.category ?? ""}
-                onChange={(e) => set({ category: (e.target.value || undefined) as SearchParams["category"] })}
+                onChange={(e) => set({ category: e.target.value || undefined })}
                 className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               >
                 <option value="">Semua Kategori</option>
-                <option value="regular">Regular</option>
-                <option value="plus">Plus</option>
-                <option value="private_vip">Private VIP</option>
-                <option value="ramadan">Ramadan</option>
-                <option value="arbain">Arbain</option>
-                <option value="other">Lainnya</option>
+                {categoryOptions.map((name) => (
+                  <option key={name} value={name}>
+                    {name}
+                  </option>
+                ))}
               </select>
             </label>
           </div>

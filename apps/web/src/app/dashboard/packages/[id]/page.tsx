@@ -26,6 +26,7 @@ import {
   useAdjustDepartureSeats,
 } from "@/hooks/use-departures";
 import { useProviders } from "@/hooks/use-providers";
+import { useCategories } from "@/hooks/use-categories";
 import { api, readApiError } from "@/lib/api";
 import { DepartureFormFields, type DepartureFormFieldsHandle } from "./departure-form-fields";
 
@@ -51,7 +52,7 @@ export default function PackageDetailPage() {
   const [title, setTitle] = useState("");
   const [providerId, setProviderId] = useState("");
   const [productType, setProductType] = useState("umrah");
-  const [category, setCategory] = useState("regular");
+  const [categoryId, setCategoryId] = useState<string>("");
   const [plusDestination, setPlusDestination] = useState("");
   const [durationDays, setDurationDays] = useState(9);
   const [description, setDescription] = useState("");
@@ -88,7 +89,7 @@ export default function PackageDetailPage() {
       setTitle(pkg.title);
       setProviderId(pkg.providerId);
       setProductType(pkg.productType);
-      setCategory(pkg.category);
+      setCategoryId(pkg.categoryId ?? "");
       setPlusDestination(pkg.plusDestination || "");
       setDurationDays(pkg.durationDays || 9);
       setDescription(pkg.description || "");
@@ -108,6 +109,17 @@ export default function PackageDetailPage() {
       setProviderId(firstActive?.id || "");
     }
   }, [isNew, providersList]);
+
+  const { data: categoriesList } = useCategories(providerId, productType);
+
+  // The category options depend on the selected provider + product type. When
+  // either changes and the currently-selected category no longer belongs to
+  // the newly loaded list, clear the selection rather than keep a stale id.
+  useEffect(() => {
+    if (categoryId && categoriesList && !categoriesList.some((c) => c.id === categoryId)) {
+      setCategoryId("");
+    }
+  }, [categoriesList, categoryId]);
 
   // Only active providers are selectable, plus the package's currently-assigned
   // provider (even if it has since been deactivated) so the selection is not lost.
@@ -155,7 +167,7 @@ export default function PackageDetailPage() {
       title: title.trim(),
       providerId,
       productType: productType as "umrah" | "haji_khusus" | "haji_furoda",
-      category: category as "regular" | "plus" | "private_vip" | "ramadan" | "arbain" | "other",
+      categoryId: categoryId || null,
       plusDestination: plusDestination.trim() || null,
       durationDays: Number(durationDays),
       description: description.trim() || null,
@@ -425,17 +437,17 @@ export default function PackageDetailPage() {
                     <Label htmlFor="category">Category</Label>
                     <select
                       id="category"
-                      value={category}
-                      onChange={(e) => setCategory(e.target.value)}
+                      value={categoryId}
+                      onChange={(e) => setCategoryId(e.target.value)}
                       disabled={!isAdmin}
                       className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      <option value="regular">Regular</option>
-                      <option value="plus">Plus</option>
-                      <option value="private_vip">Private VIP</option>
-                      <option value="ramadan">Ramadan</option>
-                      <option value="arbain">Arbain</option>
-                      <option value="other">Other</option>
+                      <option value="">— Select category —</option>
+                      {(categoriesList ?? []).map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
+                        </option>
+                      ))}
                     </select>
                   </div>
 
