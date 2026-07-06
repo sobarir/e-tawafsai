@@ -5,7 +5,7 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as bcrypt from "bcryptjs";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { ulid } from "ulid";
 import { DEFAULT_TENANT_SLUG, tenantInputSchema } from "@cometkit/shared";
 import { databaseUrl } from "../env";
@@ -171,7 +171,18 @@ async function main() {
     .where(eq(schema.providers.name, "PT. Handoff Al-Amin"));
 
   if (provider) {
-    const packageId = ulid();
+    // Idempotent: reuse the existing demo package id when re-seeding so the
+    // departure FK below never points at a freshly generated (unsaved) id.
+    const [existingPackage] = await db
+      .select({ id: schema.packages.id })
+      .from(schema.packages)
+      .where(
+        and(
+          eq(schema.packages.tenantId, tenant.id),
+          eq(schema.packages.slug, "paket-umrah-akbar-9-hari"),
+        ),
+      );
+    const packageId = existingPackage?.id ?? ulid();
     await db
       .insert(schema.packages)
       .values({
@@ -192,30 +203,37 @@ async function main() {
       })
       .onConflictDoNothing();
 
-    // Seed mock departure
-    await db
-      .insert(schema.departures)
-      .values({
-        id: ulid(),
-        tenantId: tenant.id,
-        packageId,
-        departureType: "fixed_date",
-        departureDate: new Date("2026-08-15T00:00:00Z"),
-        returnDate: new Date("2026-08-24T00:00:00Z"),
-        seatTotal: 45,
-        seatBooked: 0,
-        seatHeld: 0,
-        currency: "IDR",
-        priceQuad: 35000000,
-        dpAmount: 5000000,
-        paymentSchedule: JSON.stringify([
-          { name: "DP", amount: 5000000, daysBeforeDeparture: 60 }
-        ]),
-        status: "open",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      })
-      .onConflictDoNothing();
+    // Seed mock departure (only once — a departure's sole unique key is its
+    // id, so onConflictDoNothing cannot dedupe re-runs on its own).
+    const [existingDeparture] = await db
+      .select({ id: schema.departures.id })
+      .from(schema.departures)
+      .where(eq(schema.departures.packageId, packageId));
+    if (!existingDeparture) {
+      await db
+        .insert(schema.departures)
+        .values({
+          id: ulid(),
+          tenantId: tenant.id,
+          packageId,
+          departureType: "fixed_date",
+          departureDate: new Date("2026-08-15T00:00:00Z"),
+          returnDate: new Date("2026-08-24T00:00:00Z"),
+          seatTotal: 45,
+          seatBooked: 0,
+          seatHeld: 0,
+          currency: "IDR",
+          priceQuad: 35000000,
+          dpAmount: 5000000,
+          paymentSchedule: JSON.stringify([
+            { name: "DP", amount: 5000000, daysBeforeDeparture: 60 },
+          ]),
+          status: "open",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .onConflictDoNothing();
+    }
   }
 
   console.log(
