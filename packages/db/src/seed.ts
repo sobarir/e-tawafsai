@@ -12,8 +12,8 @@ import { databaseUrl } from "../env";
 import * as schema from "./schema";
 
 const DEMO_ACCOUNTS = [
-  { email: "admin@cometkit.dev", name: "Demo Admin", role: "admin" as const },
-  { email: "staff@cometkit.dev", name: "Demo Staff", role: "staff" as const },
+  { email: "admin@e-tawafsai.dev", name: "Demo Admin", role: "admin" as const },
+  { email: "staff@e-tawafsai.dev", name: "Demo Staff", role: "staff" as const },
 ];
 
 async function main() {
@@ -219,7 +219,7 @@ async function main() {
   }
 
   console.log(
-    "Seed complete: default tenant + admin@cometkit.dev (admin), staff@cometkit.dev (staff) / password123",
+    "Seed complete: default tenant + admin@e-tawafsai.dev (admin), staff@e-tawafsai.dev (staff) / password123",
   );
   await client.end();
 }

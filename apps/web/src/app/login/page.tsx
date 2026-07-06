@@ -43,7 +43,7 @@ export default function LoginPage() {
           </div>
           <CardTitle>Sign in</CardTitle>
           <CardDescription>
-            Seeded: admin@cometkit.dev (admin) or demo@cometkit.dev / password123
+            Seeded: admin@e-tawafsai.dev (admin) or staff@e-tawafsai.dev / password123
           </CardDescription>
         </CardHeader>
         <CardContent>

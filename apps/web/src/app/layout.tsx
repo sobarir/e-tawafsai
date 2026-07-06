@@ -3,9 +3,9 @@ import { Providers } from "@/components/providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "CometKit",
+  title: "e-tawafsai",
   description:
-    "Agentic starter kit: Turborepo scaffold with a five-phase Comet workflow from idea to archive.",
+    "Multi-tenant platform for umrah & hajj travel agents to manage providers, packages, departures, and leads.",
 };
 
 export default function RootLayout({
