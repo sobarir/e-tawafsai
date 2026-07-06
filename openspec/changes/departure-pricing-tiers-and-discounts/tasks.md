@@ -18,9 +18,9 @@
 
 ## 4. Web — departure editor (apps/web)
 
-- [ ] 4.1 Add triple & double normal price inputs to the `DeparturesSection` add-departure form
-- [ ] 4.2 Add quad/triple/double discounted price inputs to the same form and include them in the create payload
-- [ ] 4.3 Show discounted prices in the departure card pricing row
+- [x] 4.1 Add triple & double normal price inputs to the `DeparturesSection` add-departure form
+- [x] 4.2 Add quad/triple/double discounted price inputs to the same form and include them in the create payload
+- [x] 4.3 Show discounted prices in the departure card pricing row
 
 ## 5. Web — inline first departure on create (apps/web)
 

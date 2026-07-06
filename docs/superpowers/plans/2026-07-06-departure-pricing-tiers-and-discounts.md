@@ -476,7 +476,7 @@ Extract the departure entry fields, their local state, and payload assembly into
   - `DepartureFormFieldsHandle` — imperative handle: `buildPayload(): Omit<CreateDepartureInput, "packageId"> | null` (returns `null` when no departure date is entered — the "filled" signal), and `reset(): void`.
   - Task 5 consumes exactly these two exports.
 
-- [ ] **Step 1: Create the `DepartureFormFields` component**
+- [x] **Step 1: Create the `DepartureFormFields` component**
 
 Create `apps/web/src/app/dashboard/packages/[id]/departure-form-fields.tsx`:
 
@@ -636,7 +636,7 @@ export const DepartureFormFields = forwardRef<DepartureFormFieldsHandle>(
 );
 ```
 
-- [ ] **Step 2: Import the component and a ref hook in the page**
+- [x] **Step 2: Import the component and a ref hook in the page**
 
 In `apps/web/src/app/dashboard/packages/[id]/page.tsx`:
 
@@ -652,7 +652,7 @@ import { useState, useEffect, useRef, type FormEvent } from "react";
 import { DepartureFormFields, type DepartureFormFieldsHandle } from "./departure-form-fields";
 ```
 
-- [ ] **Step 3: Rewire `DeparturesSection` to use `DepartureFormFields`**
+- [x] **Step 3: Rewire `DeparturesSection` to use `DepartureFormFields`**
 
 In the `DeparturesSection` function, replace the price/seat/date local state and the inline add-form markup with the reusable component. Specifically:
 
@@ -713,7 +713,7 @@ and replace them with a single ref (keep the `showAddForm` and `error` state tha
         )}
 ```
 
-- [ ] **Step 4: Show discounted prices on the departure card**
+- [x] **Step 4: Show discounted prices on the departure card**
 
 In the departure card "Pricing & Schedule" row (currently ~lines 1036-1047), add discounted-price spans after the `Base:` span. Replace that inner `<div className="flex flex-wrap gap-x-4 ...">` block with:
 
@@ -744,7 +744,7 @@ In the departure card "Pricing & Schedule" row (currently ~lines 1036-1047), add
                       </div>
 ```
 
-- [ ] **Step 5: Typecheck and lint the web package**
+- [x] **Step 5: Typecheck and lint the web package**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH"
@@ -753,7 +753,7 @@ cd apps/web && bun run typecheck && bun run lint
 
 Expected: PASS — no unused-variable errors (confirm the removed `useState` setters are fully gone) and no type errors on `DepartureFormFieldsHandle`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/web/src/app/dashboard/packages/[id]/departure-form-fields.tsx apps/web/src/app/dashboard/packages/[id]/page.tsx
