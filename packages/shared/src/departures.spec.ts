@@ -20,7 +20,9 @@ describe("Departure schema validation", () => {
   });
 
   it("rejects without quad price", () => {
-    const { priceQuad: _omit, ...noQuad } = base;
+    const noQuad = Object.fromEntries(
+      Object.entries(base).filter(([key]) => key !== "priceQuad"),
+    );
     const res = createDepartureSchema.safeParse({ ...noQuad, paymentSchedule: [] });
     expect(res.success).toBe(false);
   });
