@@ -1,0 +1,18 @@
+{
+  "change": "provider-category-commission",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "469ae915201113f2e7676484c9e1517f55949949f66de9783a212b808d82eeee",
+  "files": [
+    { "path": "openspec/changes/provider-category-commission/proposal.md", "sha256": "d80797a85bb380ca55f3d672aace5d6f837faf412490b9e4c6a12e00ac871c20" },
+    { "path": "openspec/changes/provider-category-commission/design.md", "sha256": "c841fdf6b794218de340db2bc022fa89d1376cc81a2cb957fdb2a2d211554b20" },
+    { "path": "openspec/changes/provider-category-commission/tasks.md", "sha256": "436bc6297c3d1574b5c3b393b48539846d4ee54008c30ea898c68b8f9ad49c6b" },
+    { "path": "openspec/changes/provider-category-commission/specs/package-catalog/spec.md", "sha256": "196954a166ae00bf70b365c2a27895a53ab12e4a8ee0c5d62601d6981609d8d4" },
+    { "path": "openspec/changes/provider-category-commission/specs/package-search/spec.md", "sha256": "1d8f29612eb3920bf0bab62a76d3a00ba64dcf279be9bc5510af667573de9e71" },
+    { "path": "openspec/changes/provider-category-commission/specs/provider-category-commission/spec.md", "sha256": "448ea28506faed83d4a54ec3fa3e7dc7e18997d084369425f27d253cceb1b04a" },
+    { "path": "openspec/changes/provider-category-commission/specs/provider-management/spec.md", "sha256": "873ccf513c98492dcefa0d6e09b7c43c452539b68aad9d640adf02fcc648781f" },
+    { "path": "openspec/changes/provider-category-commission/specs/user-management/spec.md", "sha256": "74685f864a6f0c867a48f2a90ef78c75004c63f56d193a5617603c1cf1f685e4" }
+  ]
+}
