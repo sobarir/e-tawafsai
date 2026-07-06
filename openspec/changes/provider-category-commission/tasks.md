@@ -24,7 +24,7 @@
 
 ## 4. API — packages & search wiring (apps/api)
 
-- [ ] 4.1 Packages service: map `categoryId`; validate assigned category belongs to package's provider + productType; update publish validation to require valid `categoryId`
+- [x] 4.1 Packages service: map `categoryId`; validate assigned category belongs to package's provider + productType; update publish validation to require valid `categoryId`
 - [ ] 4.2 Search service: join `package_categories`; adapt category filter to `categoryId`/name; keep tenant scoping
 
 ## 5. Web — category management + form (apps/web)
