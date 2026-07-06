@@ -16,8 +16,23 @@ import {
   useDeactivateProvider,
   useUploadLogo,
 } from "@/hooks/use-providers";
+import {
+  useCategories,
+  useCreateCategory,
+  useUpdateCategory,
+  useDeleteCategory,
+} from "@/hooks/use-categories";
 import { readApiError } from "@/lib/api";
 import type { CreateProviderInput, UpdateProviderInput } from "@cometkit/shared";
+
+/** Phase 1 only supports categories for the Umrah product type. */
+const CATEGORY_PRODUCT_TYPE = "umrah";
+
+interface CategoryDraft {
+  name: string;
+  commissionType: string;
+  commissionValue: number;
+}
 
 export default function ProviderDetailPage() {
   const router = useRouter();
@@ -33,6 +48,14 @@ export default function ProviderDetailPage() {
   const activateProvider = useActivateProvider();
   const deactivateProvider = useDeactivateProvider();
   const uploadLogo = useUploadLogo();
+
+  const { data: categories = [] } = useCategories(
+    isNew ? "" : id,
+    CATEGORY_PRODUCT_TYPE,
+  );
+  const createCategory = useCreateCategory();
+  const updateCategory = useUpdateCategory();
+  const deleteCategory = useDeleteCategory();
 
   const [name, setName] = useState("");
   const [brandName, setBrandName] = useState("");
@@ -59,6 +82,11 @@ export default function ProviderDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+  // Categories (Admin-only)
+  const [categoryDrafts, setCategoryDrafts] = useState<Record<string, CategoryDraft>>({});
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [categoryError, setCategoryError] = useState<string | null>(null);
+
   const isAdmin = me?.role === "admin";
 
   useEffect(() => {
@@ -81,6 +109,22 @@ export default function ProviderDetailPage() {
       }
     }
   }, [provider]);
+
+  useEffect(() => {
+    setCategoryDrafts((prev) => {
+      const next = { ...prev };
+      for (const cat of categories) {
+        if (!next[cat.id]) {
+          next[cat.id] = {
+            name: cat.name,
+            commissionType: cat.commissionType,
+            commissionValue: cat.commissionValue,
+          };
+        }
+      }
+      return next;
+    });
+  }, [categories]);
 
   if (!isAdmin && isNew) {
     return (
@@ -183,6 +227,61 @@ export default function ProviderDetailPage() {
       setShowDeactivateDialog(true);
     } catch (err) {
       setError(await readApiError(err));
+    }
+  };
+
+  const updateCategoryDraft = (categoryId: string, patch: Partial<CategoryDraft>) => {
+    setCategoryDrafts((prev) => ({
+      ...prev,
+      [categoryId]: {
+        ...(prev[categoryId] ?? { name: "", commissionType: "flat_per_pax", commissionValue: 0 }),
+        ...patch,
+      },
+    }));
+  };
+
+  const handleAddCategory = async () => {
+    setCategoryError(null);
+    if (!newCategoryName.trim()) {
+      setCategoryError("Enter a category name.");
+      return;
+    }
+    try {
+      await createCategory.mutateAsync({
+        providerId: id,
+        productType: CATEGORY_PRODUCT_TYPE as "umrah",
+        name: newCategoryName.trim(),
+        commissionType: commissionType as "flat_per_pax" | "percent_of_price",
+        commissionValue: Number(commissionValue),
+      });
+      setNewCategoryName("");
+    } catch (err) {
+      setCategoryError(await readApiError(err));
+    }
+  };
+
+  const handleSaveCategory = async (categoryId: string) => {
+    const draft = categoryDrafts[categoryId];
+    if (!draft) return;
+    setCategoryError(null);
+    try {
+      await updateCategory.mutateAsync({
+        id: categoryId,
+        name: draft.name.trim(),
+        commissionType: draft.commissionType as "flat_per_pax" | "percent_of_price",
+        commissionValue: Number(draft.commissionValue),
+      });
+    } catch (err) {
+      setCategoryError(await readApiError(err));
+    }
+  };
+
+  const handleDeleteCategory = async (categoryId: string) => {
+    setCategoryError(null);
+    try {
+      await deleteCategory.mutateAsync(categoryId);
+    } catch (err) {
+      setCategoryError(await readApiError(err));
     }
   };
 
@@ -465,6 +564,138 @@ export default function ProviderDetailPage() {
                 )}
               </CardContent>
             </Card>
+
+            {isAdmin && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Categories</CardTitle>
+                  <CardDescription>
+                    Manage Umrah package categories and their commission overrides.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {categoryError && (
+                    <div
+                      role="alert"
+                      className="rounded-md bg-destructive/10 p-3 text-sm text-destructive font-medium"
+                    >
+                      {categoryError}
+                    </div>
+                  )}
+
+                  <div className="space-y-3">
+                    {categories.length === 0 && (
+                      <p className="text-xs text-muted-foreground">
+                        No categories yet for Umrah.
+                      </p>
+                    )}
+                    {categories.map((cat) => {
+                      const draft =
+                        categoryDrafts[cat.id] ?? {
+                          name: cat.name,
+                          commissionType: cat.commissionType,
+                          commissionValue: cat.commissionValue,
+                        };
+                      return (
+                        <div key={cat.id} className="grid gap-2 rounded-md border p-3">
+                          <div className="grid gap-2">
+                            <Label htmlFor={`category-name-${cat.id}`}>Name</Label>
+                            <Input
+                              id={`category-name-${cat.id}`}
+                              value={draft.name}
+                              onChange={(e) =>
+                                updateCategoryDraft(cat.id, { name: e.target.value })
+                              }
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="grid gap-2">
+                              <Label htmlFor={`category-commission-type-${cat.id}`}>
+                                Commission type
+                              </Label>
+                              <select
+                                id={`category-commission-type-${cat.id}`}
+                                value={draft.commissionType}
+                                onChange={(e) =>
+                                  updateCategoryDraft(cat.id, { commissionType: e.target.value })
+                                }
+                                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                              >
+                                <option value="flat_per_pax">Flat Rupiah (per Pax)</option>
+                                <option value="percent_of_price">Percentage Basis Points</option>
+                              </select>
+                            </div>
+                            <div className="grid gap-2">
+                              <Label htmlFor={`category-commission-value-${cat.id}`}>
+                                {draft.commissionType === "flat_per_pax"
+                                  ? "Value (in IDR)"
+                                  : "Basis points"}
+                              </Label>
+                              <Input
+                                id={`category-commission-value-${cat.id}`}
+                                type="number"
+                                min="0"
+                                value={draft.commissionValue}
+                                onChange={(e) =>
+                                  updateCategoryDraft(cat.id, {
+                                    commissionValue: Number(e.target.value),
+                                  })
+                                }
+                              />
+                            </div>
+                          </div>
+                          <div className="flex justify-end gap-2 pt-1">
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleSaveCategory(cat.id)}
+                              disabled={updateCategory.isPending}
+                            >
+                              Save
+                            </Button>
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="outline"
+                              className="text-destructive border-destructive/20 hover:bg-destructive/10"
+                              onClick={() => handleDeleteCategory(cat.id)}
+                              disabled={deleteCategory.isPending}
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <div className="grid gap-2 pt-3 border-t">
+                    <Label htmlFor="newCategoryName">New category</Label>
+                    <Input
+                      id="newCategoryName"
+                      value={newCategoryName}
+                      onChange={(e) => setNewCategoryName(e.target.value)}
+                      placeholder="e.g. Regular"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Commission prefilled from the provider default (
+                      {commissionType === "flat_per_pax" ? "flat" : "percentage"},{" "}
+                      {commissionValue}). Save the category, then edit its commission inline
+                      if it should differ.
+                    </p>
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={handleAddCategory}
+                      disabled={createCategory.isPending}
+                    >
+                      Add category
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         )}
       </div>
