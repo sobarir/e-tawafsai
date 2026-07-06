@@ -31,8 +31,8 @@
 
 - [x] 5.1 TanStack Query hooks `use-categories.ts` (key `["categories", providerId, productType]`) + mutations invalidating the resource root
 - [x] 5.2 Provider detail page: admin-only category-management section grouped by product type; create prefilled from provider default; edit/delete with in-use guard messaging via `readApiError()`
-- [ ] 5.3 Package form: replace hardcoded `<select>` with data-driven dropdown filtered by selected provider + productType; refresh on provider/type change
-- [ ] 5.4 Search filter: replace fixed category options with admin-defined categories
+- [x] 5.3 Package form: replace hardcoded `<select>` with data-driven dropdown filtered by selected provider + productType; refresh on provider/type change
+- [x] 5.4 Search filter: replace fixed category options with admin-defined categories
 
 ## 6. Tests & verification
 

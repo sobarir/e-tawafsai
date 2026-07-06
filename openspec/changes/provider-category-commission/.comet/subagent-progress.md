@@ -16,11 +16,11 @@ Branch base (merge-base): 9e438324540cf894811babf145df30003b0bc403
 
 ## Current Task
 
-- Plan task text: "Task 7: Web — categories hook + provider-page management UI"
-- Mapped OpenSpec tasks: 5.1, 5.2
+- Plan task text: "Task 8: Web — package form category dropdown + search filter"
+- Mapped OpenSpec tasks: 5.3, 5.4
 - Stage: spec-review + quality-review
-- Task BASE commit (for review-package): 66c50c1ac7e73517a2319f01f3116dc294735627
-- Implementation commit: f35524c
+- Task BASE commit (for review-package): 9b6bdbaf03423b045a5180ff4395b82f99337a0c
+- Implementation commit: ee82efa
 - Changed files: (pending)
 - RED/GREEN evidence: N/A — no web component-test harness; gate is `bun run verify` (typecheck+lint) green
 - Reviews passed: none
