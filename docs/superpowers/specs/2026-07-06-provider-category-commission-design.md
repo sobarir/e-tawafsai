@@ -89,3 +89,22 @@ New Nest categories module: service + controller, `@UseGuards(JwtAuthGuard, Role
 
 1. `package-catalog` — Package entity requirement: `categoryId` is **nullable, required at publish** (not "required" outright); add a scenario that a draft MAY have no category.
 2. `package-search` — category filter matches **by category name** (remove the "or by id" ambiguity).
+
+## Implementation Divergence (recorded at verify, 2026-07-07)
+
+**D4 migration mechanism changed: standalone TS backfill runner → atomic in-migration SQL backfill.**
+
+D4 / the Migration Plan originally specified three ordered steps: additive migration (0015) → an idempotent **TS backfill runner** (`db:backfill-categories`) run in an operator window → cutover migration (0016) that drops the column. That runner was built (build Task 9).
+
+During the cutover (build Task 10), a data-safety review found this unsafe under this repo's tooling: `drizzle-kit migrate` applies pending migrations **back-to-back with no operator window**, so committing 0016 alongside 0015 and relying on a between-migrations runner would drop `packages.category` before any backfill ran — **silently losing existing packages' category data**. Fresh/seeded DBs were unaffected (seed sets `categoryId` directly), which masked the risk in tests.
+
+**Resolution (user-approved):** the backfill was folded into the cutover migration `0016_late_venus.sql` itself, which now runs atomically, in order:
+1. `INSERT INTO package_categories` one row per distinct in-use `(tenant, provider, product_type, category)` (deterministic id, legacy display-name via `CASE`, commission from the provider default), `ON CONFLICT DO NOTHING`.
+2. `UPDATE packages SET category_id = <matched by normalized name>` where `category_id IS NULL`.
+3. `ALTER TABLE packages DROP COLUMN category; DROP TYPE category`.
+
+The standalone TS runner (`category-backfill-runner.ts`, `scripts/backfill-categories.ts`, its int spec, the `db:backfill-categories` script) was **removed as superseded**. Existing-row safety is proven by `packages/db/src/scripts/migrate-cutover.int.spec.ts` (reconstructs pre-0016 rows, runs the shipped SQL verbatim, asserts repoint + provider-seeded commission + idempotency).
+
+**Behavioral impact:** none — the specs' guarantee ("every existing package ends on a valid `categoryId`, commission seeded from the provider default") holds. Only the delivery mechanism changed, for atomicity/data-safety.
+
+**Deployment caveat:** `0016` was edited in place on this unreleased branch. It heals fresh and dev databases; an environment that had already applied the *old* bare-drop `0016` would not be healed by the edit (that migration is recorded as applied). No such environment exists on this branch.
