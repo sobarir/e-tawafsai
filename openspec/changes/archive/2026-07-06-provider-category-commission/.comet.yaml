@@ -17,6 +17,6 @@ verification_report: docs/superpowers/reports/2026-07-07-provider-category-commi
 branch_status: handled
 created_at: 2026-07-06
 verified_at: 2026-07-06
-archived: false
+archived: true
 handoff_context: openspec/changes/provider-category-commission/.comet/handoff/design-context.json
 handoff_hash: 469ae915201113f2e7676484c9e1517f55949949f66de9783a212b808d82eeee

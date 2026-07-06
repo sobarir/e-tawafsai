@@ -2,6 +2,7 @@
 change: provider-category-commission
 design-doc: docs/superpowers/specs/2026-07-06-provider-category-commission-design.md
 base-ref: a1db2b5ac43c9f5be098d380ebcf6f5c0bd255a2
+archived-with: 2026-07-06-provider-category-commission
 ---
 
 # Provider Category Commission Implementation Plan
@@ -29,6 +30,7 @@ base-ref: a1db2b5ac43c9f5be098d380ebcf6f5c0bd255a2
 - Always `db:migrate` before `db:seed`. Nest route order: static segments before parameterized.
 - `bun run verify` (typecheck + lint + test) is the gate; it must pass at the end of every task.
 
+archived-with: 2026-07-06-provider-category-commission
 ---
 
 ### Task 1: `package_categories` schema + nullable `packages.category_id` (additive migration)
@@ -114,6 +116,7 @@ git add packages/db/src/schema/packages.ts packages/db/src/schema/index.ts packa
 git commit -m "feat(db): add package_categories table and nullable packages.category_id"
 ```
 
+archived-with: 2026-07-06-provider-category-commission
 ---
 
 ### Task 2: Shared category contracts + `LEGACY_CATEGORY_NAMES` + package schema `categoryId`
@@ -243,6 +246,7 @@ git add packages/shared/src
 git commit -m "feat(shared): add category contracts, LEGACY_CATEGORY_NAMES, package categoryId"
 ```
 
+archived-with: 2026-07-06-provider-category-commission
 ---
 
 ### Task 3: Category policy (pure functions) + unit spec
@@ -361,6 +365,7 @@ git add apps/api/src/categories/categories.policy.ts apps/api/src/categories/cat
 git commit -m "feat(api): add categories policy (scope, normalize, DTO mappers)"
 ```
 
+archived-with: 2026-07-06-provider-category-commission
 ---
 
 ### Task 4: Categories service + controller + module (admin CRUD, uniqueness + delete guard)
@@ -596,6 +601,7 @@ git add apps/api/src/categories apps/api/src/app.module.ts
 git commit -m "feat(api): categories CRUD module (admin-guarded, uniqueness + delete guard, commission seed)"
 ```
 
+archived-with: 2026-07-06-provider-category-commission
 ---
 
 ### Task 5: Packages service maps `categoryId` + scope validation; publish requires category
@@ -655,6 +661,7 @@ git add apps/api/src/packages
 git commit -m "feat(api): packages persist categoryId with scope validation; publish requires category"
 ```
 
+archived-with: 2026-07-06-provider-category-commission
 ---
 
 ### Task 6: Search service joins categories + filters by category name
@@ -695,6 +702,7 @@ git add apps/api/src/search packages/shared/src/search.ts
 git commit -m "feat(api): search joins package_categories and filters by category name"
 ```
 
+archived-with: 2026-07-06-provider-category-commission
 ---
 
 ### Task 7: Web — categories hook + provider-page management UI
@@ -727,6 +735,7 @@ git add apps/web/src/hooks/use-categories.ts "apps/web/src/app/dashboard/provide
 git commit -m "feat(web): category management on provider page + use-categories hook"
 ```
 
+archived-with: 2026-07-06-provider-category-commission
 ---
 
 ### Task 8: Web — package form category dropdown + search filter
@@ -762,6 +771,7 @@ git add "apps/web/src/app/dashboard/packages/[id]/page.tsx" apps/web/src/app/das
 git commit -m "feat(web): data-driven category dropdown in package form + search filter by name"
 ```
 
+archived-with: 2026-07-06-provider-category-commission
 ---
 
 ### Task 9: Backfill runner + seed update
@@ -810,6 +820,7 @@ git add packages/db/src/scripts/backfill-categories.ts packages/db/src/category-
 git commit -m "feat(db): idempotent category backfill runner + seed demo categories"
 ```
 
+archived-with: 2026-07-06-provider-category-commission
 ---
 
 ### Task 10: Cutover — drop the `category` enum column + remove all `category` references
@@ -856,6 +867,7 @@ git add -A
 git commit -m "feat: drop legacy category enum, cut over to admin-defined categories"
 ```
 
+archived-with: 2026-07-06-provider-category-commission
 ---
 
 ## Self-Review

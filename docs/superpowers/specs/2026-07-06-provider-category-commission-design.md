@@ -2,6 +2,8 @@
 comet_change: provider-category-commission
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-07-06-provider-category-commission
+status: final
 ---
 
 # provider-category-commission — Technical Design
