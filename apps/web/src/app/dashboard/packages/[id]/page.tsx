@@ -99,10 +99,16 @@ export default function PackageDetailPage() {
   }, [pkg]);
 
   useEffect(() => {
-    if (isNew && providersList?.data && providersList.data.length > 0) {
-      setProviderId(providersList.data[0]?.id || "");
+    if (isNew && providersList?.data) {
+      const firstActive = providersList.data.find((prov) => prov.isActive);
+      setProviderId(firstActive?.id || "");
     }
   }, [isNew, providersList]);
+
+  // Only active providers are selectable, plus the package's currently-assigned
+  // provider (even if it has since been deactivated) so the selection is not lost.
+  const selectableProviders =
+    providersList?.data.filter((prov) => prov.isActive || prov.id === providerId) ?? [];
 
   if (!isAdmin && isNew) {
     return (
@@ -381,7 +387,7 @@ export default function PackageDetailPage() {
                       disabled={!isAdmin}
                       className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      {providersList?.data.map((prov) => (
+                      {selectableProviders.map((prov) => (
                         <option key={prov.id} value={prov.id}>
                           {prov.name}
                         </option>
