@@ -45,6 +45,9 @@ export class DeparturesService {
       priceQuad: dep.priceQuad,
       priceTriple: dep.priceTriple ?? null,
       priceDouble: dep.priceDouble ?? null,
+      priceQuadDiscount: dep.priceQuadDiscount ?? null,
+      priceTripleDiscount: dep.priceTripleDiscount ?? null,
+      priceDoubleDiscount: dep.priceDoubleDiscount ?? null,
       dpAmount: dep.dpAmount,
       paymentSchedule: JSON.parse(dep.paymentSchedule) as PaymentMilestone[],
       status: dep.status,
@@ -78,6 +81,9 @@ export class DeparturesService {
         priceQuad: input.priceQuad,
         priceTriple: input.priceTriple ?? null,
         priceDouble: input.priceDouble ?? null,
+        priceQuadDiscount: input.priceQuadDiscount ?? null,
+        priceTripleDiscount: input.priceTripleDiscount ?? null,
+        priceDoubleDiscount: input.priceDoubleDiscount ?? null,
         dpAmount: input.dpAmount,
         paymentSchedule: paymentScheduleStr,
         status: "open",
@@ -161,6 +167,9 @@ export class DeparturesService {
     if (input.priceQuad !== undefined) payload.priceQuad = input.priceQuad;
     if (input.priceTriple !== undefined) payload.priceTriple = input.priceTriple;
     if (input.priceDouble !== undefined) payload.priceDouble = input.priceDouble;
+    if (input.priceQuadDiscount !== undefined) payload.priceQuadDiscount = input.priceQuadDiscount;
+    if (input.priceTripleDiscount !== undefined) payload.priceTripleDiscount = input.priceTripleDiscount;
+    if (input.priceDoubleDiscount !== undefined) payload.priceDoubleDiscount = input.priceDoubleDiscount;
     if (input.dpAmount !== undefined) payload.dpAmount = input.dpAmount;
     if (input.paymentSchedule) payload.paymentSchedule = JSON.stringify(input.paymentSchedule);
     if (input.notes !== undefined) payload.notes = input.notes;

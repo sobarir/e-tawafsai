@@ -6,7 +6,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { ClsService } from "nestjs-cls";
 import { createDb, tenants, providers, packages, departures, inventoryAdjustments, type Database } from "@cometkit/db";
 import { eq, inArray } from "drizzle-orm";
-import { DEFAULT_TENANT_SLUG } from "@cometkit/shared";
+import { DEFAULT_TENANT_SLUG, createDepartureSchema } from "@cometkit/shared";
 import { TenantScopedDb } from "../tenancy/tenant-scoped-db";
 import { DeparturesService } from "./departures.service";
 import { PackagesService } from "../packages/packages.service";
@@ -111,6 +111,52 @@ describe("DeparturesService (integration)", () => {
     });
     expect(dep.id).toBeDefined();
     createdDepartureIds.push(dep.id);
+  });
+
+  it("persists and round-trips the full discount matrix", async () => {
+    const dep = await service.create({
+      packageId,
+      departureType: "fixed_date",
+      departureDate: new Date("2026-08-15T00:00:00.000Z").toISOString(),
+      returnDate: new Date("2026-08-24T00:00:00.000Z").toISOString(),
+      seatTotal: 45,
+      currency: "IDR",
+      priceQuad: 35000000,
+      priceTriple: 40000000,
+      priceDouble: 45000000,
+      priceQuadDiscount: 33000000,
+      priceTripleDiscount: 38000000,
+      priceDoubleDiscount: 44000000,
+      dpAmount: 5000000,
+      paymentSchedule: [{ name: "DP", amount: 5000000, daysBeforeDeparture: 60 }],
+    });
+    createdDepartureIds.push(dep.id);
+
+    expect(dep.priceQuadDiscount).toBe(33000000);
+    expect(dep.priceTripleDiscount).toBe(38000000);
+    expect(dep.priceDoubleDiscount).toBe(44000000);
+
+    const roundTrip = await service.findOne(dep.id);
+    expect(roundTrip.priceQuadDiscount).toBe(33000000);
+    expect(roundTrip.priceTripleDiscount).toBe(38000000);
+    expect(roundTrip.priceDoubleDiscount).toBe(44000000);
+  });
+
+  it("rejects a discount above its normal counterpart at the schema level", () => {
+    const res = createDepartureSchema.safeParse({
+      packageId,
+      departureType: "fixed_date",
+      departureDate: new Date("2026-08-15T00:00:00.000Z").toISOString(),
+      returnDate: new Date("2026-08-24T00:00:00.000Z").toISOString(),
+      seatTotal: 45,
+      currency: "IDR",
+      priceQuad: 35000000,
+      priceTriple: 40000000,
+      priceTripleDiscount: 41000000,
+      dpAmount: 5000000,
+      paymentSchedule: [{ name: "DP", amount: 5000000, daysBeforeDeparture: 60 }],
+    });
+    expect(res.success).toBe(false);
   });
 
   it("rejects estimated_year departures", async () => {
