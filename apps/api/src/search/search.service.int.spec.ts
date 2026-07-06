@@ -4,7 +4,16 @@ import { ulid } from "ulid";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { ClsService } from "nestjs-cls";
 import type { ConfigService } from "@nestjs/config";
-import { createDb, tenants, providers, packages, packageHotels, departures, type Database } from "@cometkit/db";
+import {
+  createDb,
+  tenants,
+  providers,
+  packages,
+  packageCategories,
+  packageHotels,
+  departures,
+  type Database,
+} from "@cometkit/db";
 import { eq, inArray } from "drizzle-orm";
 import { DEFAULT_TENANT_SLUG } from "@cometkit/shared";
 import { TenantScopedDb } from "../tenancy/tenant-scoped-db";
@@ -22,6 +31,7 @@ describe("SearchService (integration)", () => {
   let providerId: string;
   const suffix = ulid().toLowerCase();
   const pkgIds: string[] = [];
+  const categoryIds: string[] = [];
 
   // Every search is scoped to this run's provider so assertions are isolated
   // from any demo seed data in the default tenant.
@@ -37,6 +47,19 @@ describe("SearchService (integration)", () => {
     } as never;
   }
 
+  async function createCategory(name: string): Promise<string> {
+    const id = ulid();
+    await db.insert(packageCategories).values({
+      id,
+      tenantId,
+      providerId,
+      productType: "umrah",
+      name,
+    });
+    categoryIds.push(id);
+    return id;
+  }
+
   async function seedPackage(opts: {
     title: string;
     directOnly?: boolean;
@@ -47,6 +70,7 @@ describe("SearchService (integration)", () => {
     priceQuad?: number;
     priceTriple?: number | null;
     seatBooked?: number;
+    categoryId?: string | null;
   }): Promise<string> {
     const id = ulid();
     pkgIds.push(id);
@@ -58,6 +82,7 @@ describe("SearchService (integration)", () => {
       title: opts.title,
       slug: `${opts.title.toLowerCase().replace(/\s+/g, "-")}-${suffix}`,
       category: "regular",
+      categoryId: opts.categoryId ?? null,
       durationDays: opts.duration ?? 9,
       description: "paket",
       airline: "Saudia",
@@ -107,6 +132,10 @@ describe("SearchService (integration)", () => {
       await db.delete(departures).where(inArray(departures.packageId, pkgIds));
       await db.delete(packageHotels).where(inArray(packageHotels.packageId, pkgIds));
       await db.delete(packages).where(inArray(packages.id, pkgIds));
+    }
+    // Packages reference categories via categoryId — delete packages first (above).
+    if (categoryIds.length) {
+      await db.delete(packageCategories).where(inArray(packageCategories.id, categoryIds));
     }
     await db.delete(providers).where(eq(providers.id, providerId));
   });
@@ -232,5 +261,17 @@ describe("SearchService (integration)", () => {
     const ids = res.data.map((r) => r.id);
     expect(ids).toContain(near5);
     expect(ids).not.toContain(far3Id);
+  });
+
+  it("filters by category name via the joined package_categories row", async () => {
+    const categoryName = `VIP Umrah ${suffix}`;
+    const categoryId = await createCategory(categoryName);
+    const hit = await seedPackage({ title: `CatHit ${suffix}`, depDate: new Date(Date.UTC(2026, 8, 12)), categoryId });
+    const miss = await seedPackage({ title: `CatMiss ${suffix}`, depDate: new Date(Date.UTC(2026, 8, 12)) });
+    const res = await service.search(makeParams({ category: categoryName }));
+    const ids = res.data.map((r) => r.id);
+    expect(ids).toContain(hit);
+    expect(ids).not.toContain(miss);
+    expect(res.data.find((r) => r.id === hit)!.category).toBe(categoryName);
   });
 });

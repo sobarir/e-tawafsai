@@ -28,7 +28,7 @@ interface SearchRow {
   provider_name: string;
   provider_brand_name: string;
   ppiu_license_no: string | null;
-  category: string;
+  category: string | null;
   airline: string | null;
   next_departure_date: string | Date;
   price_from: number;
@@ -94,7 +94,7 @@ export class SearchService {
     const filters = sql`
       p.tenant_id = ${tenantId}
       and p.status <> 'archived'
-      and (${params.category ?? null}::text is null or p.category = ${params.category ?? null})
+      and (${params.category ?? null}::text is null or pc.name = ${params.category ?? null})
       and (${params.productType ?? null}::text is null or p.product_type = ${params.productType ?? null})
       and (${params.airline ?? null}::text is null or p.airline = ${params.airline ?? null})
       and (${params.departureCity ?? null}::text is null or p.departure_city = ${params.departureCity ?? null})
@@ -114,7 +114,7 @@ export class SearchService {
               and (${params.minStars ?? null}::int is null or phc.stars >= ${params.minStars ?? null}::int)))`;
 
     const rowsResult = await this.db.execute(sql`
-      select p.id, p.title, p.slug, p.category, p.airline,
+      select p.id, p.title, p.slug, pc.name as category, p.airline,
              pr.name as provider_name, pr.brand_name as provider_brand_name,
              pr.ppiu_license_no,
              nd.departure_date as next_departure_date, nd.price_from, nd.seats_left,
@@ -122,6 +122,7 @@ export class SearchService {
              hj.hotels
       from packages p
       join providers pr on pr.id = p.provider_id
+      left join package_categories pc on pc.id = p.category_id
       ${depLateral}
       ${hotelLateral}
       where ${filters}
@@ -132,6 +133,7 @@ export class SearchService {
       select count(*)::int as total
       from packages p
       join providers pr on pr.id = p.provider_id
+      left join package_categories pc on pc.id = p.category_id
       ${depLateral}
       where ${filters}`);
 
@@ -148,7 +150,7 @@ export class SearchService {
       providerName: r.provider_name,
       providerBrandName: r.provider_brand_name,
       ppiuLicenseNo: r.ppiu_license_no,
-      category: r.category,
+      category: r.category ?? null,
       airline: r.airline,
       nextDepartureDate: new Date(r.next_departure_date).toISOString(),
       priceFrom: r.price_from,

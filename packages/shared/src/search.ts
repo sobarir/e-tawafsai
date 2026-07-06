@@ -1,5 +1,5 @@
 import * as z from "zod";
-import { PACKAGE_CATEGORIES, PRODUCT_TYPES } from "./packages";
+import { PRODUCT_TYPES } from "./packages";
 
 export const OCCUPANCIES = ["quad", "triple", "double"] as const;
 export type Occupancy = (typeof OCCUPANCIES)[number];
@@ -33,7 +33,7 @@ export const searchPackagesSchema = z.object({
   durationMin: z.coerce.number().int().positive().optional(),
   durationMax: z.coerce.number().int().positive().optional(),
   // structured catalog filters
-  category: z.enum(PACKAGE_CATEGORIES).optional(),
+  category: z.string().max(120).optional(),
   productType: z.enum(PRODUCT_TYPES).optional(),
   airline: z.string().max(120).optional(),
   departureCity: z.string().max(120).optional(),
@@ -59,7 +59,7 @@ export interface SearchResultDto {
   providerName: string;
   providerBrandName: string; // for the WhatsApp summary
   ppiuLicenseNo: string | null; // for the WhatsApp summary
-  category: string;
+  category: string | null;
   airline: string | null;
   nextDepartureDate: string; // ISO — earliest matching departure
   priceFrom: number; // min priceQuad among matching departures
