@@ -34,5 +34,5 @@
 
 ## 6. Verify
 
-- [ ] 6.1 Run `bun run verify` (typecheck + lint + unit) and `bun run test:int`; confirm all green.
+- [x] 6.1 Run `bun run verify` (typecheck + lint + unit) and `bun run test:int`; confirm all green. _`verify`: 12/12 tasks pass (shared 46, api unit 43, + db/web typecheck & lint). `test:int`: 58 tests across 12 files, all green._
 - [ ] 6.2 Manually exercise: seed data present, admin CRUD + deactivate, form dropdowns with keep-assigned behavior, publish gating, search by airline — per the acceptance scenarios.
