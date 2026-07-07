@@ -1,0 +1,15 @@
+{
+  "change": "confirm-dialog-and-session-redirect",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "f997db85f5f1ed565213d38b602ab7a1a3f71846e992dc93e907bfcc9945e0ec",
+  "files": [
+    { "path": "openspec/changes/confirm-dialog-and-session-redirect/proposal.md", "sha256": "cae297cd9e76ed7af1c4231f5bd484d9e4865043d3cbbe10edc99cec80887e8b" },
+    { "path": "openspec/changes/confirm-dialog-and-session-redirect/design.md", "sha256": "fd34b323ff57cb1dc3fc6a35235668bba930e088d6b3b053500eeee26deab451" },
+    { "path": "openspec/changes/confirm-dialog-and-session-redirect/tasks.md", "sha256": "be8f509b6efa76ee720c14950385c3d527ef206905d5585713a062e3f66e9a9b" },
+    { "path": "openspec/changes/confirm-dialog-and-session-redirect/specs/destructive-action-confirmation/spec.md", "sha256": "2ad4256f756a265ba1d78bd8389c6e3b56fa9cae2569bf8320e36f87db5792a8" },
+    { "path": "openspec/changes/confirm-dialog-and-session-redirect/specs/session-expiry-redirect/spec.md", "sha256": "96ebe82ec340271c9646435cf0ac5b05b38659153f771bd3ed9989d2cb7e4282" }
+  ]
+}
