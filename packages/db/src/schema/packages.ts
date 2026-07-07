@@ -21,9 +21,9 @@ export const packages = pgTable("packages", {
   plusDestination: varchar("plus_destination", { length: 120 }),
   durationDays: integer("duration_days"),
   description: text("description"),
-  airline: varchar("airline", { length: 120 }),
+  airlineId: ulidRef("airline_id").references(() => airlines.id),
   flightRoute: varchar("flight_route", { length: 255 }),
-  departureCity: varchar("departure_city", { length: 120 }),
+  departureCityId: ulidRef("departure_city_id").references(() => departureCities.id),
   isFeatured: boolean("is_featured").notNull().default(false),
   directOnly: boolean("direct_only").notNull().default(false),
   hasBeenPublished: boolean("has_been_published").notNull().default(false),
@@ -54,6 +54,31 @@ export const packageCategories = pgTable("package_categories", {
 
 export type DbPackageCategory = typeof packageCategories.$inferSelect;
 export type NewDbPackageCategory = typeof packageCategories.$inferInsert;
+
+export const airlines = pgTable("airlines", {
+  id: ulidPk(),
+  ...tenantOwned(),
+  name: varchar("name", { length: 120 }).notNull(),
+  isActive: boolean("is_active").notNull().default(true),
+  ...timestamps,
+}, (t) => [
+  uniqueIndex("airlines_tenant_name_idx").on(t.tenantId, sql`lower(btrim(${t.name}))`),
+]);
+
+export const departureCities = pgTable("departure_cities", {
+  id: ulidPk(),
+  ...tenantOwned(),
+  name: varchar("name", { length: 120 }).notNull(),
+  isActive: boolean("is_active").notNull().default(true),
+  ...timestamps,
+}, (t) => [
+  uniqueIndex("departure_cities_tenant_name_idx").on(t.tenantId, sql`lower(btrim(${t.name}))`),
+]);
+
+export type DbAirline = typeof airlines.$inferSelect;
+export type NewDbAirline = typeof airlines.$inferInsert;
+export type DbDepartureCity = typeof departureCities.$inferSelect;
+export type NewDbDepartureCity = typeof departureCities.$inferInsert;
 
 export const packageHotels = pgTable("package_hotels", {
   id: ulidPk(),

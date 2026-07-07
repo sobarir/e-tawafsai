@@ -43,8 +43,6 @@ export async function seedSearchBenchmark(
       slug: `bench-umrah-${suffix}-${i}`,
       durationDays: duration,
       description: `Paket umrah nyaman dekat Masjidil Haram ${i}`,
-      airline: i % 2 === 0 ? "Saudia" : "Garuda Indonesia",
-      departureCity: "Jakarta",
       directOnly: i % 4 === 0,
       status: "published",
       hasBeenPublished: true,
