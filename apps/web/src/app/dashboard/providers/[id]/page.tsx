@@ -23,6 +23,7 @@ import {
   useDeleteCategory,
 } from "@/hooks/use-categories";
 import { readApiError } from "@/lib/api";
+import { useConfirm } from "@/hooks/use-confirm";
 import type { CreateProviderInput, UpdateProviderInput } from "@cometkit/shared";
 
 /** Phase 1 only supports categories for the Umrah product type. */
@@ -56,6 +57,7 @@ export default function ProviderDetailPage() {
   const createCategory = useCreateCategory();
   const updateCategory = useUpdateCategory();
   const deleteCategory = useDeleteCategory();
+  const confirm = useConfirm();
 
   const [name, setName] = useState("");
   const [brandName, setBrandName] = useState("");
@@ -74,10 +76,6 @@ export default function ProviderDetailPage() {
   const [ppiuLicense, setPpiuLicense] = useState("");
   const [pihkLicense, setPihkLicense] = useState("");
   const [consentChecked, setConsentChecked] = useState(false);
-
-  // Modal / Confirmations
-  const [showDeactivateDialog, setShowDeactivateDialog] = useState(false);
-  const [deactivateImpact, setDeactivateImpact] = useState<{ id: string; name: string }[]>([]);
 
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -221,10 +219,39 @@ export default function ProviderDetailPage() {
     setError(null);
     setSuccess(null);
     try {
-      // Fetch affected packages or call deactivate mutation to get list
+      // The mutation both deactivates the provider and returns the packages it
+      // unpublished; surface that impact list in the shared confirmation dialog.
       const res = await deactivateProvider.mutateAsync(id);
-      setDeactivateImpact(res.affectedPackages);
-      setShowDeactivateDialog(true);
+      const affected = res.affectedPackages;
+      const ok = await confirm({
+        title: "Deactivate this operator?",
+        confirmLabel: "Deactivate",
+        description: (
+          <div className="space-y-2">
+            <p>
+              All published packages owned by this provider are unpublished in one atomic
+              transaction.
+            </p>
+            {affected.length > 0 ? (
+              <div className="rounded-md border p-3 bg-muted/40 max-h-32 overflow-y-auto">
+                <span className="font-mono text-[10px] uppercase block tracking-wider text-muted-foreground mb-2">
+                  Affected packages ({affected.length})
+                </span>
+                <ul className="text-xs list-disc pl-4 space-y-1 font-medium">
+                  {affected.map((pkg) => (
+                    <li key={pkg.id}>{pkg.name}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <p className="text-xs text-emerald-600 font-medium">
+                No packages currently affected by this deactivation.
+              </p>
+            )}
+          </div>
+        ),
+      });
+      if (ok) setSuccess("Provider deactivated successfully.");
     } catch (err) {
       setError(await readApiError(err));
     }
@@ -278,6 +305,12 @@ export default function ProviderDetailPage() {
 
   const handleDeleteCategory = async (categoryId: string) => {
     setCategoryError(null);
+    const ok = await confirm({
+      title: "Delete this category?",
+      description: "The category and its commission override will be removed. This cannot be undone.",
+      confirmLabel: "Delete",
+    });
+    if (!ok) return;
     try {
       await deleteCategory.mutateAsync(categoryId);
     } catch (err) {
@@ -700,51 +733,6 @@ export default function ProviderDetailPage() {
         )}
       </div>
 
-      {showDeactivateDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-          <Card className="max-w-md w-full mx-4 shadow-lg border">
-            <CardHeader>
-              <CardTitle className="text-destructive text-lg">Confirm Deactivation</CardTitle>
-              <CardDescription>
-                Deactivating this operator has direct impacts on published package registries.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-muted-foreground">
-                All published packages owned by this provider will be unpublished automatically in one atomic transaction.
-              </p>
-              {deactivateImpact.length > 0 ? (
-                <div className="rounded-md border p-3 bg-muted/40 max-h-32 overflow-y-auto">
-                  <span className="font-mono text-[10px] uppercase block tracking-wider text-muted-foreground mb-2">
-                    Affected Packages ({deactivateImpact.length})
-                  </span>
-                  <ul className="text-xs list-disc pl-4 space-y-1 font-medium">
-                    {deactivateImpact.map((pkg) => (
-                      <li key={pkg.id}>{pkg.name}</li>
-                    ))}
-                  </ul>
-                </div>
-              ) : (
-                <p className="text-xs text-emerald-600 font-medium">
-                  No packages currently affected by this deactivation.
-                </p>
-              )}
-              <div className="flex justify-end gap-2 pt-2">
-                <Button variant="outline" size="sm" onClick={() => setShowDeactivateDialog(false)}>
-                  Cancel
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => setShowDeactivateDialog(false)}
-                >
-                  Confirm Deactivate
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
     </main>
   );
 }
