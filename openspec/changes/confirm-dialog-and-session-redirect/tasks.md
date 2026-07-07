@@ -15,8 +15,8 @@
 
 ## 3. Session-expiry redirect
 
-- [ ] 3.1 Add a `401` handler in the ky layer (`src/lib/api.ts`) that clears the session hint, drops the `me` query, and redirects to `/login?returnUrl=<current path>`
-- [ ] 3.2 Exclude `auth/login` requests and the `/login` route from the handler; ensure `403` is never redirected
+- [x] 3.1 Add a `401` handler in the ky layer (`src/lib/api.ts`) that clears the session hint, drops the `me` query, and redirects to `/login?returnUrl=<current path>` (hard nav wipes the cache incl. `me`)
+- [x] 3.2 Exclude `auth/login` requests and the `/login` route from the handler; ensure `403` is never redirected
 - [ ] 3.3 Login page: read `returnUrl` + show the "session expired" notice (`src/app/login/page.tsx`); on successful login navigate to `returnUrl` (fallback to default dashboard when absent or `/login`)
 
 ## 4. Tests & verification
