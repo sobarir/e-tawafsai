@@ -11,10 +11,10 @@ export class PackagesPolicy {
     if (!pkg.durationDays) {
       errors.push("durationDays");
     }
-    if (!pkg.airline) {
+    if (!pkg.airlineId) {
       errors.push("airline");
     }
-    if (!pkg.departureCity) {
+    if (!pkg.departureCityId) {
       errors.push("departureCity");
     }
     if (!pkg.categoryId) {

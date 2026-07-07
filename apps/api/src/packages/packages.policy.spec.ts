@@ -15,9 +15,11 @@ describe("PackagesPolicy.validatePublishReady", () => {
     plusDestination: null,
     durationDays: 9,
     description: null,
-    airline: "Saudi Arabian Airlines",
+    airlineId: "air_1",
+    airlineName: "Saudi Arabian Airlines",
     flightRoute: "CGK-MED, JED-CGK",
-    departureCity: "Jakarta",
+    departureCityId: "dcity_1",
+    departureCityName: "Jakarta",
     isFeatured: false,
     status: "draft",
     needsReview: false,
@@ -45,8 +47,8 @@ describe("PackagesPolicy.validatePublishReady", () => {
     const incompletePkg = {
       ...basePkg,
       durationDays: null,
-      airline: null,
-      departureCity: null,
+      airlineId: null,
+      departureCityId: null,
       hotels: [],
     } as unknown as PackageDto;
 

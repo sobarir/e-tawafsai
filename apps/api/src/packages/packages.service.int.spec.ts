@@ -10,6 +10,8 @@ import {
   providers,
   packages,
   packageCategories,
+  airlines,
+  departureCities,
   type Database,
 } from "@cometkit/db";
 import { eq, inArray } from "drizzle-orm";
@@ -30,10 +32,28 @@ describe("PackagesService (integration)", () => {
   let service: PackagesService;
   let tenantId: string;
   let providerId: string;
+  let airlineId: string;
+  let departureCityId: string;
   const createdPackageIds: string[] = [];
   const createdProviderIds: string[] = [];
   const createdCategoryIds: string[] = [];
+  const createdAirlineIds: string[] = [];
+  const createdDepartureCityIds: string[] = [];
   const suffix = ulid().toLowerCase();
+
+  async function createAirline(name: string): Promise<string> {
+    const id = ulid();
+    await db.insert(airlines).values({ id, tenantId, name });
+    createdAirlineIds.push(id);
+    return id;
+  }
+
+  async function createDepartureCity(name: string): Promise<string> {
+    const id = ulid();
+    await db.insert(departureCities).values({ id, tenantId, name });
+    createdDepartureCityIds.push(id);
+    return id;
+  }
 
   async function createProvider(): Promise<string> {
     const id = ulid();
@@ -83,6 +103,8 @@ describe("PackagesService (integration)", () => {
 
     // Create a helper active provider for package associations
     providerId = await createProvider();
+    airlineId = await createAirline(`Bench Air ${suffix}`);
+    departureCityId = await createDepartureCity(`Bench City ${suffix}`);
 
     const cls = { get: () => tenantId } as unknown as ClsService;
     const scoped = new TenantScopedDb(db, cls);
@@ -99,6 +121,12 @@ describe("PackagesService (integration)", () => {
     }
     if (createdProviderIds.length > 0) {
       await db.delete(providers).where(inArray(providers.id, createdProviderIds));
+    }
+    if (createdAirlineIds.length > 0) {
+      await db.delete(airlines).where(inArray(airlines.id, createdAirlineIds));
+    }
+    if (createdDepartureCityIds.length > 0) {
+      await db.delete(departureCities).where(inArray(departureCities.id, createdDepartureCityIds));
     }
   });
 
@@ -150,8 +178,8 @@ describe("PackagesService (integration)", () => {
     // 3. Update fields but without hotel -> fails
     await service.update(pkg.id, {
       durationDays: 9,
-      airline: "Garuda Indonesia",
-      departureCity: "Jakarta",
+      airlineId,
+      departureCityId,
       categoryId,
     });
     await expect(service.publish(pkg.id)).rejects.toBeInstanceOf(BadRequestException);
@@ -193,8 +221,8 @@ describe("PackagesService (integration)", () => {
 
     await service.update(pkg.id, {
       durationDays: 9,
-      airline: "Garuda Indonesia",
-      departureCity: "Jakarta",
+      airlineId,
+      departureCityId,
     });
     await service.addHotel(pkg.id, {
       cityName: "Makkah",
@@ -302,8 +330,8 @@ describe("PackagesService (integration)", () => {
 
     await service.update(pkg.id, {
       durationDays: 9,
-      airline: "Garuda Indonesia",
-      departureCity: "Jakarta",
+      airlineId,
+      departureCityId,
     });
     await service.addHotel(pkg.id, {
       cityName: "Makkah",

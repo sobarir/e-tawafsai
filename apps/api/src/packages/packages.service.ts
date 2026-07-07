@@ -6,6 +6,8 @@ import {
   packages,
   packageHotels,
   packageCategories,
+  airlines,
+  departureCities,
   tags,
   packageTags,
   packageFlyers,
@@ -59,6 +61,8 @@ export class PackagesService {
     if (categoryId) {
       await this.assertCategoryScope(categoryId, input.providerId, productType);
     }
+    if (input.airlineId) await this.assertAirlineOwned(input.airlineId);
+    if (input.departureCityId) await this.assertDepartureCityOwned(input.departureCityId);
 
     const [created] = await this.db
       .insert(packages)
@@ -73,9 +77,9 @@ export class PackagesService {
         plusDestination: input.plusDestination ?? null,
         durationDays: input.durationDays ?? null,
         description: input.description ?? null,
-        airline: input.airline ?? null,
+        airlineId: input.airlineId ?? null,
         flightRoute: input.flightRoute ?? null,
-        departureCity: input.departureCity ?? null,
+        departureCityId: input.departureCityId ?? null,
         isFeatured: input.isFeatured ?? false,
         status: "draft",
         hasBeenPublished: false,
@@ -143,10 +147,32 @@ export class PackagesService {
       categoryName = categoryRow?.name ?? null;
     }
 
+    let airlineName: string | null = null;
+    if (pkg.airlineId) {
+      const [a] = await this.db
+        .select({ name: airlines.name })
+        .from(airlines)
+        .where(and(eq(airlines.tenantId, this.tenantDb.tenantId), eq(airlines.id, pkg.airlineId)))
+        .limit(1);
+      airlineName = a?.name ?? null;
+    }
+
+    let departureCityName: string | null = null;
+    if (pkg.departureCityId) {
+      const [c] = await this.db
+        .select({ name: departureCities.name })
+        .from(departureCities)
+        .where(and(eq(departureCities.tenantId, this.tenantDb.tenantId), eq(departureCities.id, pkg.departureCityId)))
+        .limit(1);
+      departureCityName = c?.name ?? null;
+    }
+
     return {
       ...pkg,
       categoryId: pkg.categoryId,
       categoryName,
+      airlineName,
+      departureCityName,
       needsReview,
       hotels: hotels.map((h) => ({
         cityName: h.cityName,
@@ -199,6 +225,8 @@ export class PackagesService {
         effectiveProductType,
       );
     }
+    if (input.airlineId) await this.assertAirlineOwned(input.airlineId);
+    if (input.departureCityId) await this.assertDepartureCityOwned(input.departureCityId);
 
     const updateData: Partial<DbPackage> = {
       ...input,
@@ -345,6 +373,16 @@ export class PackagesService {
     if (!category || !categoryMatchesScope(category, providerId, productType)) {
       throw new BadRequestException("category");
     }
+  }
+
+  private async assertAirlineOwned(airlineId: string): Promise<void> {
+    const [row] = await this.tenantDb.select(airlines, eq(airlines.id, airlineId));
+    if (!row) throw new BadRequestException("airline");
+  }
+
+  private async assertDepartureCityOwned(departureCityId: string): Promise<void> {
+    const [row] = await this.tenantDb.select(departureCities, eq(departureCities.id, departureCityId));
+    if (!row) throw new BadRequestException("departureCity");
   }
 
   private async generateUniqueSlug(title: string): Promise<string> {
