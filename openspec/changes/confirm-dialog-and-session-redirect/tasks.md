@@ -10,7 +10,7 @@
 - [ ] 2.2 Providers: replace the bespoke deactivate modal with `ConfirmDialog` and render the affected-packages impact list in its content slot (`dashboard/providers/[id]/page.tsx`)
 - [ ] 2.3 Providers: gate category deletes with `ConfirmDialog` (same file)
 - [ ] 2.4 Packages: replace native `window.confirm` for departure-schedule delete with `ConfirmDialog`, and gate package unpublish (`dashboard/packages/[id]/page.tsx`)
-- [ ] 2.5 Users + templates: gate deletes (`dashboard/users/page.tsx`, `dashboard/settings/templates/page.tsx`)
+- [ ] 2.5 Users: gate the deactivate-user action (`dashboard/users/page.tsx`). (Templates have no destructive action — excluded.)
 - [ ] 2.6 Sweep for any remaining destructive call sites and confirm none fire without the dialog
 
 ## 3. Session-expiry redirect

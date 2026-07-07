@@ -15,7 +15,8 @@ redirect.
 - Route **every destructive action** in the web app through this dialog: master-data airline/city
   deletes, provider category deletes, provider **deactivate** (replacing the bespoke modal and
   folding in its affected-packages impact list), package departure-schedule deletes (replacing the
-  native `window.confirm`), package **unpublish**, user deletes, and template deletes.
+  native `window.confirm`), package **unpublish**, and user **deactivate**. (Templates have no
+  destructive action; hard package/provider delete hooks exist but are currently unused.)
 - Add global session-expiry handling: any `401` response redirects the user to `/login`, preserving
   the current path as a `returnUrl`, and the login page shows a "your session expired" notice; after
   re-login the user is returned to `returnUrl`.
@@ -43,8 +44,7 @@ redirect.
 - **Affected code (apps/web only):**
   - New: `src/components/ui/alert-dialog.tsx` (+ a thin `ConfirmDialog` wrapper if warranted).
   - Wiring: `dashboard/settings/master-data/page.tsx`, `dashboard/providers/[id]/page.tsx`,
-    `dashboard/packages/[id]/page.tsx`, `dashboard/users/page.tsx`,
-    `dashboard/settings/templates/page.tsx`, and any other destructive call sites.
+    `dashboard/packages/[id]/page.tsx`, `dashboard/users/page.tsx` (deactivate).
   - Session expiry: `src/lib/api.ts` (ky `afterResponse`/`beforeError` 401 hook), possibly
     `src/components/providers.tsx` (QueryClient cache handler), and `src/app/login/page.tsx`
     (returnUrl + session-expired notice).

@@ -114,11 +114,14 @@ safeReturnUrl(raw: string | null): string
 | `dashboard/settings/master-data/page.tsx` | delete airline, delete city | gate via `useConfirm` |
 | `dashboard/providers/[id]/page.tsx` | deactivate (impact list), delete category | replace bespoke modal → `confirm` w/ ReactNode impact list; gate category delete |
 | `dashboard/packages/[id]/page.tsx` | delete departure schedule, unpublish | replace `window.confirm`; gate unpublish |
-| `dashboard/users/page.tsx` | delete user | gate via `useConfirm` |
-| `dashboard/settings/templates/page.tsx` | delete template | gate via `useConfirm` |
+| `dashboard/users/page.tsx` | deactivate user | gate via `useConfirm` |
 
-Each migration preserves the site's existing mutation call and error handling; only the confirmation
-gate changes. A final sweep confirms no destructive call fires without the dialog.
+Verified inventory (2026-07-07): the destructive actions are the 7 above. **Templates have no
+destructive action** (only update) and are excluded. Users have **no hard delete** — only
+`deactivateUser` (a destructive state change, in scope). `useDeletePackage` / `useDeleteProvider`
+hooks exist but are currently unused (no call site), so nothing to wire. Each migration preserves the
+site's existing mutation call and error handling; only the confirmation gate changes. A final sweep
+confirms no destructive call fires without the dialog.
 
 ## Testing strategy
 

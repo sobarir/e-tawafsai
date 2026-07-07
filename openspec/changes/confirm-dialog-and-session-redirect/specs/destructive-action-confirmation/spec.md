@@ -22,10 +22,10 @@ confirm-button label styled as destructive, and cancel/confirm handlers.
 ### Requirement: All destructive actions are confirmed
 
 The web app SHALL gate every irreversible action with the reusable confirmation dialog: deletes
-(airlines, departure cities, provider categories, package departure schedules, users, templates),
-provider deactivation, and package unpublish. No destructive action SHALL execute directly on click
-without an intervening confirmation, and native `window.confirm` and the bespoke provider-deactivate
-modal SHALL be removed in favor of the shared dialog.
+(airlines, departure cities, provider categories, package departure schedules), provider
+deactivation, user deactivation, and package unpublish. No destructive action SHALL execute directly
+on click without an intervening confirmation, and native `window.confirm` and the bespoke
+provider-deactivate modal SHALL be removed in favor of the shared dialog.
 
 #### Scenario: Delete requires confirmation
 
