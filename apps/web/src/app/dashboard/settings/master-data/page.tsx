@@ -19,6 +19,7 @@ import {
   useDeleteDepartureCity,
 } from "@/hooks/use-departure-cities";
 import { readApiError } from "@/lib/api";
+import { useConfirm } from "@/hooks/use-confirm";
 
 interface Row {
   id: string;
@@ -40,6 +41,7 @@ function MasterList({ title, rows, onCreate, onRename, onToggle, onDelete, onErr
   const [newName, setNewName] = useState("");
   const [editId, setEditId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
+  const confirm = useConfirm();
 
   const guard = async (fn: () => Promise<void>) => {
     try {
@@ -121,7 +123,16 @@ function MasterList({ title, rows, onCreate, onRename, onToggle, onDelete, onErr
                 variant="ghost"
                 size="sm"
                 className="text-destructive hover:bg-destructive/10"
-                onClick={() => guard(() => onDelete(r.id))}
+                onClick={() =>
+                  guard(async () => {
+                    const ok = await confirm({
+                      title: "Delete this entry?",
+                      description: `“${r.name}” will be removed from ${title.toLowerCase()}. This cannot be undone.`,
+                      confirmLabel: "Delete",
+                    });
+                    if (ok) await onDelete(r.id);
+                  })
+                }
               >
                 Delete
               </Button>

@@ -6,7 +6,7 @@
 
 ## 2. Wire destructive actions to the dialog
 
-- [ ] 2.1 Master data: gate airline + departure-city deletes (`dashboard/settings/master-data/page.tsx`) with `ConfirmDialog`, removing the immediate-fire path
+- [x] 2.1 Master data: gate airline + departure-city deletes (`dashboard/settings/master-data/page.tsx`) with `ConfirmDialog`, removing the immediate-fire path
 - [ ] 2.2 Providers: replace the bespoke deactivate modal with `ConfirmDialog` and render the affected-packages impact list in its content slot (`dashboard/providers/[id]/page.tsx`)
 - [ ] 2.3 Providers: gate category deletes with `ConfirmDialog` (same file)
 - [ ] 2.4 Packages: replace native `window.confirm` for departure-schedule delete with `ConfirmDialog`, and gate package unpublish (`dashboard/packages/[id]/page.tsx`)
