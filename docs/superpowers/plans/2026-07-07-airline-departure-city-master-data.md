@@ -788,6 +788,12 @@ In the main `rowsResult` query, change `p.airline` in the select list to `la.nam
 ```
 Add the **same two joins** to the `countResult` query (it currently joins providers + `depLateral`; add both master joins so the `dca.name` / `la.name` filter references resolve there too).
 
+**Also (from Task 4 discovery):** `search_doc` was regenerated in migration `0018` as `title + description` only (it previously included the now-dropped `airline` free-text column). To preserve full-text airline search per the package-search spec, extend the `q` predicate's OR branch to also match the joined airline name, mirroring the existing hotel-name EXISTS. In the `filters` SQL `q` block, add a final OR arm:
+```sql
+           or la.name ilike '%' || ${params.q ?? null} || '%'
+```
+(so `q` matches title/description via `search_doc`, hotel names via the existing EXISTS, or the airline name via the join.)
+
 - [ ] **Step 3: Verify typecheck + full unit suite**
 
 Run: `cd apps/api && bun run typecheck && bun run vitest run`

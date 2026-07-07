@@ -1,15 +1,15 @@
 ## 1. Shared contracts (`packages/shared`)
 
-- [ ] 1.1 Add `AirlineDto` and `DepartureCityDto` interfaces (`id`, `name`, `isActive`) and create/update request Zod schemas (name required, trimmed, max 120) in a new `master-data.ts` (exported from the package index).
-- [ ] 1.2 Update package create/update schemas to replace `airline` / `departureCity` free-text with nullable `airlineId` / `departureCityId` (length-26 ULID), and update the publish schema to require both ids.
-- [ ] 1.3 Update `PackageDto` (and any package read type) to carry `airlineId` / `departureCityId` plus resolved `airlineName` / `departureCityName`; keep the search DTO exposing the airline name.
+- [x] 1.1 Add `AirlineDto` and `DepartureCityDto` interfaces (`id`, `name`, `isActive`) and create/update request Zod schemas (name required, trimmed, max 120) in a new `master-data.ts` (exported from the package index).
+- [x] 1.2 Update package create/update schemas to replace `airline` / `departureCity` free-text with nullable `airlineId` / `departureCityId` (length-26 ULID), and update the publish schema to require both ids.
+- [x] 1.3 Update `PackageDto` (and any package read type) to carry `airlineId` / `departureCityId` plus resolved `airlineName` / `departureCityName`; keep the search DTO exposing the airline name.
 
 ## 2. Database (`packages/db`)
 
-- [ ] 2.1 Add `airlines` and `departure_cities` tables (`ulidPk`, `tenantOwned()`, `name`, `isActive` default true, `timestamps`) each with a `uniqueIndex` on `(tenantId, lower(btrim(name)))`; export inferred row types.
-- [ ] 2.2 Add nullable `airlineId` / `departureCityId` `ulidRef` FKs on `packages`; run `db:generate` for the additive DDL migration.
-- [ ] 2.3 Hand-add the backfill step to the generated migration: per tenant, upsert one master row per distinct non-blank existing free-text value (case-insensitive; deterministic id like `0016`), then `UPDATE packages` to set the FKs by normalized-name match; blank/null values leave a null FK. No starter list injected for real tenants.
-- [ ] 2.4 Add the cutover to the same migration: drop the `airline` and `departure_city` columns after the update step; apply with `db:migrate` and confirm it runs clean.
+- [x] 2.1 Add `airlines` and `departure_cities` tables (`ulidPk`, `tenantOwned()`, `name`, `isActive` default true, `timestamps`) each with a `uniqueIndex` on `(tenantId, lower(btrim(name)))`; export inferred row types.
+- [x] 2.2 Add nullable `airlineId` / `departureCityId` `ulidRef` FKs on `packages`; run `db:generate` for the additive DDL migration. _(schema half done here; `db:generate` runs in Task 4)_
+- [x] 2.3 Hand-add the backfill step to the generated migration: per tenant, upsert one master row per distinct non-blank existing free-text value (case-insensitive; deterministic id like `0016`), then `UPDATE packages` to set the FKs by normalized-name match; blank/null values leave a null FK. No starter list injected for real tenants. _(migration 0017, additive+backfill)_
+- [x] 2.4 Add the cutover: drop `airline` / `departure_city` (migration 0018). Also drop+recreate the `search_doc` generated column, which depended on `airline` (regenerated as title+description; airline stays full-text-searchable via a query join — see Task 4.2/8). Applied clean; backfill verified (0 unbackfilled rows).
 - [ ] 2.5 Update `seed.ts` to insert the curated starter airlines/departure cities for the demo tenant only and reference them by id on the demo package; run `db:migrate` then `db:seed`.
 
 ## 3. API — master-data modules (`apps/api`)
