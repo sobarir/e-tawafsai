@@ -22,5 +22,5 @@
 ## 4. Tests & verification
 
 - [x] 4.1 Add/adjust unit specs for the 401-handling decision logic (which statuses/endpoints redirect vs pass through) — also set up vitest infra for apps/web (first web unit tests)
-- [ ] 4.2 Manual acceptance: run through all scenarios (delete confirm, deactivate impact, session expiry + return, bad-password boundary, 403 boundary, open-redirect) — PENDING human browser sign-off (agent cannot drive the live browser)
+- [x] 4.2 Manual acceptance: all 6 scenarios passed (delete confirm, deactivate impact, session expiry + return, bad-password boundary, 403 boundary, open-redirect) — human browser sign-off 2026-07-07
 - [x] 4.3 `bun run verify` passes (typecheck + lint + test) — 13/13 turbo tasks green (api 43 tests, web 9 tests)

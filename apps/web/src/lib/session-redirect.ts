@@ -29,11 +29,18 @@ const DEFAULT_PATH = "/dashboard";
  * Constrain a returnUrl to a safe same-origin path to avoid open redirects.
  * Accepts only a path with a single leading slash; rejects protocol-relative
  * (`//host`), absolute (`http(s)://…`), the login route itself, and empty.
+ *
+ * Also rejects backslashes (browsers normalize `\` to `/`, so `/\host` becomes
+ * protocol-relative) and control characters, which are otherwise usable to
+ * smuggle an off-origin redirect past a naive `//` check.
  */
 export function safeReturnUrl(raw: string | null | undefined): string {
   if (!raw) return DEFAULT_PATH;
   if (!raw.startsWith("/")) return DEFAULT_PATH;
-  if (raw.startsWith("//")) return DEFAULT_PATH;
+  if (raw.startsWith("//") || raw.includes("\\")) return DEFAULT_PATH;
+  if ([...raw].some((ch) => { const c = ch.charCodeAt(0); return c < 0x20 || c === 0x7f; })) {
+    return DEFAULT_PATH;
+  }
   if (raw === "/login" || raw.startsWith("/login?") || raw.startsWith("/login/")) {
     return DEFAULT_PATH;
   }

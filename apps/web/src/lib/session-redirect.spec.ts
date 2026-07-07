@@ -56,6 +56,14 @@ describe("safeReturnUrl", () => {
     expect(safeReturnUrl("https://evil.com/x")).toBe("/dashboard");
   });
 
+  it("rejects backslash and control-char open-redirect tricks", () => {
+    expect(safeReturnUrl("/\\evil.com")).toBe("/dashboard");
+    expect(safeReturnUrl("/\\\\evil.com")).toBe("/dashboard");
+    expect(safeReturnUrl("/dashboard\\..\\x")).toBe("/dashboard");
+    expect(safeReturnUrl("/\tevil")).toBe("/dashboard");
+    expect(safeReturnUrl("/\nevil")).toBe("/dashboard");
+  });
+
   it("rejects /login and empty/null", () => {
     expect(safeReturnUrl("/login")).toBe("/dashboard");
     expect(safeReturnUrl("/login?returnUrl=/x")).toBe("/dashboard");
