@@ -9,6 +9,24 @@ below. When in
 doubt, read `docs/FEATURE_PATTERN.md` and copy the structure of the worked
 example: **user management** (`apps/api/src/users`, `apps/web/src/app/dashboard/users`).
 
+## Working cadence (manual gating — non-negotiable)
+
+The repo owner requires full manual gating on ALL work, in every Comet
+change and every ad-hoc task. This OVERRIDES Comet's normal auto-advance.
+
+1. **Stop after each completed task and ask for approval before starting
+   the next one.** No auto continuation, no chaining tasks or phases.
+   Commit + tick the task in `tasks.md`, then pause and ask.
+2. **Code review only after ALL tasks are complete — never per-task.**
+   Run a single `/code-review` (or requesting-code-review) pass at the end
+   of build/verify. Do not review after each individual task.
+
+Consequences for Comet: set `auto_transition: false` in `.comet.yaml`
+(phases resolve `NEXT: manual`). Do NOT use
+`build_mode: subagent-driven-development` (its core is per-task dual
+review); use `build_mode: direct` (full workflow needs
+`direct_override: true`).
+
 ## Commands
 
 | Command                | Purpose                                        |
