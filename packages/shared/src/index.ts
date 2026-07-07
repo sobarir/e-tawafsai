@@ -9,6 +9,7 @@ export * from "./providers";
 export * from "./provider-dedup";
 export * from "./packages";
 export * from "./categories";
+export * from "./master-data";
 export * from "./departures";
 export * from "./search";
 
