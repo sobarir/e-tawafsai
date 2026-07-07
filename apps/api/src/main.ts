@@ -48,6 +48,9 @@ async function bootstrap() {
   app.enableCors({
     origin: config.getOrThrow<string>("CORS_ORIGIN"),
     credentials: true,
+    // @fastify/cors@11 defaults methods to "GET,HEAD,POST", which blocks the
+    // PATCH/PUT/DELETE mutations our admin CRUD relies on. Set them explicitly.
+    methods: ["GET", "HEAD", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
   });
 
   const port = config.getOrThrow<number>("PORT");
