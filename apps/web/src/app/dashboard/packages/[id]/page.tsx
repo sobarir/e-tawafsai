@@ -27,6 +27,8 @@ import {
 } from "@/hooks/use-departures";
 import { useProviders } from "@/hooks/use-providers";
 import { useCategories } from "@/hooks/use-categories";
+import { useAirlines } from "@/hooks/use-airlines";
+import { useDepartureCities } from "@/hooks/use-departure-cities";
 import { api, readApiError } from "@/lib/api";
 import { DepartureFormFields, type DepartureFormFieldsHandle } from "./departure-form-fields";
 
@@ -56,9 +58,9 @@ export default function PackageDetailPage() {
   const [plusDestination, setPlusDestination] = useState("");
   const [durationDays, setDurationDays] = useState(9);
   const [description, setDescription] = useState("");
-  const [airline, setAirline] = useState("");
+  const [airlineId, setAirlineId] = useState("");
   const [flightRoute, setFlightRoute] = useState("");
-  const [departureCity, setDepartureCity] = useState("");
+  const [departureCityId, setDepartureCityId] = useState("");
   const [isFeatured, setIsFeatured] = useState(false);
   const [slug, setSlug] = useState("");
 
@@ -93,9 +95,9 @@ export default function PackageDetailPage() {
       setPlusDestination(pkg.plusDestination || "");
       setDurationDays(pkg.durationDays || 9);
       setDescription(pkg.description || "");
-      setAirline(pkg.airline || "");
+      setAirlineId(pkg.airlineId ?? "");
       setFlightRoute(pkg.flightRoute || "");
-      setDepartureCity(pkg.departureCity || "");
+      setDepartureCityId(pkg.departureCityId ?? "");
       setIsFeatured(pkg.isFeatured);
       setSlug(pkg.slug);
       setFlyers(pkg.flyers);
@@ -111,6 +113,8 @@ export default function PackageDetailPage() {
   }, [isNew, providersList]);
 
   const { data: categoriesList } = useCategories(providerId, productType);
+  const { data: airlinesList } = useAirlines();
+  const { data: departureCitiesList } = useDepartureCities();
 
   // The category options depend on the selected provider + product type. When
   // either changes and the currently-selected category no longer belongs to
@@ -125,6 +129,11 @@ export default function PackageDetailPage() {
   // provider (even if it has since been deactivated) so the selection is not lost.
   const selectableProviders =
     providersList?.data.filter((prov) => prov.isActive || prov.id === providerId) ?? [];
+
+  // Only active master rows are selectable, plus the currently-assigned row
+  // (even if since deactivated) so an existing package's value is not lost.
+  const airlineOptions = (airlinesList ?? []).filter((a) => a.isActive || a.id === airlineId);
+  const departureCityOptions = (departureCitiesList ?? []).filter((c) => c.isActive || c.id === departureCityId);
 
   if (!isAdmin && isNew) {
     return (
@@ -171,9 +180,9 @@ export default function PackageDetailPage() {
       plusDestination: plusDestination.trim() || null,
       durationDays: Number(durationDays),
       description: description.trim() || null,
-      airline: airline.trim() || null,
+      airlineId: airlineId || null,
       flightRoute: flightRoute.trim() || null,
-      departureCity: departureCity.trim() || null,
+      departureCityId: departureCityId || null,
       isFeatured,
     };
 
@@ -496,12 +505,20 @@ export default function PackageDetailPage() {
                 <div className="grid grid-cols-3 gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="airline">Airline</Label>
-                    <Input
+                    <select
                       id="airline"
-                      value={airline}
-                      onChange={(e) => setAirline(e.target.value)}
+                      value={airlineId}
+                      onChange={(e) => setAirlineId(e.target.value)}
                       disabled={!isAdmin}
-                    />
+                      className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <option value="">— Select airline —</option>
+                      {airlineOptions.map((a) => (
+                        <option key={a.id} value={a.id}>
+                          {a.name}{a.isActive ? "" : " (inactive)"}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="flightRoute">Flight Route</Label>
@@ -515,12 +532,20 @@ export default function PackageDetailPage() {
                   </div>
                   <div className="grid gap-2">
                     <Label htmlFor="departureCity">Departure City</Label>
-                    <Input
+                    <select
                       id="departureCity"
-                      value={departureCity}
-                      onChange={(e) => setDepartureCity(e.target.value)}
+                      value={departureCityId}
+                      onChange={(e) => setDepartureCityId(e.target.value)}
                       disabled={!isAdmin}
-                    />
+                      className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <option value="">— Select departure city —</option>
+                      {departureCityOptions.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}{c.isActive ? "" : " (inactive)"}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 

@@ -18,7 +18,7 @@ export type UpdateAirlineInput = z.input<typeof updateAirlineSchema>;
 export type CreateDepartureCityInput = z.input<typeof createDepartureCitySchema>;
 export type UpdateDepartureCityInput = z.input<typeof updateDepartureCitySchema>;
 
-interface MasterRowDto {
+export interface AirlineDto {
   id: string;
   tenantId: string;
   name: string;
@@ -26,5 +26,12 @@ interface MasterRowDto {
   createdAt: string;
   updatedAt: string;
 }
-export type AirlineDto = MasterRowDto;
-export type DepartureCityDto = MasterRowDto;
+
+export interface DepartureCityDto {
+  id: string;
+  tenantId: string;
+  name: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}

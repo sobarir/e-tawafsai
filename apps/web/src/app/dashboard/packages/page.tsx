@@ -95,7 +95,7 @@ export default function PackagesPage() {
                   Airline & Route
                 </span>
                 <span>
-                  {pkg.airline ? `${pkg.airline} (${pkg.departureCity ?? ""})` : "Not specified"}
+                  {pkg.airlineName ? `${pkg.airlineName} (${pkg.departureCityName ?? ""})` : "Not specified"}
                 </span>
               </div>
               <div>
