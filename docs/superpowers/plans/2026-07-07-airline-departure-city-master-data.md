@@ -6,7 +6,7 @@ base-ref: 106a4083c073cda755660c2675ae63f550aaae47
 
 # Airline & Departure City Master Data Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans (or superpowers:subagent-driven-development) to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans (or superpowers:subagent-driven-development) to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Replace the free-text `airline` / `departureCity` package fields with two tenant-global admin-managed master tables (`airlines`, `departure_cities`), referenced by nullable FKs, selected via form dropdowns.
 
@@ -40,7 +40,7 @@ base-ref: 106a4083c073cda755660c2675ae63f550aaae47
 **Interfaces:**
 - Produces: `createAirlineSchema`, `updateAirlineSchema`, `createDepartureCitySchema`, `updateDepartureCitySchema` (Zod); `CreateAirlineInput`, `UpdateAirlineInput`, `CreateDepartureCityInput`, `UpdateDepartureCityInput` (types); `AirlineDto`, `DepartureCityDto` (interfaces). Airline and departure-city share an identical shape — both schemas are structurally the same (`name`, optional `isActive`).
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // packages/shared/src/master-data.spec.ts
@@ -74,12 +74,12 @@ describe("master-data schemas", () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `cd packages/shared && bun run vitest run src/master-data.spec.ts`
 Expected: FAIL — cannot resolve `./master-data`.
 
-- [ ] **Step 3: Create the schemas**
+- [x] **Step 3: Create the schemas**
 
 ```ts
 // packages/shared/src/master-data.ts
@@ -115,7 +115,7 @@ export type AirlineDto = MasterRowDto;
 export type DepartureCityDto = MasterRowDto;
 ```
 
-- [ ] **Step 4: Wire the index export**
+- [x] **Step 4: Wire the index export**
 
 Add to `packages/shared/src/index.ts` immediately after `export * from "./categories";`:
 
@@ -123,12 +123,12 @@ Add to `packages/shared/src/index.ts` immediately after `export * from "./catego
 export * from "./master-data";
 ```
 
-- [ ] **Step 5: Run test to verify it passes**
+- [x] **Step 5: Run test to verify it passes**
 
 Run: `cd packages/shared && bun run vitest run src/master-data.spec.ts`
 Expected: PASS (4 tests).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add packages/shared/src/master-data.ts packages/shared/src/master-data.spec.ts packages/shared/src/index.ts
@@ -147,7 +147,7 @@ git commit -m "feat(shared): airline & departure-city master-data schemas and DT
 - Consumes: nothing new.
 - Produces: `createPackageSchema` / `updatePackageSchema` carry nullable `airlineId` / `departureCityId` (length-26) instead of free-text `airline` / `departureCity`; `publishPackageSchema` requires both ids; `PackageDto` carries `airlineId`, `departureCityId`, `airlineName`, `departureCityName` and drops `airline` / `departureCity`. `flightRoute` is unchanged.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 ```ts
 // packages/shared/src/packages.spec.ts
@@ -176,12 +176,12 @@ describe("package schema FK ids", () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `cd packages/shared && bun run vitest run src/packages.spec.ts`
 Expected: FAIL — `airlineId` unknown / publish accepts missing airlineId.
 
-- [ ] **Step 3: Edit `packages/shared/src/packages.ts`**
+- [x] **Step 3: Edit `packages/shared/src/packages.ts`**
 
 In `createPackageSchema`, replace the two lines:
 ```ts
@@ -217,12 +217,12 @@ In `PackageDto`, replace `airline: string | null;` and `departureCity: string | 
 ```
 (keep `flightRoute: string | null;`).
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `cd packages/shared && bun run vitest run src/packages.spec.ts`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add packages/shared/src/packages.ts packages/shared/src/packages.spec.ts
@@ -239,7 +239,7 @@ git commit -m "feat(shared): package schema uses airlineId/departureCityId FKs"
 **Interfaces:**
 - Produces: `airlines`, `departureCities` tables + `DbAirline`, `NewDbAirline`, `DbDepartureCity`, `NewDbDepartureCity` types; `packages.airlineId`, `packages.departureCityId` nullable FK columns; the `airline` / `departureCity` varchars removed from the table definition.
 
-- [ ] **Step 1: Add the master tables**
+- [x] **Step 1: Add the master tables**
 
 In `packages/db/src/schema/packages.ts`, after the `packageCategories` block (and its exported types), add:
 
@@ -272,7 +272,7 @@ export type NewDbDepartureCity = typeof departureCities.$inferInsert;
 
 (`sql`, `uniqueIndex`, `boolean`, `varchar` are already imported at the top of this file.)
 
-- [ ] **Step 2: Swap the package columns to FKs**
+- [x] **Step 2: Swap the package columns to FKs**
 
 In the `packages` table definition, replace:
 ```ts
@@ -287,12 +287,12 @@ with:
   departureCityId: ulidRef("departure_city_id").references(() => departureCities.id),
 ```
 
-- [ ] **Step 3: Typecheck the db package**
+- [x] **Step 3: Typecheck the db package**
 
 Run: `cd packages/db && bun run typecheck` (or `bunx tsc --noEmit`)
 Expected: PASS (schema compiles; downstream api errors are handled in later tasks — do not fix them here).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add packages/db/src/schema/packages.ts
@@ -310,12 +310,12 @@ git commit -m "feat(db): airlines & departure_cities tables + package FK columns
 - Consumes: Task 3 schema.
 - Produces: a migration that creates both tables, adds both FK columns, backfills every tenant's distinct non-blank values, repoints packages, and drops the old varchars.
 
-- [ ] **Step 1: Generate the additive DDL migration**
+- [x] **Step 1: Generate the additive DDL migration**
 
 Run: `cd packages/db && bun run db:generate`
 Expected: a new `drizzle/00NN_*.sql` creating `airlines`, `departure_cities`, adding `airline_id` / `departure_city_id`, and (drizzle will also emit) dropping `airline` / `departure_city`. Note the generated file path.
 
-- [ ] **Step 2: Insert the backfill BEFORE the DROP statements**
+- [x] **Step 2: Insert the backfill BEFORE the DROP statements**
 
 Open the generated file. Ensure statement order is: (a) CREATE TABLE airlines/departure_cities; (b) ALTER TABLE packages ADD COLUMN airline_id / departure_city_id; (c) **[insert backfill here]**; (d) ALTER TABLE packages DROP COLUMN airline / departure_city. If drizzle placed the DROP before your backfill, move the DROP statements to the end. Insert these four statements (each terminated with `--> statement-breakpoint`) at point (c):
 
@@ -349,12 +349,12 @@ WHERE dc."tenant_id" = p."tenant_id"
 	AND p."departure_city" IS NOT NULL AND btrim(p."departure_city") <> '';
 ```
 
-- [ ] **Step 3: Apply the migration**
+- [x] **Step 3: Apply the migration**
 
 Run: `cd packages/db && bun run db:migrate`
 Expected: migration applies without error. (If it fails, load `systematic-debugging` before editing — do not patch blindly.)
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add packages/db/drizzle
@@ -374,7 +374,7 @@ git commit -m "feat(db): migration backfills airline/city master data and drops 
 - Consumes: `TenantScopedDb`, `airlines` table, `Database`, shared airline schemas/DTO.
 - Produces: `AirlinesService` with `list()`, `findById(id)`, `create(input)`, `update(id, input)`, `remove(id)`; `normalizeAirlineName(name)`, `toAirlineDto(row)`; REST at `/airlines`.
 
-- [ ] **Step 1: Write the failing policy test**
+- [x] **Step 1: Write the failing policy test**
 
 ```ts
 // apps/api/src/airlines/airlines.policy.spec.ts
@@ -399,12 +399,12 @@ describe("airlines.policy", () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `cd apps/api && bun run vitest run src/airlines/airlines.policy.spec.ts`
 Expected: FAIL — module not found.
 
-- [ ] **Step 3: Write the policy**
+- [x] **Step 3: Write the policy**
 
 ```ts
 // apps/api/src/airlines/airlines.policy.ts
@@ -427,12 +427,12 @@ export function toAirlineDto(row: DbAirline): AirlineDto {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `cd apps/api && bun run vitest run src/airlines/airlines.policy.spec.ts`
 Expected: PASS (2 tests).
 
-- [ ] **Step 5: Write the service**
+- [x] **Step 5: Write the service**
 
 ```ts
 // apps/api/src/airlines/airlines.service.ts
@@ -523,7 +523,7 @@ export class AirlinesService {
 }
 ```
 
-- [ ] **Step 6: Write the controller**
+- [x] **Step 6: Write the controller**
 
 ```ts
 // apps/api/src/airlines/airlines.controller.ts
@@ -573,7 +573,7 @@ export class AirlinesController {
 }
 ```
 
-- [ ] **Step 7: Write the module and register it**
+- [x] **Step 7: Write the module and register it**
 
 ```ts
 // apps/api/src/airlines/airlines.module.ts
@@ -591,12 +591,12 @@ export class AirlinesModule {}
 
 In `apps/api/src/app.module.ts`: add `import { AirlinesModule } from "./airlines/airlines.module";` with the other imports, and add `AirlinesModule,` to the `imports` array (after `CategoriesModule,`).
 
-- [ ] **Step 8: Verify unit specs + typecheck**
+- [x] **Step 8: Verify unit specs + typecheck**
 
 Run: `cd apps/api && bun run vitest run src/airlines/airlines.policy.spec.ts && bun run typecheck`
 Expected: policy PASS. Typecheck will still error in `packages.service.ts` / `search.service.ts` (fixed in Tasks 7-8) — that's expected; confirm no NEW errors inside `src/airlines`.
 
-- [ ] **Step 9: Commit**
+- [x] **Step 9: Commit**
 
 ```bash
 git add apps/api/src/airlines apps/api/src/app.module.ts
@@ -614,16 +614,16 @@ git commit -m "feat(api): airlines CRUD module with name-conflict and delete gua
 **Interfaces:**
 - Produces: `DepartureCitiesService` (same method set as `AirlinesService` but over `departureCities` + `packages.departureCityId`); `normalizeDepartureCityName`, `toDepartureCityDto`; REST at `/departure-cities`.
 
-- [ ] **Step 1: Write the failing policy test**
+- [x] **Step 1: Write the failing policy test**
 
 Mirror Task 5 Step 1 in `apps/api/src/departure-cities/departure-cities.policy.spec.ts`, importing `normalizeDepartureCityName`, `toDepartureCityDto`, using name `"Jakarta"`.
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `cd apps/api && bun run vitest run src/departure-cities/departure-cities.policy.spec.ts`
 Expected: FAIL — module not found.
 
-- [ ] **Step 3: Write policy / service / controller / module**
+- [x] **Step 3: Write policy / service / controller / module**
 
 Copy Task 5's four source files into `apps/api/src/departure-cities/`, replacing verbatim:
 - symbol `Airline` → `DepartureCity`, `airline` → `departureCity`
@@ -635,12 +635,12 @@ Copy Task 5's four source files into `apps/api/src/departure-cities/`, replacing
 
 Register in `apps/api/src/app.module.ts`: import `DepartureCitiesModule` and add `DepartureCitiesModule,` after `AirlinesModule,`.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `cd apps/api && bun run vitest run src/departure-cities/departure-cities.policy.spec.ts`
 Expected: PASS (2 tests).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/api/src/departure-cities apps/api/src/app.module.ts
@@ -659,16 +659,16 @@ git commit -m "feat(api): departure-cities CRUD module"
 - Consumes: `airlines`, `departureCities` tables; `PackageDto` new fields.
 - Produces: create/update persist `airlineId` / `departureCityId` with tenant-ownership validation; `findOne` resolves `airlineName` / `departureCityName` via lookup; publish gating checks the ids.
 
-- [ ] **Step 1: Update the publish policy test (Red)**
+- [x] **Step 1: Update the publish policy test (Red)**
 
 In `apps/api/src/packages/packages.policy.spec.ts`, update fixtures: replace `airline: "X"` / `departureCity: "Y"` with `airlineId: "a1", airlineName: "X", departureCityId: "c1", departureCityName: "Y"`, and add a case asserting that a missing `airlineId` yields an `"airline"` error and missing `departureCityId` yields `"departureCity"`.
 
-- [ ] **Step 2: Run to verify it fails**
+- [x] **Step 2: Run to verify it fails**
 
 Run: `cd apps/api && bun run vitest run src/packages/packages.policy.spec.ts`
 Expected: FAIL (policy still reads `pkg.airline`).
 
-- [ ] **Step 3: Update `packages.policy.ts`**
+- [x] **Step 3: Update `packages.policy.ts`**
 
 Replace the airline / departureCity checks:
 ```ts
@@ -680,7 +680,7 @@ Replace the airline / departureCity checks:
     }
 ```
 
-- [ ] **Step 4: Update `packages.service.ts` writes**
+- [x] **Step 4: Update `packages.service.ts` writes**
 
 Add imports: `airlines, departureCities` to the `@cometkit/db` import.
 
@@ -714,7 +714,7 @@ Add the two private helpers next to `assertCategoryScope`:
   }
 ```
 
-- [ ] **Step 5: Resolve names in `findOne()` and fix the return shape**
+- [x] **Step 5: Resolve names in `findOne()` and fix the return shape**
 
 After the `categoryName` lookup block, add:
 ```ts
@@ -743,12 +743,12 @@ The `return { ...pkg, ... }` spread carries `airlineId` / `departureCityId` from
       departureCityName,
 ```
 
-- [ ] **Step 6: Run policy test + typecheck the packages area**
+- [x] **Step 6: Run policy test + typecheck the packages area**
 
 Run: `cd apps/api && bun run vitest run src/packages/packages.policy.spec.ts && bun run typecheck`
 Expected: policy PASS; typecheck errors now only remain in `search.service.ts` (Task 8).
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add apps/api/src/packages
@@ -766,7 +766,7 @@ git commit -m "feat(api): packages persist airline/city FKs, resolve names, gate
 - Consumes: `airlines`, `departure_cities` tables (raw SQL joins).
 - Produces: airline / departure-city filters match the joined master-row name; result payload's `airline` is the joined airline name. `SearchResultDto` shape is unchanged (still exposes `airline` string).
 
-- [ ] **Step 1: Update the filter predicates**
+- [x] **Step 1: Update the filter predicates**
 
 In the `filters` SQL, replace:
 ```sql
@@ -779,7 +779,7 @@ with:
       and (${params.departureCity ?? null}::text is null or dca.name = ${params.departureCity ?? null})
 ```
 
-- [ ] **Step 2: Add the joins and swap the select**
+- [x] **Step 2: Add the joins and swap the select**
 
 In the main `rowsResult` query, change `p.airline` in the select list to `la.name as airline`, and add the two joins after `left join package_categories pc on pc.id = p.category_id`:
 ```sql
@@ -794,12 +794,12 @@ Add the **same two joins** to the `countResult` query (it currently joins provid
 ```
 (so `q` matches title/description via `search_doc`, hotel names via the existing EXISTS, or the airline name via the join.)
 
-- [ ] **Step 3: Verify typecheck + full unit suite**
+- [x] **Step 3: Verify typecheck + full unit suite**
 
 Run: `cd apps/api && bun run typecheck && bun run vitest run`
 Expected: PASS (no remaining `p.airline` references; `SearchRow.airline` still string).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add apps/api/src/search/search.service.ts
@@ -816,7 +816,7 @@ git commit -m "feat(api): search joins airline/city master tables for filter and
 **Interfaces:**
 - Produces: demo-tenant `airlines` / `departure_cities` rows; the demo package references them by id.
 
-- [ ] **Step 1: Insert starter rows before the demo package block**
+- [x] **Step 1: Insert starter rows before the demo package block**
 
 Just before the demo package `existingPackage` lookup, add (uses the already-imported `and`, `eq`, `ulid`, `schema`):
 
@@ -845,7 +845,7 @@ Just before the demo package `existingPackage` lookup, add (uses the already-imp
 
 Note: the `onConflictDoNothing()` above relies on the normalized-name unique index; if a raw `.values` conflict target is required by drizzle, use `.onConflictDoNothing()` with no target (the partial unique index still enforces at the DB).
 
-- [ ] **Step 2: Point the demo package at the ids**
+- [x] **Step 2: Point the demo package at the ids**
 
 In the demo package `.values({...})`, replace:
 ```ts
@@ -860,12 +860,12 @@ with:
         departureCityId: demoCity?.id,
 ```
 
-- [ ] **Step 3: Migrate then seed**
+- [x] **Step 3: Migrate then seed**
 
 Run: `cd packages/db && bun run db:migrate && bun run db:seed`
 Expected: both complete; no error. (If already migrated in Task 4, `db:migrate` is a no-op.)
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add packages/db/src/seed.ts
@@ -882,7 +882,7 @@ git commit -m "feat(db): seed starter airlines/cities for demo tenant"
 **Interfaces:**
 - Produces: `useAirlines()`, `useCreateAirline()`, `useUpdateAirline()`, `useDeleteAirline()` and the departure-cities equivalents; query keys `["airlines"]` / `["departure-cities"]`.
 
-- [ ] **Step 1: Write `use-airlines.ts`**
+- [x] **Step 1: Write `use-airlines.ts`**
 
 Copy the structure of `apps/web/src/hooks/use-categories.ts`, but: no params on the list query (`enabled` always), resource `"airlines"`, types `AirlineDto` / `CreateAirlineInput` / `UpdateAirlineInput`:
 
@@ -924,16 +924,16 @@ export function useDeleteAirline() {
 }
 ```
 
-- [ ] **Step 2: Write `use-departure-cities.ts`**
+- [x] **Step 2: Write `use-departure-cities.ts`**
 
 Same as Step 1 with resource `"departure-cities"`, key `["departure-cities"]`, types `DepartureCityDto` / `CreateDepartureCityInput` / `UpdateDepartureCityInput`, exported hook names `useDepartureCities` / `useCreateDepartureCity` / `useUpdateDepartureCity` / `useDeleteDepartureCity`.
 
-- [ ] **Step 3: Typecheck web**
+- [x] **Step 3: Typecheck web**
 
 Run: `cd apps/web && bun run typecheck`
 Expected: PASS for the new hooks (form/search errors handled in Tasks 12-13).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add apps/web/src/hooks/use-airlines.ts apps/web/src/hooks/use-departure-cities.ts
@@ -952,7 +952,7 @@ git commit -m "feat(web): airline & departure-city query hooks"
 - Consumes: the Task 10 hooks.
 - Produces: an admin-only page listing airlines and departure cities with add / rename / activate-toggle / delete, reusing one generic list section for both.
 
-- [ ] **Step 1: Add the nav link**
+- [x] **Step 1: Add the nav link**
 
 In `settings/page.tsx` header actions, add before the Templates link:
 ```tsx
@@ -961,7 +961,7 @@ In `settings/page.tsx` header actions, add before the Templates link:
           </Button>
 ```
 
-- [ ] **Step 2: Write the master-data page**
+- [x] **Step 2: Write the master-data page**
 
 Create `apps/web/src/app/dashboard/settings/master-data/page.tsx` — an admin-guarded page (copy the `me.role !== "admin"` guard block and the `role="alert"` error banner from `templates/page.tsx`) with two `MasterList` sections. Each section: a create input + button, and a list where each row shows the name (editable via inline input on an "Edit" toggle), an Active/Inactive toggle button (calls update with `{ isActive: !row.isActive }`), and a Delete button; all mutations wrapped in try/catch surfacing `readApiError(err)` into the banner.
 
@@ -1118,12 +1118,12 @@ export default function MasterDataPage() {
 }
 ```
 
-- [ ] **Step 3: Typecheck web**
+- [x] **Step 3: Typecheck web**
 
 Run: `cd apps/web && bun run typecheck`
 Expected: PASS for the new page + settings link.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add "apps/web/src/app/dashboard/settings/master-data/page.tsx" "apps/web/src/app/dashboard/settings/page.tsx"
@@ -1141,7 +1141,7 @@ git commit -m "feat(web): master-data admin section for airlines & departure cit
 - Consumes: `useAirlines`, `useDepartureCities`, `PackageDto` new fields.
 - Produces: airline & departure-city `<select>` dropdowns bound to ids; keep-assigned-when-editing behavior; payload sends ids.
 
-- [ ] **Step 1: Swap the state**
+- [x] **Step 1: Swap the state**
 
 Replace `const [airline, setAirline] = useState("");` and `const [departureCity, setDepartureCity] = useState("");` with:
 ```tsx
@@ -1150,7 +1150,7 @@ Replace `const [airline, setAirline] = useState("");` and `const [departureCity,
 ```
 Add near the other hooks: `const { data: airlinesList } = useAirlines();` and `const { data: departureCitiesList } = useDepartureCities();` (import both hooks at the top).
 
-- [ ] **Step 2: Load from the package**
+- [x] **Step 2: Load from the package**
 
 In the `if (pkg) {` effect, replace `setAirline(pkg.airline || "");` / `setDepartureCity(pkg.departureCity || "");` with:
 ```tsx
@@ -1158,7 +1158,7 @@ In the `if (pkg) {` effect, replace `setAirline(pkg.airline || "");` / `setDepar
       setDepartureCityId(pkg.departureCityId ?? "");
 ```
 
-- [ ] **Step 3: Build option lists with assigned-preservation**
+- [x] **Step 3: Build option lists with assigned-preservation**
 
 After `selectableProviders`, add:
 ```tsx
@@ -1166,7 +1166,7 @@ After `selectableProviders`, add:
   const departureCityOptions = (departureCitiesList ?? []).filter((c) => c.isActive || c.id === departureCityId);
 ```
 
-- [ ] **Step 4: Swap the inputs for selects**
+- [x] **Step 4: Swap the inputs for selects**
 
 Replace the Airline `<Input>` block with:
 ```tsx
@@ -1186,7 +1186,7 @@ Replace the Airline `<Input>` block with:
 ```
 Replace the Departure City `<Input>` block the same way (id `departureCity`, `departureCityId`, `setDepartureCityId`, `departureCityOptions`, label "Departure City").
 
-- [ ] **Step 5: Update the payload**
+- [x] **Step 5: Update the payload**
 
 In `handleFormSubmit`'s `payload`, replace `airline: airline.trim() || null,` / `departureCity: departureCity.trim() || null,` with:
 ```tsx
@@ -1194,12 +1194,12 @@ In `handleFormSubmit`'s `payload`, replace `airline: airline.trim() || null,` / 
       departureCityId: departureCityId || null,
 ```
 
-- [ ] **Step 6: Typecheck web**
+- [x] **Step 6: Typecheck web**
 
 Run: `cd apps/web && bun run typecheck`
 Expected: PASS (no `airline` / `departureCity` string references remain in this file).
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add "apps/web/src/app/dashboard/packages/[id]/page.tsx"
@@ -1216,16 +1216,16 @@ git commit -m "feat(web): airline & departure-city dropdowns on package form"
 **Interfaces:**
 - Consumes: `SearchResultDto.airline` (still the airline name via join).
 
-- [ ] **Step 1: Confirm no code change needed for result card**
+- [x] **Step 1: Confirm no code change needed for result card**
 
 `result-card.tsx` reads `dto.airline` — still a string. No change. The search filter inputs (`local.airline`, `local.departureCity`) remain free-text name matches (non-goal to dropdownize). Verify by reading both files; only touch them if a type error appears.
 
-- [ ] **Step 2: Typecheck web (full)**
+- [x] **Step 2: Typecheck web (full)**
 
 Run: `cd apps/web && bun run typecheck`
 Expected: PASS.
 
-- [ ] **Step 3: Commit (only if a file changed)**
+- [x] **Step 3: Commit (only if a file changed)**
 
 ```bash
 git add apps/web/src/app/dashboard/search
@@ -1244,20 +1244,20 @@ If nothing changed, skip this commit.
 **Interfaces:**
 - Consumes: the running Postgres (`bun run test:int`).
 
-- [ ] **Step 1: Write the airlines integration spec**
+- [x] **Step 1: Write the airlines integration spec**
 
 Model it on `apps/api/src/users/users.service.int.spec.ts` / `categories.service.int.spec.ts` (same bootstrap + row cleanup). Cover: create airline; duplicate normalized name → `ConflictException`; delete unreferenced → ok; create a package referencing the airline, then delete airline → `ConflictException` (in-use guard).
 
-- [ ] **Step 2: Extend the packages integration spec**
+- [x] **Step 2: Extend the packages integration spec**
 
 Add: create a draft with an `airlineId` + `departureCityId`; publish succeeds when both + category + Makkah hotel + active provider present; publish is rejected (BadRequest naming `airline` / `departureCity`) when either id is missing.
 
-- [ ] **Step 3: Run integration tests**
+- [x] **Step 3: Run integration tests**
 
 Run: `cd apps/api && bun run test:int`
 Expected: PASS (new + existing). If failures, load `systematic-debugging` before fixing.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add apps/api/src/airlines/airlines.service.int.spec.ts apps/api/src/packages/packages.service.int.spec.ts
@@ -1268,16 +1268,16 @@ git commit -m "test(api): integration coverage for master-data CRUD, guard, publ
 
 ### Task 15: Full verify
 
-- [ ] **Step 1: Run the quality gate**
+- [x] **Step 1: Run the quality gate**
 
 Run: `bun run verify` (repo root) then `cd apps/api && bun run test:int`
 Expected: typecheck + lint + unit + integration all PASS.
 
-- [ ] **Step 2: Manual smoke (per acceptance scenarios)**
+- [x] **Step 2: Manual smoke (per acceptance scenarios)**
 
 Run `bun run dev`, then: Settings → Master data (add/rename/deactivate an airline; delete a referenced one is rejected); create a package (airline/city dropdowns show active rows; publish blocked until both chosen); editing a package whose airline was deactivated still shows it selected; search by an airline name returns the package with the name on the card.
 
-- [ ] **Step 3: Commit any fixes, then this plan is complete.**
+- [x] **Step 3: Commit any fixes, then this plan is complete.**
 
 ## Self-Review
 
