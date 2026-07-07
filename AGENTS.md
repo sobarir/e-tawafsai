@@ -140,6 +140,29 @@ Then report in Comet vocabulary: active change(s), current phase, tasks
 remaining, verify result, and the single next command (usually
 `/comet continue`).
 
+**Auto-resolve the branch on resume (do this before executing any build
+task).** A session may start on `main`, but a `build`-phase change with
+`isolation: branch` must be worked on its own branch. The branch name is
+NOT stored in `.comet.yaml` — derive it from the change name and switch to
+it automatically:
+
+```bash
+# <change> = the active change folder name
+branch=$(git branch --list "*<change>*" --format='%(refname:short)' | head -1)
+```
+
+- If `branch` is found and differs from the current branch: only switch
+  when the working tree is clean (`git status --porcelain` empty) — run
+  `git checkout "$branch"`, then continue. If the tree is dirty, STOP and
+  tell the user which branch to switch to rather than risk their changes.
+- If no branch matches (e.g. it was deleted or the change is `hotfix`/
+  `tweak` on `main`), stay put and note it.
+- Never create a new branch on resume — that only happens once, at the
+  build plan-ready step.
+
+This makes `/comet continue` pick the correct branch and next unchecked
+task on its own, from any starting branch.
+
 ## Platform notes (Claude Code & Antigravity)
 
 - Skills live in both `.claude/skills/` (Claude Code) and `.agents/skills/`
