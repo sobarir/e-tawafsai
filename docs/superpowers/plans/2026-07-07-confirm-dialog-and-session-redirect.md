@@ -2,6 +2,7 @@
 change: confirm-dialog-and-session-redirect
 design-doc: docs/superpowers/specs/2026-07-07-confirm-dialog-and-session-redirect-design.md
 base-ref: e7fe1178d219334dbc5a4e1181ffeb393bee9aad
+archived-with: 2026-07-07-confirm-dialog-and-session-redirect
 ---
 
 # Confirm Dialog & Session Redirect Implementation Plan
@@ -24,6 +25,7 @@ base-ref: e7fe1178d219334dbc5a4e1181ffeb393bee9aad
 - Quality gate: `bun run verify` (typecheck + lint + test) must pass. Run bun with `export PATH="/c/Users/rahma/.bun/bin:$PATH"` first (bash) or use PowerShell.
 - The 7 destructive actions in scope (verified 2026-07-07): master-data delete airline + delete city; provider deactivate + delete category; package delete-departure + unpublish; user deactivate. Templates have no destructive action.
 
+archived-with: 2026-07-07-confirm-dialog-and-session-redirect
 ---
 
 ### Task 1: AlertDialog primitive + dependency
@@ -175,6 +177,7 @@ git add apps/web/package.json apps/web/bun.lock apps/web/src/components/ui/alert
 git commit -m "feat(web): add shadcn AlertDialog primitive"
 ```
 
+archived-with: 2026-07-07-confirm-dialog-and-session-redirect
 ---
 
 ### Task 2: ConfirmProvider + useConfirm, mounted app-wide
@@ -338,6 +341,7 @@ git add apps/web/src/components/confirm-provider.tsx apps/web/src/hooks/use-conf
 git commit -m "feat(web): add useConfirm() imperative confirmation dialog"
 ```
 
+archived-with: 2026-07-07-confirm-dialog-and-session-redirect
 ---
 
 ### Task 3: Gate master-data deletes
@@ -386,6 +390,7 @@ git add apps/web/src/app/dashboard/settings/master-data/page.tsx
 git commit -m "feat(web): confirm master-data airline/city deletes"
 ```
 
+archived-with: 2026-07-07-confirm-dialog-and-session-redirect
 ---
 
 ### Task 4: Gate provider deactivate + category delete (replace bespoke modal)
@@ -473,6 +478,7 @@ git add apps/web/src/app/dashboard/providers/[id]/page.tsx
 git commit -m "feat(web): route provider deactivate + category delete through shared confirm"
 ```
 
+archived-with: 2026-07-07-confirm-dialog-and-session-redirect
 ---
 
 ### Task 5: Gate package departure delete + unpublish (replace window.confirm)
@@ -543,6 +549,7 @@ git add apps/web/src/app/dashboard/packages/[id]/page.tsx
 git commit -m "feat(web): confirm package departure delete + unpublish"
 ```
 
+archived-with: 2026-07-07-confirm-dialog-and-session-redirect
 ---
 
 ### Task 6: Gate user deactivate
@@ -592,6 +599,7 @@ git add apps/web/src/app/dashboard/users/page.tsx
 git commit -m "feat(web): confirm user deactivation"
 ```
 
+archived-with: 2026-07-07-confirm-dialog-and-session-redirect
 ---
 
 ### Task 7: Pure session-redirect helpers (TDD)
@@ -711,6 +719,7 @@ git add apps/web/src/lib/session-redirect.ts apps/web/src/lib/session-redirect.s
 git commit -m "feat(web): add pure 401 redirect decision helpers with specs"
 ```
 
+archived-with: 2026-07-07-confirm-dialog-and-session-redirect
 ---
 
 ### Task 8: ky beforeError 401 hook
@@ -775,6 +784,7 @@ git add apps/web/src/lib/api.ts
 git commit -m "feat(web): redirect to login on 401 via ky beforeError hook"
 ```
 
+archived-with: 2026-07-07-confirm-dialog-and-session-redirect
 ---
 
 ### Task 9: Login page — returnUrl + session-expired notice
@@ -833,6 +843,7 @@ git add apps/web/src/app/login/page.tsx
 git commit -m "feat(web): login returnUrl + session-expired notice"
 ```
 
+archived-with: 2026-07-07-confirm-dialog-and-session-redirect
 ---
 
 ### Task 10: Final sweep, manual acceptance, and full verify
@@ -871,6 +882,7 @@ git add -A
 git commit -m "chore(web): final sweep + verify for confirm dialog & session redirect"
 ```
 
+archived-with: 2026-07-07-confirm-dialog-and-session-redirect
 ---
 
 ## Self-Review notes

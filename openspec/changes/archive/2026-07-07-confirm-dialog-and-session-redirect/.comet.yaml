@@ -17,7 +17,7 @@ verification_report: docs/superpowers/reports/2026-07-07-confirm-dialog-and-sess
 branch_status: handled
 created_at: 2026-07-07
 verified_at: 2026-07-07
-archived: false
+archived: true
 handoff_context: openspec/changes/confirm-dialog-and-session-redirect/.comet/handoff/design-context.json
 handoff_hash: f997db85f5f1ed565213d38b602ab7a1a3f71846e992dc93e907bfcc9945e0ec
 direct_override: true

@@ -2,6 +2,8 @@
 comet_change: confirm-dialog-and-session-redirect
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-07-07-confirm-dialog-and-session-redirect
+status: final
 ---
 
 # Design: confirm-dialog-and-session-redirect
