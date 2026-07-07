@@ -12,6 +12,7 @@ import {
   packageCategories,
   packageHotels,
   departures,
+  airlines,
   type Database,
 } from "@cometkit/db";
 import { eq, inArray } from "drizzle-orm";
@@ -32,6 +33,7 @@ describe("SearchService (integration)", () => {
   const suffix = ulid().toLowerCase();
   const pkgIds: string[] = [];
   const categoryIds: string[] = [];
+  const airlineIds: string[] = [];
 
   // Every search is scoped to this run's provider so assertions are isolated
   // from any demo seed data in the default tenant.
@@ -45,6 +47,13 @@ describe("SearchService (integration)", () => {
       providerId,
       ...partial,
     } as never;
+  }
+
+  async function createAirline(name: string): Promise<string> {
+    const id = ulid();
+    await db.insert(airlines).values({ id, tenantId, name });
+    airlineIds.push(id);
+    return id;
   }
 
   async function createCategory(name: string): Promise<string> {
@@ -71,6 +80,7 @@ describe("SearchService (integration)", () => {
     priceTriple?: number | null;
     seatBooked?: number;
     categoryId?: string | null;
+    airlineId?: string | null;
   }): Promise<string> {
     const id = ulid();
     pkgIds.push(id);
@@ -82,6 +92,7 @@ describe("SearchService (integration)", () => {
       title: opts.title,
       slug: `${opts.title.toLowerCase().replace(/\s+/g, "-")}-${suffix}`,
       categoryId: opts.categoryId ?? null,
+      airlineId: opts.airlineId ?? null,
       durationDays: opts.duration ?? 9,
       description: "paket",
       directOnly: opts.directOnly ?? false,
@@ -130,9 +141,12 @@ describe("SearchService (integration)", () => {
       await db.delete(packageHotels).where(inArray(packageHotels.packageId, pkgIds));
       await db.delete(packages).where(inArray(packages.id, pkgIds));
     }
-    // Packages reference categories via categoryId — delete packages first (above).
+    // Packages reference categories/airlines via FKs — delete packages first (above).
     if (categoryIds.length) {
       await db.delete(packageCategories).where(inArray(packageCategories.id, categoryIds));
+    }
+    if (airlineIds.length) {
+      await db.delete(airlines).where(inArray(airlines.id, airlineIds));
     }
     await db.delete(providers).where(eq(providers.id, providerId));
   });
@@ -270,5 +284,17 @@ describe("SearchService (integration)", () => {
     expect(ids).toContain(hit);
     expect(ids).not.toContain(miss);
     expect(res.data.find((r) => r.id === hit)!.category).toBe(categoryName);
+  });
+
+  it("filters by airline name via the joined airlines row and returns it on the result", async () => {
+    const airlineName = `Saudia ${suffix}`;
+    const airlineId = await createAirline(airlineName);
+    const hit = await seedPackage({ title: `AirHit ${suffix}`, depDate: new Date(Date.UTC(2026, 8, 12)), airlineId });
+    const miss = await seedPackage({ title: `AirMiss ${suffix}`, depDate: new Date(Date.UTC(2026, 8, 12)) });
+    const res = await service.search(makeParams({ airline: airlineName }));
+    const ids = res.data.map((r) => r.id);
+    expect(ids).toContain(hit);
+    expect(ids).not.toContain(miss);
+    expect(res.data.find((r) => r.id === hit)!.airline).toBe(airlineName);
   });
 });

@@ -23,7 +23,7 @@
 
 - [x] 4.1 Update the packages service/mappers to persist `airlineId` / `departureCityId`, validate tenant ownership on set, enforce both at publish, and resolve names via join for the DTO.
 - [x] 4.2 Update the search service query to join `airlines` / `departure_cities`, filter by joined name, and return the airline name on results. _Also re-added airline-name matching to the full-text `q` branch (search_doc lost `airline` in migration 0018)._
-- [ ] 4.3 Integration spec: create → assign airline/city → publish gating; plus one search-by-airline-name spec.
+- [x] 4.3 Integration spec: create → assign airline/city → publish gating; plus one search-by-airline-name spec. _Added packages publish-gating (field-error naming + resolved DTO names) and search-by-airline specs; also added `airlines`/`departure-cities` service int specs (create, dup-name conflict, delete unused, in-use delete guard) to honor the Task 3.4 deferral. 27 int tests green; typecheck clean._
 
 ## 5. Web — admin UI & form (`apps/web`)
 

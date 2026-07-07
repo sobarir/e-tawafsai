@@ -238,6 +238,52 @@ describe("PackagesService (integration)", () => {
     });
   });
 
+  it("gates publish on missing airline/departure city and resolves their names once assigned", async () => {
+    const localProviderId = await createProvider();
+    const categoryId = await createCategory(localProviderId, "umrah", `Airline Gate ${suffix}`);
+    const localAirlineId = await createAirline(`Assigned Air ${suffix}`);
+    const localDepartureCityId = await createDepartureCity(`Assigned City ${suffix}`);
+
+    const pkg = await service.create({
+      title: "Airline Gate Pack",
+      providerId: localProviderId,
+      productType: "umrah",
+      categoryId,
+    });
+    createdPackageIds.push(pkg.id);
+
+    await service.addHotel(pkg.id, {
+      cityName: "Makkah",
+      name: "Hilton Suites Makkah",
+      stars: 5,
+      distanceM: 50,
+      isPelataran: false,
+    });
+
+    // Only the departure city set -> publish is blocked, naming "airline".
+    await service.update(pkg.id, { durationDays: 9, departureCityId: localDepartureCityId });
+    await expect(service.publish(pkg.id)).rejects.toMatchObject({
+      message: expect.stringContaining("airline"),
+    });
+
+    // Now only the airline set (city cleared) -> publish is blocked, naming "departureCity".
+    await service.update(pkg.id, { airlineId: localAirlineId, departureCityId: null });
+    await expect(service.publish(pkg.id)).rejects.toMatchObject({
+      message: expect.stringContaining("departureCity"),
+    });
+
+    // Both assigned -> publish succeeds and the DTO carries the resolved names.
+    await service.update(pkg.id, { departureCityId: localDepartureCityId });
+    const published = await service.publish(pkg.id);
+    expect(published.status).toBe("published");
+
+    const detail = await service.findOne(pkg.id);
+    expect(detail.airlineId).toBe(localAirlineId);
+    expect(detail.airlineName).toBe(`Assigned Air ${suffix}`);
+    expect(detail.departureCityId).toBe(localDepartureCityId);
+    expect(detail.departureCityName).toBe(`Assigned City ${suffix}`);
+  });
+
   it("rejects a categoryId that belongs to another provider or productType", async () => {
     const localProviderId = await createProvider();
     const otherProviderId = await createProvider();
