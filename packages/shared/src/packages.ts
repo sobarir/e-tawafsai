@@ -11,9 +11,9 @@ export const createPackageSchema = z.object({
   plusDestination: z.string().max(120).nullable().optional(),
   durationDays: z.number().int().positive().nullable().optional(),
   description: z.string().nullable().optional(),
-  airline: z.string().max(120).nullable().optional(),
+  airlineId: z.string().length(26).nullable().optional(),
   flightRoute: z.string().max(255).nullable().optional(),
-  departureCity: z.string().max(120).nullable().optional(),
+  departureCityId: z.string().length(26).nullable().optional(),
   isFeatured: z.boolean().default(false),
 });
 
@@ -21,8 +21,8 @@ export const updatePackageSchema = createPackageSchema.partial();
 
 export const publishPackageSchema = z.object({
   durationDays: z.number().int().positive(),
-  airline: z.string().min(1).max(120),
-  departureCity: z.string().min(1).max(120),
+  airlineId: z.string().length(26),
+  departureCityId: z.string().length(26),
   categoryId: z.string().length(26),
 });
 
@@ -49,9 +49,11 @@ export interface PackageDto {
   plusDestination: string | null;
   durationDays: number | null;
   description: string | null;
-  airline: string | null;
+  airlineId: string | null;
+  airlineName: string | null;
   flightRoute: string | null;
-  departureCity: string | null;
+  departureCityId: string | null;
+  departureCityName: string | null;
   isFeatured: boolean;
   status: string;
   needsReview: boolean;
