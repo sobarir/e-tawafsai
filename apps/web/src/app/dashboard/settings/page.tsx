@@ -135,6 +135,9 @@ export default function SettingsPage() {
         </div>
         <div className="flex gap-2">
           <Button asChild variant="outline" size="sm">
+            <Link href="/dashboard/settings/master-data">Master data</Link>
+          </Button>
+          <Button asChild variant="outline" size="sm">
             <Link href="/dashboard/settings/templates">Templates</Link>
           </Button>
           <Button asChild variant="outline" size="sm">
