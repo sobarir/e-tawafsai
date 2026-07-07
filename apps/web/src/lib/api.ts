@@ -25,17 +25,23 @@ export interface ApiError {
 }
 
 export async function readApiError(error: unknown): Promise<string> {
-  if (error && typeof error === "object" && "response" in error) {
-    try {
-      const body = (await (
-        error as { response: Response }
-      ).response.json()) as ApiError;
+  if (error && typeof error === "object") {
+    const err = error as { data?: unknown; response?: Response };
+    // ky v2 pre-parses the JSON error body into `error.data` and consumes the
+    // response stream, so `error.response.json()` throws. Read `data` first.
+    let body = err.data as ApiError | undefined;
+    if ((!body || typeof body !== "object") && err.response) {
+      try {
+        body = (await err.response.json()) as ApiError;
+      } catch {
+        // fall through to generic message
+      }
+    }
+    if (body && typeof body === "object") {
       if (body.errors) {
         return Object.values(body.errors).flat().join(" ");
       }
       if (body.message) return body.message;
-    } catch {
-      // fall through to generic message
     }
   }
   return "Something went wrong. Check that the API is running and try again.";
