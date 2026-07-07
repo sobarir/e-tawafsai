@@ -11,7 +11,7 @@
 - [x] 2.3 Providers: gate category deletes with `ConfirmDialog` (same file)
 - [x] 2.4 Packages: replace native `window.confirm` for departure-schedule delete with `ConfirmDialog`, and gate package unpublish (`dashboard/packages/[id]/page.tsx`)
 - [x] 2.5 Users: gate the deactivate-user action (`dashboard/users/page.tsx`). (Templates have no destructive action — excluded.)
-- [ ] 2.6 Sweep for any remaining destructive call sites and confirm none fire without the dialog
+- [x] 2.6 Sweep for any remaining destructive call sites and confirm none fire without the dialog — grep sweep clean (no native confirm/alert/window.confirm gating remains)
 
 ## 3. Session-expiry redirect
 
@@ -22,5 +22,5 @@
 ## 4. Tests & verification
 
 - [x] 4.1 Add/adjust unit specs for the 401-handling decision logic (which statuses/endpoints redirect vs pass through) — also set up vitest infra for apps/web (first web unit tests)
-- [ ] 4.2 Manual acceptance: run through all five acceptance scenarios (delete confirm, deactivate impact, session expiry + return, bad-password boundary, 403 boundary)
-- [ ] 4.3 `bun run verify` passes (typecheck + lint + test)
+- [ ] 4.2 Manual acceptance: run through all scenarios (delete confirm, deactivate impact, session expiry + return, bad-password boundary, 403 boundary, open-redirect) — PENDING human browser sign-off (agent cannot drive the live browser)
+- [x] 4.3 `bun run verify` passes (typecheck + lint + test) — 13/13 turbo tasks green (api 43 tests, web 9 tests)
