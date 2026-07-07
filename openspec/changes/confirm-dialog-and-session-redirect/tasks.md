@@ -2,7 +2,7 @@
 
 - [x] 1.1 Add `@radix-ui/react-alert-dialog` (latest resolved version) to `apps/web/package.json` and install
 - [x] 1.2 Create the `AlertDialog` primitive at `apps/web/src/components/ui/alert-dialog.tsx` in the shadcn idiom (theme tokens, dark mode)
-- [ ] 1.3 Add a thin `ConfirmDialog` wrapper exposing `{ title, description | children, confirmLabel, destructive variant, onConfirm, onCancel, open state }`
+- [x] 1.3 Add a thin `ConfirmDialog` wrapper exposing `{ title, description | children, confirmLabel, destructive variant, onConfirm, onCancel, open state }` — implemented as imperative `useConfirm()` + `ConfirmProvider`
 
 ## 2. Wire destructive actions to the dialog
 
