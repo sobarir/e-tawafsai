@@ -96,14 +96,15 @@ export class SearchService {
       and p.status <> 'archived'
       and (${params.category ?? null}::text is null or pc.name = ${params.category ?? null})
       and (${params.productType ?? null}::text is null or p.product_type = ${params.productType ?? null})
-      and (${params.airline ?? null}::text is null or p.airline = ${params.airline ?? null})
-      and (${params.departureCity ?? null}::text is null or p.departure_city = ${params.departureCity ?? null})
+      and (${params.airline ?? null}::text is null or la.name = ${params.airline ?? null})
+      and (${params.departureCity ?? null}::text is null or dca.name = ${params.departureCity ?? null})
       and (${params.providerId ?? null}::text is null or p.provider_id = ${params.providerId ?? null})
       and (${params.durationMin ?? null}::int is null or p.duration_days >= ${params.durationMin ?? null}::int)
       and (${params.durationMax ?? null}::int is null or p.duration_days <= ${params.durationMax ?? null}::int)
       and (${params.directOnly} = false or p.direct_only = true)
       and (${params.q ?? null}::text is null
            or p.search_doc @@ plainto_tsquery('simple', ${params.q ?? null})
+           or la.name ilike '%' || ${params.q ?? null} || '%'
            or exists (select 1 from package_hotels phq
                       where phq.package_id = p.id and phq.name ilike '%' || ${params.q ?? null} || '%'))
       and (${params.hotelCity ?? null}::text is null or exists (
@@ -114,7 +115,7 @@ export class SearchService {
               and (${params.minStars ?? null}::int is null or phc.stars >= ${params.minStars ?? null}::int)))`;
 
     const rowsResult = await this.db.execute(sql`
-      select p.id, p.title, p.slug, pc.name as category, p.airline,
+      select p.id, p.title, p.slug, pc.name as category, la.name as airline,
              pr.name as provider_name, pr.brand_name as provider_brand_name,
              pr.ppiu_license_no,
              nd.departure_date as next_departure_date, nd.price_from, nd.seats_left,
@@ -123,6 +124,8 @@ export class SearchService {
       from packages p
       join providers pr on pr.id = p.provider_id
       left join package_categories pc on pc.id = p.category_id
+      left join airlines la on la.id = p.airline_id
+      left join departure_cities dca on dca.id = p.departure_city_id
       ${depLateral}
       ${hotelLateral}
       where ${filters}
@@ -134,6 +137,8 @@ export class SearchService {
       from packages p
       join providers pr on pr.id = p.provider_id
       left join package_categories pc on pc.id = p.category_id
+      left join airlines la on la.id = p.airline_id
+      left join departure_cities dca on dca.id = p.departure_city_id
       ${depLateral}
       where ${filters}`);
 
