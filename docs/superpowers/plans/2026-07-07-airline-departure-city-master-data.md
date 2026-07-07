@@ -2,6 +2,7 @@
 change: airline-departure-city-master-data
 design-doc: docs/superpowers/specs/2026-07-07-airline-departure-city-master-data-design.md
 base-ref: 106a4083c073cda755660c2675ae63f550aaae47
+archived-with: 2026-07-07-airline-departure-city-master-data
 ---
 
 # Airline & Departure City Master Data Implementation Plan
@@ -28,6 +29,7 @@ base-ref: 106a4083c073cda755660c2675ae63f550aaae47
 - THE quality gate: `bun run verify` (typecheck + lint + unit) must pass; DB-touching paths also `bun run test:int` (in `apps/api`).
 - ULID pk via `ulidPk()`, FK via `ulidRef(name)` (both `char(26)`); timestamps via `timestamps` helper (`packages/db/src/columns.ts`).
 
+archived-with: 2026-07-07-airline-departure-city-master-data
 ---
 
 ### Task 1: Shared master-data contracts
@@ -135,6 +137,7 @@ git add packages/shared/src/master-data.ts packages/shared/src/master-data.spec.
 git commit -m "feat(shared): airline & departure-city master-data schemas and DTOs"
 ```
 
+archived-with: 2026-07-07-airline-departure-city-master-data
 ---
 
 ### Task 2: Package contract switch to FK ids
@@ -229,6 +232,7 @@ git add packages/shared/src/packages.ts packages/shared/src/packages.spec.ts
 git commit -m "feat(shared): package schema uses airlineId/departureCityId FKs"
 ```
 
+archived-with: 2026-07-07-airline-departure-city-master-data
 ---
 
 ### Task 3: DB schema — master tables + FK columns
@@ -299,6 +303,7 @@ git add packages/db/src/schema/packages.ts
 git commit -m "feat(db): airlines & departure_cities tables + package FK columns"
 ```
 
+archived-with: 2026-07-07-airline-departure-city-master-data
 ---
 
 ### Task 4: Migration — additive DDL, backfill, cutover
@@ -361,6 +366,7 @@ git add packages/db/drizzle
 git commit -m "feat(db): migration backfills airline/city master data and drops varchars"
 ```
 
+archived-with: 2026-07-07-airline-departure-city-master-data
 ---
 
 ### Task 5: Airlines API module
@@ -603,6 +609,7 @@ git add apps/api/src/airlines apps/api/src/app.module.ts
 git commit -m "feat(api): airlines CRUD module with name-conflict and delete guard"
 ```
 
+archived-with: 2026-07-07-airline-departure-city-master-data
 ---
 
 ### Task 6: Departure-cities API module
@@ -647,6 +654,7 @@ git add apps/api/src/departure-cities apps/api/src/app.module.ts
 git commit -m "feat(api): departure-cities CRUD module"
 ```
 
+archived-with: 2026-07-07-airline-departure-city-master-data
 ---
 
 ### Task 7: Packages service — FK mapping, publish gating, DTO names
@@ -755,6 +763,7 @@ git add apps/api/src/packages
 git commit -m "feat(api): packages persist airline/city FKs, resolve names, gate publish"
 ```
 
+archived-with: 2026-07-07-airline-departure-city-master-data
 ---
 
 ### Task 8: Search — join master tables
@@ -806,6 +815,7 @@ git add apps/api/src/search/search.service.ts
 git commit -m "feat(api): search joins airline/city master tables for filter and name"
 ```
 
+archived-with: 2026-07-07-airline-departure-city-master-data
 ---
 
 ### Task 9: Seed — starter master rows for the demo tenant
@@ -872,6 +882,7 @@ git add packages/db/src/seed.ts
 git commit -m "feat(db): seed starter airlines/cities for demo tenant"
 ```
 
+archived-with: 2026-07-07-airline-departure-city-master-data
 ---
 
 ### Task 10: Web hooks
@@ -940,6 +951,7 @@ git add apps/web/src/hooks/use-airlines.ts apps/web/src/hooks/use-departure-citi
 git commit -m "feat(web): airline & departure-city query hooks"
 ```
 
+archived-with: 2026-07-07-airline-departure-city-master-data
 ---
 
 ### Task 11: Web admin — master-data section under Settings
@@ -1130,6 +1142,7 @@ git add "apps/web/src/app/dashboard/settings/master-data/page.tsx" "apps/web/src
 git commit -m "feat(web): master-data admin section for airlines & departure cities"
 ```
 
+archived-with: 2026-07-07-airline-departure-city-master-data
 ---
 
 ### Task 12: Create-package form — dropdowns
@@ -1206,6 +1219,7 @@ git add "apps/web/src/app/dashboard/packages/[id]/page.tsx"
 git commit -m "feat(web): airline & departure-city dropdowns on package form"
 ```
 
+archived-with: 2026-07-07-airline-departure-city-master-data
 ---
 
 ### Task 13: Search UI — read names (no free-text field change)
@@ -1233,6 +1247,7 @@ git commit -m "chore(web): confirm search reads airline name from joined DTO"
 ```
 If nothing changed, skip this commit.
 
+archived-with: 2026-07-07-airline-departure-city-master-data
 ---
 
 ### Task 14: API integration tests
@@ -1264,6 +1279,7 @@ git add apps/api/src/airlines/airlines.service.int.spec.ts apps/api/src/packages
 git commit -m "test(api): integration coverage for master-data CRUD, guard, publish gating"
 ```
 
+archived-with: 2026-07-07-airline-departure-city-master-data
 ---
 
 ### Task 15: Full verify

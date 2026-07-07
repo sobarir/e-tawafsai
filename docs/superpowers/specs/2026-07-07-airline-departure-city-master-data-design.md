@@ -2,6 +2,8 @@
 comet_change: airline-departure-city-master-data
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-07-07-airline-departure-city-master-data
+status: final
 ---
 
 # Airline & Departure City Master Data — Technical Design

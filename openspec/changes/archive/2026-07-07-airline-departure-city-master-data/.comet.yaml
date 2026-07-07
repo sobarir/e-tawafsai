@@ -17,6 +17,6 @@ verification_report: docs/superpowers/reports/2026-07-07-airline-departure-city-
 branch_status: handled
 created_at: 2026-07-07
 verified_at: 2026-07-07
-archived: false
+archived: true
 handoff_context: openspec/changes/airline-departure-city-master-data/.comet/handoff/design-context.json
 handoff_hash: 9960cf0d715954233e7ad19d379663a9172499def1a474a5b9f12843f354604b
