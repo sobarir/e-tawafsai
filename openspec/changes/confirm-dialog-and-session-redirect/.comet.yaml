@@ -1,12 +1,12 @@
 workflow: full
 phase: build
 context_compression: off
-build_mode: null
+build_mode: direct
 build_pause: null
 subagent_dispatch: null
-tdd_mode: null
+tdd_mode: direct
 review_mode: off
-isolation: null
+isolation: branch
 verify_mode: null
 auto_transition: false
 base_ref: d67050c065eeb406a32c688d14dceba784e2a8b3
@@ -20,3 +20,4 @@ verified_at: null
 archived: false
 handoff_context: openspec/changes/confirm-dialog-and-session-redirect/.comet/handoff/design-context.json
 handoff_hash: f997db85f5f1ed565213d38b602ab7a1a3f71846e992dc93e907bfcc9945e0ec
+direct_override: true
