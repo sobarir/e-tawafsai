@@ -204,6 +204,34 @@ async function main() {
         ),
       );
 
+    // Starter airline / departure-city master rows for the demo tenant only.
+    // Real tenants curate their own via the admin UI; the migration only
+    // backfills their existing free-text values.
+    const STARTER_AIRLINES = [
+      "Garuda Indonesia", "Saudia", "Lion Air", "Citilink", "Batik Air", "Saudi Arabian Airlines",
+    ];
+    const STARTER_CITIES = [
+      "Jakarta", "Surabaya", "Medan", "Makassar", "Solo", "Balikpapan",
+    ];
+    for (const name of STARTER_AIRLINES) {
+      await db.insert(schema.airlines)
+        .values({ id: ulid(), tenantId: tenant.id, name, isActive: true })
+        .onConflictDoNothing();
+    }
+    for (const name of STARTER_CITIES) {
+      await db.insert(schema.departureCities)
+        .values({ id: ulid(), tenantId: tenant.id, name, isActive: true })
+        .onConflictDoNothing();
+    }
+    const [demoAirline] = await db
+      .select({ id: schema.airlines.id })
+      .from(schema.airlines)
+      .where(and(eq(schema.airlines.tenantId, tenant.id), eq(schema.airlines.name, "Saudi Arabian Airlines")));
+    const [demoCity] = await db
+      .select({ id: schema.departureCities.id })
+      .from(schema.departureCities)
+      .where(and(eq(schema.departureCities.tenantId, tenant.id), eq(schema.departureCities.name, "Jakarta")));
+
     // Idempotent: reuse the existing demo package id when re-seeding so the
     // departure FK below never points at a freshly generated (unsaved) id.
     const [existingPackage] = await db
@@ -228,9 +256,9 @@ async function main() {
         categoryId: demoCategory?.id,
         durationDays: 9,
         description: "Paket Umrah Al-Amin Akbar regular 9 hari hemat dan lengkap.",
-        airline: "Saudi Arabian Airlines",
+        airlineId: demoAirline?.id,
         flightRoute: "CGK-JED-CGK",
-        departureCity: "Jakarta",
+        departureCityId: demoCity?.id,
         status: "published",
         hasBeenPublished: true,
       })
