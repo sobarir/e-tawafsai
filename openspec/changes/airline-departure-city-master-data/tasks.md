@@ -35,4 +35,4 @@
 ## 6. Verify
 
 - [x] 6.1 Run `bun run verify` (typecheck + lint + unit) and `bun run test:int`; confirm all green. _`verify`: 12/12 tasks pass (shared 46, api unit 43, + db/web typecheck & lint). `test:int`: 58 tests across 12 files, all green._
-- [ ] 6.2 Manually exercise: seed data present, admin CRUD + deactivate, form dropdowns with keep-assigned behavior, publish gating, search by airline — per the acceptance scenarios.
+- [x] 6.2 Manually exercise: seed data present, admin CRUD + deactivate, form dropdowns with keep-assigned behavior, publish gating, search by airline — per the acceptance scenarios. _All scenarios pass. Surfaced 2 pre-existing infra bugs (fixed, folded in): (1) `@fastify/cors@11` default methods excluded PATCH/PUT/DELETE — admin edit/delete blocked; (2) `readApiError` used ky-v1 `response.json()` while ky v2 consumes the body into `error.data` — every API error showed the generic message. Search reached via `/dashboard/search` URL (no dashboard nav link exists — pre-existing gap, deferred to a separate tweak, not this change's scope)._
