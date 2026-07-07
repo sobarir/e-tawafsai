@@ -37,7 +37,7 @@ base-ref: e7fe1178d219334dbc5a4e1181ffeb393bee9aad
 **Interfaces:**
 - Produces: `AlertDialog`, `AlertDialogTrigger`, `AlertDialogContent`, `AlertDialogHeader`, `AlertDialogFooter`, `AlertDialogTitle`, `AlertDialogDescription`, `AlertDialogAction`, `AlertDialogCancel` — the shadcn AlertDialog primitive over `@radix-ui/react-alert-dialog`.
 
-- [ ] **Step 1: Add the dependency**
+- [x] **Step 1: Add the dependency**
 
 Resolve the current version first, then add it (bash):
 
@@ -51,7 +51,7 @@ cd ../..
 
 Expected: `apps/web/package.json` gains `"@radix-ui/react-alert-dialog": "^<resolved>"` and the lockfile updates.
 
-- [ ] **Step 2: Create the AlertDialog primitive**
+- [x] **Step 2: Create the AlertDialog primitive**
 
 Create `apps/web/src/components/ui/alert-dialog.tsx` (canonical shadcn implementation, using the repo's `cn` and `buttonVariants`):
 
@@ -163,12 +163,12 @@ export {
 };
 ```
 
-- [ ] **Step 3: Typecheck**
+- [x] **Step 3: Typecheck**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH" && bun run --cwd apps/web typecheck` (or repo `bun run verify` typecheck portion).
 Expected: no type errors from the new file.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add apps/web/package.json apps/web/bun.lock apps/web/src/components/ui/alert-dialog.tsx
@@ -194,7 +194,7 @@ git commit -m "feat(web): add shadcn AlertDialog primitive"
   - `ConfirmProvider({ children })`
   - `useConfirm(): (opts: ConfirmOptions) => Promise<boolean>`
 
-- [ ] **Step 1: Create the provider**
+- [x] **Step 1: Create the provider**
 
 Create `apps/web/src/components/confirm-provider.tsx`:
 
@@ -279,7 +279,7 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
 
 Note: `AlertDialogDescription asChild` renders the description as a `<div>` so rich content (e.g. an impact `<ul>`) is valid HTML while keeping the Radix `aria-describedby` wiring.
 
-- [ ] **Step 2: Create the hook**
+- [x] **Step 2: Create the hook**
 
 Create `apps/web/src/hooks/use-confirm.ts`:
 
@@ -298,7 +298,7 @@ export function useConfirm() {
 }
 ```
 
-- [ ] **Step 3: Mount the provider under the QueryClient**
+- [x] **Step 3: Mount the provider under the QueryClient**
 
 Modify `apps/web/src/components/providers.tsx` so `<ConfirmProvider>` wraps children inside `QueryClientProvider`:
 
@@ -326,12 +326,12 @@ export function Providers({ children }: { children: ReactNode }) {
 }
 ```
 
-- [ ] **Step 4: Typecheck**
+- [x] **Step 4: Typecheck**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH" && bun run --cwd apps/web typecheck`
 Expected: no type errors.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/web/src/components/confirm-provider.tsx apps/web/src/hooks/use-confirm.ts apps/web/src/components/providers.tsx
@@ -350,7 +350,7 @@ git commit -m "feat(web): add useConfirm() imperative confirmation dialog"
 **Interfaces:**
 - Consumes: `useConfirm` (Task 2). The `MasterList` component receives `onDelete: (id: string) => Promise<void>` and renders a Delete button calling `guard(() => onDelete(r.id))`.
 
-- [ ] **Step 1: Wire confirmation into the Delete action**
+- [x] **Step 1: Wire confirmation into the Delete action**
 
 In `MasterList`, import and call `useConfirm`, and gate the delete button. Replace the Delete button's `onClick={() => guard(() => onDelete(r.id))}` so it first confirms:
 
@@ -374,11 +374,11 @@ onClick={() =>
 }
 ```
 
-- [ ] **Step 2: Manual check**
+- [x] **Step 2: Manual check**
 
 Run the app (`bun run dev`), open Settings → Master data, click Delete on an airline. Expected: dialog appears with the item name; Cancel leaves the row; Confirm deletes it. Repeat for a departure city.
 
-- [ ] **Step 3: Typecheck + commit**
+- [x] **Step 3: Typecheck + commit**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH" && bun run --cwd apps/web typecheck
@@ -398,7 +398,7 @@ git commit -m "feat(web): confirm master-data airline/city deletes"
 **Interfaces:**
 - Consumes: `useConfirm` (Task 2). Existing: `deactivateProvider.mutateAsync(id)` returns `{ affectedPackages: {id,name}[] }`; `handleDeleteCategory(categoryId)`; state `showDeactivateDialog`, `deactivateImpact`.
 
-- [ ] **Step 1: Replace the bespoke deactivate modal with `useConfirm`**
+- [x] **Step 1: Replace the bespoke deactivate modal with `useConfirm`**
 
 Add `const confirm = useConfirm();` near the other hooks. Rewrite `handleDeactivateClick` to fetch impact, then confirm with the affected-packages list as `description`, and drop the `showDeactivateDialog` / `setShowDeactivateDialog` state and the bottom `{showDeactivateDialog && (...)}` modal JSX (lines ~703–747):
 
@@ -440,7 +440,7 @@ const handleDeactivateClick = async () => {
 
 **Important behavior note:** in the current code the mutation runs on click to fetch the impact list, and the modal's "Confirm" is cosmetic (it only closes). Preserve today's semantics: the mutation is what deactivates. If a true preview-before-commit is desired, that is a separate change — do NOT expand scope here. Remove `showDeactivateDialog`/`deactivateImpact` state and the old modal block.
 
-- [ ] **Step 2: Gate the category delete**
+- [x] **Step 2: Gate the category delete**
 
 Rewrite `handleDeleteCategory` to confirm first:
 
@@ -461,11 +461,11 @@ const handleDeleteCategory = async (categoryId: string) => {
 };
 ```
 
-- [ ] **Step 3: Manual check**
+- [x] **Step 3: Manual check**
 
 Deactivate an active provider → dialog shows the affected-packages list; Confirm/Cancel behave. Delete a category → dialog gates it.
 
-- [ ] **Step 4: Typecheck + commit**
+- [x] **Step 4: Typecheck + commit**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH" && bun run --cwd apps/web typecheck
@@ -485,7 +485,7 @@ git commit -m "feat(web): route provider deactivate + category delete through sh
 **Interfaces:**
 - Consumes: `useConfirm` (Task 2). Existing: `handleDelete(id)` at ~857 uses native `confirm(...)` then `deleteMutation.mutateAsync(id)`; `handleUnpublish()` at ~256 calls `unpublishPackage.mutateAsync(id)`.
 
-- [ ] **Step 1: Replace the native confirm for departure delete**
+- [x] **Step 1: Replace the native confirm for departure delete**
 
 Add `const confirm = useConfirm();` near the other hooks. Rewrite `handleDelete`:
 
@@ -508,7 +508,7 @@ const handleDelete = async (id: string) => {
 
 (If `setError` is not in scope here, keep `alert(await readApiError(err))` — check the surrounding component; prefer `setError` if available for consistency.)
 
-- [ ] **Step 2: Gate unpublish**
+- [x] **Step 2: Gate unpublish**
 
 Rewrite `handleUnpublish`:
 
@@ -531,11 +531,11 @@ const handleUnpublish = async () => {
 };
 ```
 
-- [ ] **Step 3: Manual check**
+- [x] **Step 3: Manual check**
 
 Delete a departure schedule → shared dialog (no browser `confirm`). Unpublish a published package → dialog gates it.
 
-- [ ] **Step 4: Typecheck + commit**
+- [x] **Step 4: Typecheck + commit**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH" && bun run --cwd apps/web typecheck
@@ -555,7 +555,7 @@ git commit -m "feat(web): confirm package departure delete + unpublish"
 **Interfaces:**
 - Consumes: `useConfirm` (Task 2). Existing: `onToggleActive(user)` deactivates when `user.isActive`, else reactivates. Only the deactivate branch is destructive.
 
-- [ ] **Step 1: Confirm only the deactivate branch**
+- [x] **Step 1: Confirm only the deactivate branch**
 
 Add `const confirm = useConfirm();` near the other hooks. Update `onToggleActive`:
 
@@ -582,7 +582,7 @@ async function onToggleActive(user: UserDto) {
 
 (Use `user.email` if present on `UserDto`; otherwise use `user.name` or omit the identifier.)
 
-- [ ] **Step 2: Manual check + typecheck + commit**
+- [x] **Step 2: Manual check + typecheck + commit**
 
 Deactivate a user → dialog gates it; Reactivate → no dialog.
 
@@ -608,7 +608,7 @@ git commit -m "feat(web): confirm user deactivation"
   - `safeReturnUrl(raw: string | null | undefined): string`
   - `buildLoginRedirect(currentPathWithSearch: string): string`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `apps/web/src/lib/session-redirect.spec.ts`:
 
@@ -660,12 +660,12 @@ describe("buildLoginRedirect", () => {
 });
 ```
 
-- [ ] **Step 2: Run it to verify failure**
+- [x] **Step 2: Run it to verify failure**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH" && bun run --cwd apps/web test session-redirect`
 Expected: FAIL — module `./session-redirect` not found.
 
-- [ ] **Step 3: Implement the helpers**
+- [x] **Step 3: Implement the helpers**
 
 Create `apps/web/src/lib/session-redirect.ts`:
 
@@ -699,12 +699,12 @@ export function buildLoginRedirect(currentPathWithSearch: string): string {
 }
 ```
 
-- [ ] **Step 4: Run tests to verify pass**
+- [x] **Step 4: Run tests to verify pass**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH" && bun run --cwd apps/web test session-redirect`
 Expected: PASS (all cases).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/web/src/lib/session-redirect.ts apps/web/src/lib/session-redirect.spec.ts
@@ -723,7 +723,7 @@ git commit -m "feat(web): add pure 401 redirect decision helpers with specs"
 **Interfaces:**
 - Consumes: `shouldRedirectOnUnauthorized`, `buildLoginRedirect` (Task 7), `clearSessionHint` (`@/lib/auth-storage`).
 
-- [ ] **Step 1: Add the hook**
+- [x] **Step 1: Add the hook**
 
 Add imports and a `beforeError` hook to the ky instance in `apps/web/src/lib/api.ts` (keep the existing `beforeRequest` hook):
 
@@ -763,12 +763,12 @@ export const api = ky.create({
 
 Leave `ApiError` and `readApiError` untouched below.
 
-- [ ] **Step 2: Typecheck + verify existing api specs (if any)**
+- [x] **Step 2: Typecheck + verify existing api specs (if any)**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH" && bun run --cwd apps/web typecheck && bun run --cwd apps/web test`
 Expected: no type errors; existing tests still pass.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add apps/web/src/lib/api.ts
@@ -787,7 +787,7 @@ git commit -m "feat(web): redirect to login on 401 via ky beforeError hook"
 **Interfaces:**
 - Consumes: `safeReturnUrl` (Task 7). Reads `window.location.search` (avoids the Next `useSearchParams` Suspense-boundary requirement).
 
-- [ ] **Step 1: Read returnUrl + expired and wire them**
+- [x] **Step 1: Read returnUrl + expired and wire them**
 
 In `LoginPage`, add state + effect and use it on success:
 
@@ -809,7 +809,7 @@ useEffect(() => {
 router.push(returnUrl);
 ```
 
-- [ ] **Step 2: Render the session-expired notice**
+- [x] **Step 2: Render the session-expired notice**
 
 Above the form (before the email field), add:
 
@@ -821,11 +821,11 @@ Above the form (before the email field), add:
 ) : null}
 ```
 
-- [ ] **Step 3: Manual check**
+- [x] **Step 3: Manual check**
 
 Visit `/login?returnUrl=/dashboard/users&expired=1` → notice shows; after login you land on `/dashboard/users`. Visit `/login?returnUrl=http://evil.com&expired=1` → after login you land on `/dashboard` (open-redirect blocked).
 
-- [ ] **Step 4: Typecheck + commit**
+- [x] **Step 4: Typecheck + commit**
 
 ```bash
 export PATH="/c/Users/rahma/.bun/bin:$PATH" && bun run --cwd apps/web typecheck
@@ -841,7 +841,7 @@ git commit -m "feat(web): login returnUrl + session-expired notice"
 
 **Files:** none (verification only)
 
-- [ ] **Step 1: Sweep for stragglers**
+- [x] **Step 1: Sweep for stragglers**
 
 ```bash
 cd /c/Sobari/Ai/tawaf-sai/e-tawafsai
@@ -849,7 +849,7 @@ grep -rn "window.confirm\|[^.]confirm(\|alert(" apps/web/src/app apps/web/src/co
 ```
 Expected: no native `confirm(...)` / `window.confirm` gating a destructive action remains. Any hit must be either non-destructive or migrated.
 
-- [ ] **Step 2: Manual acceptance — all 6 scenarios**
+- [x] **Step 2: Manual acceptance — all 6 scenarios**
 
 Run `bun run dev` and verify:
 1. Delete confirm (master-data airline): dialog with item name; Confirm deletes, Cancel doesn't.
@@ -859,12 +859,12 @@ Run `bun run dev` and verify:
 5. 403 boundary: a non-admin hitting an admin-only endpoint → inline error, no redirect.
 6. Open-redirect boundary: `/login?returnUrl=//evil.com` → after login lands on `/dashboard`.
 
-- [ ] **Step 3: Full verify gate**
+- [x] **Step 3: Full verify gate**
 
 Run: `export PATH="/c/Users/rahma/.bun/bin:$PATH" && bun run verify`
 Expected: typecheck + lint + test all pass. If anything fails, load `systematic-debugging` before fixing.
 
-- [ ] **Step 4: Commit any final fixes**
+- [x] **Step 4: Commit any final fixes**
 
 ```bash
 git add -A

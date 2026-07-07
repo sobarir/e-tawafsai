@@ -30,6 +30,7 @@ import { useCategories } from "@/hooks/use-categories";
 import { useAirlines } from "@/hooks/use-airlines";
 import { useDepartureCities } from "@/hooks/use-departure-cities";
 import { api, readApiError } from "@/lib/api";
+import { useConfirm } from "@/hooks/use-confirm";
 import { DepartureFormFields, type DepartureFormFieldsHandle } from "./departure-form-fields";
 
 export default function PackageDetailPage() {
@@ -49,6 +50,7 @@ export default function PackageDetailPage() {
   const publishPackage = usePublishPackage();
   const unpublishPackage = useUnpublishPackage();
   const uploadFlyer = useUploadFlyer();
+  const confirm = useConfirm();
   const createTag = useCreateTag();
 
   const [title, setTitle] = useState("");
@@ -256,6 +258,12 @@ export default function PackageDetailPage() {
   const handleUnpublish = async () => {
     setError(null);
     setSuccess(null);
+    const ok = await confirm({
+      title: "Unpublish this package?",
+      description: "It will revert to draft and stop appearing in search until you publish it again.",
+      confirmLabel: "Unpublish",
+    });
+    if (!ok) return;
     try {
       await unpublishPackage.mutateAsync(id);
       setSuccess("Package reverted to draft.");
@@ -789,6 +797,7 @@ function DeparturesSection({ packageId, isAdmin }: { packageId: string; isAdmin:
   const createMutation = useCreateDeparture();
   const deleteMutation = useDeleteDeparture();
   const adjustMutation = useAdjustDepartureSeats();
+  const confirm = useConfirm();
 
   // Create state
   const [showAddForm, setShowAddForm] = useState(false);
@@ -855,12 +864,17 @@ function DeparturesSection({ packageId, isAdmin }: { packageId: string; isAdmin:
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this departure schedule?")) return;
+    const ok = await confirm({
+      title: "Delete this departure schedule?",
+      description: "The departure and its seat inventory will be removed. This cannot be undone.",
+      confirmLabel: "Delete",
+    });
+    if (!ok) return;
     try {
       await deleteMutation.mutateAsync(id);
       void refetch();
     } catch (err) {
-      alert(await readApiError(err));
+      setError(await readApiError(err));
     }
   };
 

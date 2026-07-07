@@ -145,6 +145,18 @@ and login UI are thin wrappers — not worth brittle DOM tests.
 - **New dependency** → `@radix-ui/react-alert-dialog` (latest resolved version) declared in
   `apps/web/package.json` (bun's isolated linker does not hoist).
 
+## Accepted limitations (from end-of-build code review, 2026-07-07)
+
+- **Provider deactivate confirms *after* the mutation.** `handleDeactivateClick` calls
+  `deactivateProvider.mutateAsync(id)` before opening the dialog, because the affected-packages
+  impact list comes from the mutation response. Consequently, clicking **Cancel** does not undo the
+  deactivation (matching the previous bespoke-modal behavior). Accepted as a known limitation for
+  this change; a true preview-before-commit would need a separate "compute impact without
+  deactivating" API and is deferred to a follow-up. The related cosmetic gap (no success message on
+  Cancel) is accepted with it.
+- The `confirm-provider` resolution relies on Radix's Action/Cancel `onClick` firing before
+  `onOpenChange(false)` (standard shadcn pattern); left as-is.
+
 ## Open Questions
 
 None — both architectural forks (dialog API, redirect execution) are resolved and confirmed.

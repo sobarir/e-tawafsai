@@ -1,4 +1,6 @@
-import ky from "ky";
+import ky, { HTTPError } from "ky";
+import { clearSessionHint } from "@/lib/auth-storage";
+import { shouldRedirectOnUnauthorized, buildLoginRedirect } from "@/lib/session-redirect";
 
 /**
  * API client - single ky instance for the NestJS API.
@@ -13,6 +15,25 @@ export const api = ky.create({
         if (typeof window !== "undefined") {
           request.headers.set("X-Forwarded-Host", window.location.host);
         }
+      },
+    ],
+    beforeError: [
+      (state) => {
+        // Global session-expiry handling: a 401 means the session is gone, so
+        // clear the client hint and hard-navigate to /login with a return URL.
+        // The full reload wipes the QueryClient cache, so no React context is
+        // needed here. Excludes the login endpoint and the /login route; 403 is
+        // left untouched (see shouldRedirectOnUnauthorized).
+        if (typeof window !== "undefined" && state.error instanceof HTTPError) {
+          const status = state.error.response?.status ?? 0;
+          const requestUrl = state.request?.url ?? "";
+          const currentPath = window.location.pathname;
+          if (shouldRedirectOnUnauthorized({ status, requestUrl, currentPath })) {
+            clearSessionHint();
+            window.location.assign(buildLoginRedirect(currentPath + window.location.search));
+          }
+        }
+        return state.error;
       },
     ],
   },

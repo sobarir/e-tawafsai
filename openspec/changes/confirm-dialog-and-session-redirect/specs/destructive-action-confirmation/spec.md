@@ -23,9 +23,12 @@ confirm-button label styled as destructive, and cancel/confirm handlers.
 
 The web app SHALL gate every irreversible action with the reusable confirmation dialog: deletes
 (airlines, departure cities, provider categories, package departure schedules), provider
-deactivation, user deactivation, and package unpublish. No destructive action SHALL execute directly
-on click without an intervening confirmation, and native `window.confirm` and the bespoke
-provider-deactivate modal SHALL be removed in favor of the shared dialog.
+deactivation, user deactivation, and package unpublish. Except for provider deactivation, no
+destructive action SHALL execute directly on click without an intervening confirmation, and native
+`window.confirm` and the bespoke provider-deactivate modal SHALL be removed in favor of the shared
+dialog. Provider deactivation is an exception: because the affected-packages impact list is produced
+by the deactivation call itself, the action executes on click and the shared dialog presents the
+impact for acknowledgement (see its scenario).
 
 #### Scenario: Delete requires confirmation
 
@@ -36,9 +39,9 @@ provider-deactivate modal SHALL be removed in favor of the shared dialog.
 #### Scenario: Deactivate uses the shared dialog with impact details
 
 - **WHEN** an admin clicks Deactivate on an active provider
-- **THEN** the shared confirmation dialog appears rendering the affected-packages impact list in its
-  content slot, and the provider is deactivated (with its packages unpublished) only after the user
-  confirms
+- **THEN** the provider is deactivated and its published packages are unpublished in one atomic
+  transaction, and the shared dialog appears rendering the affected-packages impact list in its
+  content slot for the admin to acknowledge
 
 #### Scenario: No native confirm remains
 
