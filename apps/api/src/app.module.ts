@@ -15,6 +15,7 @@ import { ProvidersModule } from "./providers/providers.module";
 import { PackagesModule } from "./packages/packages.module";
 import { CategoriesModule } from "./categories/categories.module";
 import { AirlinesModule } from "./airlines/airlines.module";
+import { DepartureCitiesModule } from "./departure-cities/departure-cities.module";
 import { DeparturesModule } from "./departures/departures.module";
 import { SearchModule } from "./search/search.module";
 
@@ -51,6 +52,7 @@ import { SearchModule } from "./search/search.module";
     PackagesModule,
     CategoriesModule,
     AirlinesModule,
+    DepartureCitiesModule,
     DeparturesModule,
     SearchModule,
   ],
