@@ -21,6 +21,6 @@
 
 ## 4. Tests & verification
 
-- [ ] 4.1 Add/adjust unit specs for the 401-handling decision logic (which statuses/endpoints redirect vs pass through)
+- [x] 4.1 Add/adjust unit specs for the 401-handling decision logic (which statuses/endpoints redirect vs pass through) — also set up vitest infra for apps/web (first web unit tests)
 - [ ] 4.2 Manual acceptance: run through all five acceptance scenarios (delete confirm, deactivate impact, session expiry + return, bad-password boundary, 403 boundary)
 - [ ] 4.3 `bun run verify` passes (typecheck + lint + test)
