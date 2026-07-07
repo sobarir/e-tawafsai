@@ -1,0 +1,16 @@
+{
+  "change": "airline-departure-city-master-data",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "9960cf0d715954233e7ad19d379663a9172499def1a474a5b9f12843f354604b",
+  "files": [
+    { "path": "openspec/changes/airline-departure-city-master-data/proposal.md", "sha256": "cff5359c9a4cb1c0fa80f5bfac85590c4c241ac436df59737ec7609d4c683c38" },
+    { "path": "openspec/changes/airline-departure-city-master-data/design.md", "sha256": "0ad2a9f9a03cb8507a4187ab78332a1e89214650c298dfc3824c348469cd0a02" },
+    { "path": "openspec/changes/airline-departure-city-master-data/tasks.md", "sha256": "be6759bb3246ae3f9ade10d3880b04743f037ae1bb9b1207d127411652fb7208" },
+    { "path": "openspec/changes/airline-departure-city-master-data/specs/airline-departure-city-master-data/spec.md", "sha256": "4ebe7472266801cc3942de7f1c6934644b2afbfc4998a1e85f66512266160982" },
+    { "path": "openspec/changes/airline-departure-city-master-data/specs/package-catalog/spec.md", "sha256": "ad3dd309ddfd04a91dc3cba4c41a059eebb8fa008a7232008676640a58e44fbe" },
+    { "path": "openspec/changes/airline-departure-city-master-data/specs/package-search/spec.md", "sha256": "cdba82cda021f0ad810be80593f6736e0fb71056f282f69160508b529a041829" }
+  ]
+}
