@@ -17,6 +17,7 @@ import {
   useUsers,
 } from "@/hooks/use-users";
 import { readApiError } from "@/lib/api";
+import { useConfirm } from "@/hooks/use-confirm";
 import { cn } from "@/lib/utils";
 
 export default function UsersPage() {
@@ -27,6 +28,7 @@ export default function UsersPage() {
   const updateUser = useUpdateUser();
   const deactivateUser = useDeactivateUser();
   const reactivateUser = useReactivateUser();
+  const confirm = useConfirm();
   const [error, setError] = useState<string | null>(null);
 
   if (me && me.role !== "admin") {
@@ -79,8 +81,15 @@ export default function UsersPage() {
     setError(null);
     try {
       if (user.isActive) {
+        const ok = await confirm({
+          title: "Deactivate this user?",
+          description: `${user.email} will lose access until an admin reactivates them.`,
+          confirmLabel: "Deactivate",
+        });
+        if (!ok) return;
         await deactivateUser.mutateAsync(user.id);
       } else {
+        // Reactivating is not destructive — no confirmation needed.
         await reactivateUser.mutateAsync(user.id);
       }
     } catch (err) {
