@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -18,6 +19,7 @@ import { ZodValidationPipe } from "../common/zod-validation.pipe";
 import {
   createPackageSchema,
   updatePackageSchema,
+  attachHotelSchema,
   type CreatePackageInput,
   type UpdatePackageInput,
   type AuthUser,
@@ -114,9 +116,19 @@ export class PackagesController {
   @Roles("admin")
   async addHotel(
     @Param("id") id: string,
-    @Body() hotel: HotelInput,
+    @Body(new ZodValidationPipe(attachHotelSchema)) hotel: HotelInput,
   ) {
     return this.packagesService.addHotel(id, hotel);
+  }
+
+  @Delete(":id/hotels/:hotelId")
+  @Roles("admin")
+  async removeHotel(
+    @Param("id") id: string,
+    @Param("hotelId") hotelId: string,
+  ): Promise<{ ok: true }> {
+    await this.packagesService.removeHotel(id, hotelId);
+    return { ok: true };
   }
 
   @Post(":id/publish")

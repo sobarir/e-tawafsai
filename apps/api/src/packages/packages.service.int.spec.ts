@@ -1,4 +1,4 @@
-import { BadRequestException } from "@nestjs/common";
+import { BadRequestException, ConflictException } from "@nestjs/common";
 import { config } from "dotenv";
 import { resolve } from "node:path";
 import { ulid } from "ulid";
@@ -10,6 +10,8 @@ import {
   providers,
   packages,
   packageCategories,
+  packageHotels,
+  hotels,
   airlines,
   departureCities,
   type Database,
@@ -39,7 +41,25 @@ describe("PackagesService (integration)", () => {
   const createdCategoryIds: string[] = [];
   const createdAirlineIds: string[] = [];
   const createdDepartureCityIds: string[] = [];
+  const createdHotelIds: string[] = [];
   const suffix = ulid().toLowerCase();
+
+  let makkahHotelSeq = 0;
+  // Create a Makkah catalog hotel and return its id (name is unique per call).
+  async function createMakkahHotel(): Promise<string> {
+    const id = ulid();
+    await db.insert(hotels).values({
+      id,
+      tenantId,
+      name: `Hilton Suites Makkah ${suffix}-${makkahHotelSeq++}`,
+      city: "Makkah",
+      stars: 5,
+      distanceM: 50,
+      isPelataran: false,
+    });
+    createdHotelIds.push(id);
+    return id;
+  }
 
   async function createAirline(name: string): Promise<string> {
     const id = ulid();
@@ -112,9 +132,14 @@ describe("PackagesService (integration)", () => {
   });
 
   afterAll(async () => {
-    // Packages reference categories via categoryId — delete packages first.
+    // package_hotels links reference both packages (cascade) and hotels —
+    // clear links first, then packages, then the catalog hotels.
     if (createdPackageIds.length > 0) {
+      await db.delete(packageHotels).where(inArray(packageHotels.packageId, createdPackageIds));
       await db.delete(packages).where(inArray(packages.id, createdPackageIds));
+    }
+    if (createdHotelIds.length > 0) {
+      await db.delete(hotels).where(inArray(hotels.id, createdHotelIds));
     }
     if (createdCategoryIds.length > 0) {
       await db.delete(packageCategories).where(inArray(packageCategories.id, createdCategoryIds));
@@ -184,14 +209,9 @@ describe("PackagesService (integration)", () => {
     });
     await expect(service.publish(pkg.id)).rejects.toBeInstanceOf(BadRequestException);
 
-    // 4. Add Makkah hotel
-    await service.addHotel(pkg.id, {
-      cityName: "Makkah",
-      name: "Hilton Suites Makkah",
-      stars: 5,
-      distanceM: 50,
-      isPelataran: false,
-    });
+    // 4. Add Makkah hotel (from the catalog, by id)
+    const makkahHotelId = await createMakkahHotel();
+    await service.addHotel(pkg.id, { hotelId: makkahHotelId });
 
     // 5. Publish -> succeeds!
     const published = await service.publish(pkg.id);
@@ -224,13 +244,7 @@ describe("PackagesService (integration)", () => {
       airlineId,
       departureCityId,
     });
-    await service.addHotel(pkg.id, {
-      cityName: "Makkah",
-      name: "Hilton Suites Makkah",
-      stars: 5,
-      distanceM: 50,
-      isPelataran: false,
-    });
+    await service.addHotel(pkg.id, { hotelId: await createMakkahHotel() });
 
     // categoryId is still null -> publish is blocked specifically on "category"
     await expect(service.publish(pkg.id)).rejects.toMatchObject({
@@ -252,13 +266,7 @@ describe("PackagesService (integration)", () => {
     });
     createdPackageIds.push(pkg.id);
 
-    await service.addHotel(pkg.id, {
-      cityName: "Makkah",
-      name: "Hilton Suites Makkah",
-      stars: 5,
-      distanceM: 50,
-      isPelataran: false,
-    });
+    await service.addHotel(pkg.id, { hotelId: await createMakkahHotel() });
 
     // Only the departure city set -> publish is blocked, naming "airline".
     await service.update(pkg.id, { durationDays: 9, departureCityId: localDepartureCityId });
@@ -379,13 +387,7 @@ describe("PackagesService (integration)", () => {
       airlineId,
       departureCityId,
     });
-    await service.addHotel(pkg.id, {
-      cityName: "Makkah",
-      name: "Hilton Suites Makkah",
-      stars: 5,
-      distanceM: 50,
-      isPelataran: false,
-    });
+    await service.addHotel(pkg.id, { hotelId: await createMakkahHotel() });
 
     const published = await service.publish(pkg.id);
     expect(published.status).toBe("published");
@@ -393,5 +395,36 @@ describe("PackagesService (integration)", () => {
     const detail = await service.findOne(pkg.id);
     expect(detail.categoryId).toBe(categoryId);
     expect(detail.categoryName).toBe(`In Scope ${suffix}`);
+  });
+
+  it("attaches a catalog hotel, surfaces it on the DTO, rejects duplicates, and detaches", async () => {
+    const localProviderId = await createProvider();
+    const pkg = await service.create({
+      title: "Hotel Link Pack",
+      providerId: localProviderId,
+      productType: "umrah",
+    });
+    createdPackageIds.push(pkg.id);
+
+    const hotelId = await createMakkahHotel();
+
+    // Attach surfaces the catalog attributes (mapped city -> cityName) + hotelId.
+    await service.addHotel(pkg.id, { hotelId });
+    const detail = await service.findOne(pkg.id);
+    expect(detail.hotels).toHaveLength(1);
+    expect(detail.hotels[0]).toMatchObject({ hotelId, cityName: "Makkah", stars: 5 });
+
+    // Duplicate attach of the same hotel is rejected.
+    await expect(service.addHotel(pkg.id, { hotelId })).rejects.toBeInstanceOf(ConflictException);
+
+    // A hotelId not in this tenant is rejected with a field-level error.
+    await expect(service.addHotel(pkg.id, { hotelId: ulid() })).rejects.toBeInstanceOf(BadRequestException);
+
+    // Detach removes the link only; the catalog hotel remains.
+    await service.removeHotel(pkg.id, hotelId);
+    const afterDetach = await service.findOne(pkg.id);
+    expect(afterDetach.hotels).toHaveLength(0);
+    const [stillInCatalog] = await db.select().from(hotels).where(eq(hotels.id, hotelId));
+    expect(stillInCatalog).toBeDefined();
   });
 });

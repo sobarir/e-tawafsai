@@ -10,6 +10,7 @@ export * from "./provider-dedup";
 export * from "./packages";
 export * from "./categories";
 export * from "./master-data";
+export * from "./hotels";
 export * from "./departures";
 export * from "./search";
 

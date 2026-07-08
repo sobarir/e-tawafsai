@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, NotFoundException, Inject } from "@nestjs/common";
+import { Injectable, BadRequestException, ConflictException, NotFoundException, Inject } from "@nestjs/common";
 import { eq, and } from "drizzle-orm";
 import { ulid } from "ulid";
 import { PinoLogger, InjectPinoLogger } from "nestjs-pino";
@@ -8,6 +8,7 @@ import {
   packageCategories,
   airlines,
   departureCities,
+  hotels,
   tags,
   packageTags,
   packageFlyers,
@@ -105,9 +106,17 @@ export class PackagesService {
       throw new NotFoundException("Package not found");
     }
 
-    const hotels = await this.db
-      .select()
+    const hotelRows = await this.db
+      .select({
+        hotelId: hotels.id,
+        cityName: hotels.city,
+        name: hotels.name,
+        stars: hotels.stars,
+        distanceM: hotels.distanceM,
+        isPelataran: hotels.isPelataran,
+      })
       .from(packageHotels)
+      .innerJoin(hotels, eq(packageHotels.hotelId, hotels.id))
       .where(eq(packageHotels.packageId, id));
 
     const flyerRecords = await this.db
@@ -174,13 +183,7 @@ export class PackagesService {
       airlineName,
       departureCityName,
       needsReview,
-      hotels: hotels.map((h) => ({
-        cityName: h.cityName,
-        name: h.name,
-        stars: h.stars,
-        distanceM: h.distanceM,
-        isPelataran: h.isPelataran,
-      })),
+      hotels: hotelRows,
       flyers: flyerRecords.map((f) => f.url),
       tags: tagRecords.map((t) => t.name),
       createdAt: pkg.createdAt.toISOString(),
@@ -257,26 +260,51 @@ export class PackagesService {
     return updated;
   }
 
-  async addHotel(packageId: string, hotel: HotelInput): Promise<DbPackageHotel> {
-    const id = ulid();
-    const [created] = await this.db
-      .insert(packageHotels)
-      .values({
-        id,
-        packageId,
-        cityName: hotel.cityName,
-        name: hotel.name,
-        stars: hotel.stars,
-        distanceM: hotel.distanceM ?? null,
-        isPelataran: hotel.isPelataran,
-      })
-      .returning();
+  async addHotel(packageId: string, input: HotelInput): Promise<DbPackageHotel> {
+    const [pkg] = await this.db
+      .select()
+      .from(packages)
+      .where(and(eq(packages.tenantId, this.tenantDb.tenantId), eq(packages.id, packageId)))
+      .limit(1);
+    if (!pkg) throw new NotFoundException("Package not found");
 
-    if (!created) {
-      throw new Error("Insert returned no hotel");
+    const [hotel] = await this.db
+      .select()
+      .from(hotels)
+      .where(and(eq(hotels.tenantId, this.tenantDb.tenantId), eq(hotels.id, input.hotelId)))
+      .limit(1);
+    if (!hotel) throw new BadRequestException("hotel (not found in this tenant)");
+
+    try {
+      const [created] = await this.db
+        .insert(packageHotels)
+        .values({ id: ulid(), packageId, hotelId: input.hotelId })
+        .returning();
+      if (!created) throw new Error("Insert returned no hotel");
+      this.logger.info({ packageId, hotelId: input.hotelId }, "package.hotel_attached");
+      return created;
+    } catch (err) {
+      const code = (e: unknown): string | undefined =>
+        typeof e === "object" && e !== null ? (e as { code?: string }).code : undefined;
+      const cause = typeof err === "object" && err !== null ? (err as { cause?: unknown }).cause : undefined;
+      if (code(err) === "23505" || code(cause) === "23505") {
+        throw new ConflictException("Hotel already attached to this package");
+      }
+      throw err;
     }
+  }
 
-    return created;
+  async removeHotel(packageId: string, hotelId: string): Promise<void> {
+    const [pkg] = await this.db
+      .select()
+      .from(packages)
+      .where(and(eq(packages.tenantId, this.tenantDb.tenantId), eq(packages.id, packageId)))
+      .limit(1);
+    if (!pkg) throw new NotFoundException("Package not found");
+    await this.db
+      .delete(packageHotels)
+      .where(and(eq(packageHotels.packageId, packageId), eq(packageHotels.hotelId, hotelId)));
+    this.logger.info({ packageId, hotelId }, "package.hotel_detached");
   }
 
   async publish(id: string): Promise<DbPackage> {

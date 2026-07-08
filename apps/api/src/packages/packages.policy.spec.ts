@@ -25,6 +25,7 @@ describe("PackagesPolicy.validatePublishReady", () => {
     needsReview: false,
     hotels: [
       {
+        hotelId: "hotel_1",
         cityName: "Makkah",
         name: "Grand Zamzam",
         stars: 5,

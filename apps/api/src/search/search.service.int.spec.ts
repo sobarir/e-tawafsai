@@ -11,6 +11,7 @@ import {
   packages,
   packageCategories,
   packageHotels,
+  hotels,
   departures,
   airlines,
   type Database,
@@ -34,6 +35,20 @@ describe("SearchService (integration)", () => {
   const pkgIds: string[] = [];
   const categoryIds: string[] = [];
   const airlineIds: string[] = [];
+  const hotelIds: string[] = [];
+
+  // Create a Makkah catalog hotel and link it to a package.
+  async function linkHotel(
+    packageId: string,
+    name: string,
+    stars = 5,
+    distanceM = 150,
+  ): Promise<void> {
+    const hotelId = ulid();
+    await db.insert(hotels).values({ id: hotelId, tenantId, name, city: "Makkah", stars, distanceM, isPelataran: false });
+    hotelIds.push(hotelId);
+    await db.insert(packageHotels).values({ id: ulid(), packageId, hotelId });
+  }
 
   // Every search is scoped to this run's provider so assertions are isolated
   // from any demo seed data in the default tenant.
@@ -100,9 +115,7 @@ describe("SearchService (integration)", () => {
       hasBeenPublished: true,
     });
     if (opts.hotelName) {
-      await db.insert(packageHotels).values({
-        id: ulid(), packageId: id, cityName: "Makkah", name: opts.hotelName, stars: 5, distanceM: 150, isPelataran: false,
-      });
+      await linkHotel(id, opts.hotelName);
     }
     await db.insert(departures).values({
       id: ulid(), tenantId, packageId: id, departureType: "fixed_date",
@@ -140,6 +153,9 @@ describe("SearchService (integration)", () => {
       await db.delete(departures).where(inArray(departures.packageId, pkgIds));
       await db.delete(packageHotels).where(inArray(packageHotels.packageId, pkgIds));
       await db.delete(packages).where(inArray(packages.id, pkgIds));
+    }
+    if (hotelIds.length) {
+      await db.delete(hotels).where(inArray(hotels.id, hotelIds));
     }
     // Packages reference categories/airlines via FKs — delete packages first (above).
     if (categoryIds.length) {
@@ -261,7 +277,7 @@ describe("SearchService (integration)", () => {
       slug: `hotelfar-${suffix}`, durationDays: 9, description: "paket",
       directOnly: false, status: "published", hasBeenPublished: true,
     });
-    await db.insert(packageHotels).values({ id: ulid(), packageId: far3Id, cityName: "Makkah", name: `Far Hotel ${suffix}`, stars: 3, distanceM: 900, isPelataran: false });
+    await linkHotel(far3Id, `Far Hotel ${suffix}`, 3, 900);
     await db.insert(departures).values({
       id: ulid(), tenantId, packageId: far3Id, departureType: "fixed_date",
       departureDate: new Date(Date.UTC(2026, 8, 12)), returnDate: new Date(Date.UTC(2026, 8, 21)),

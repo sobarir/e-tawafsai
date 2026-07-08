@@ -86,9 +86,10 @@ export class SearchService {
     const hotelLateral = sql`
       left join lateral (
         select coalesce(json_agg(json_build_object(
-          'cityName', ph.city_name, 'name', ph.name,
-          'stars', ph.stars, 'distanceM', ph.distance_m)), '[]'::json) as hotels
-        from package_hotels ph where ph.package_id = p.id
+          'cityName', h.city, 'name', h.name,
+          'stars', h.stars, 'distanceM', h.distance_m)), '[]'::json) as hotels
+        from package_hotels ph join hotels h on h.id = ph.hotel_id
+        where ph.package_id = p.id
       ) hj on true`;
 
     const filters = sql`
@@ -105,14 +106,14 @@ export class SearchService {
       and (${params.q ?? null}::text is null
            or p.search_doc @@ plainto_tsquery('simple', ${params.q ?? null})
            or la.name ilike '%' || ${params.q ?? null} || '%'
-           or exists (select 1 from package_hotels phq
-                      where phq.package_id = p.id and phq.name ilike '%' || ${params.q ?? null} || '%'))
+           or exists (select 1 from package_hotels phq join hotels hq on hq.id = phq.hotel_id
+                      where phq.package_id = p.id and hq.name ilike '%' || ${params.q ?? null} || '%'))
       and (${params.hotelCity ?? null}::text is null or exists (
-            select 1 from package_hotels phc
+            select 1 from package_hotels phc join hotels hc on hc.id = phc.hotel_id
             where phc.package_id = p.id
-              and phc.city_name = ${params.hotelCity ?? null}
-              and (${params.maxDistanceM ?? null}::int is null or phc.distance_m <= ${params.maxDistanceM ?? null}::int)
-              and (${params.minStars ?? null}::int is null or phc.stars >= ${params.minStars ?? null}::int)))`;
+              and hc.city = ${params.hotelCity ?? null}
+              and (${params.maxDistanceM ?? null}::int is null or hc.distance_m <= ${params.maxDistanceM ?? null}::int)
+              and (${params.minStars ?? null}::int is null or hc.stars >= ${params.minStars ?? null}::int)))`;
 
     const rowsResult = await this.db.execute(sql`
       select p.id, p.title, p.slug, pc.name as category, la.name as airline,

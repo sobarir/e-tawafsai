@@ -134,6 +134,13 @@
       "when": 1783395315442,
       "tag": "0018_wandering_spencer_smythe",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1783491477610,
+      "tag": "0019_chubby_swordsman",
+      "breakpoints": true
     }
   ]
 }

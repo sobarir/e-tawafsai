@@ -80,21 +80,47 @@ export type NewDbAirline = typeof airlines.$inferInsert;
 export type DbDepartureCity = typeof departureCities.$inferSelect;
 export type NewDbDepartureCity = typeof departureCities.$inferInsert;
 
+// Tenant-global hotel catalog. Unlike the airline/city masters, a hotel
+// carries attributes (city, stars, distance-to-Haram, pelataran). City is
+// free text so Makkah, Madinah, and transit/plus cities are all expressible;
+// uniqueness is on the normalized name+city pair so one name may exist in two
+// cities.
+export const hotels = pgTable("hotels", {
+  id: ulidPk(),
+  ...tenantOwned(),
+  name: varchar("name", { length: 120 }).notNull(),
+  city: varchar("city", { length: 120 }).notNull(),
+  stars: integer("stars").notNull().default(3),
+  distanceM: integer("distance_m"),
+  isPelataran: boolean("is_pelataran").notNull().default(false),
+  isActive: boolean("is_active").notNull().default(true),
+  ...timestamps,
+}, (t) => [
+  uniqueIndex("hotels_tenant_name_city_idx")
+    .on(t.tenantId, sql`lower(btrim(${t.name}))`, sql`lower(btrim(${t.city}))`),
+]);
+
+export type DbHotel = typeof hotels.$inferSelect;
+export type NewDbHotel = typeof hotels.$inferInsert;
+
+// A pure link between a package and a catalog hotel. All hotel attributes
+// live on `hotels`; this table only records which hotels a package uses.
 export const packageHotels = pgTable("package_hotels", {
   id: ulidPk(),
   packageId: ulidRef("package_id")
     .notNull()
     .references(() => packages.id, { onDelete: "cascade" }),
-  cityName: varchar("city_name", { length: 120 }).notNull(),
-  name: varchar("name", { length: 255 }).notNull(),
-  stars: integer("stars").notNull().default(3),
-  distanceM: integer("distance_m"),
-  isPelataran: boolean("is_pelataran").notNull().default(false),
+  hotelId: ulidRef("hotel_id")
+    .notNull()
+    .references(() => hotels.id),
   ...timestamps,
 }, (table) => [
-  // Serves package-search hotel lateral (json_agg) and hotel-name EXISTS, both
-  // correlated on package_id. Postgres does not auto-index FK columns.
+  // Both FK columns are queried (search laterals correlate on package_id;
+  // delete-guard counts on hotel_id). Postgres does not auto-index FK columns.
   index("package_hotels_package_id_idx").on(table.packageId),
+  index("package_hotels_hotel_id_idx").on(table.hotelId),
+  // A package must not attach the same hotel twice.
+  unique("package_hotels_package_hotel_idx").on(table.packageId, table.hotelId),
 ]);
 
 export const tags = pgTable("tags", {
