@@ -2,6 +2,7 @@
 change: hotel-master-catalog
 design-doc: docs/superpowers/specs/2026-07-08-hotel-master-catalog-design.md
 base-ref: ebfcc2d0b46aff54056a7a9aa7df3d3670a25f72
+archived-with: 2026-07-08-hotel-master-catalog
 ---
 
 # Hotel Master Catalog Implementation Plan
@@ -23,6 +24,7 @@ base-ref: ebfcc2d0b46aff54056a7a9aa7df3d3670a25f72
 - `bun run verify` (typecheck + lint + test) is the gate; `bun run test:int` needs local Postgres. Always `db:migrate` before `db:seed`. Run `.ts` scripts with `bun file.ts`. Export bun PATH in bash: `export PATH="/c/Users/rahma/.bun/bin:$PATH"`.
 - New runtime imports must be declared in that package's `package.json` (bun isolated linker does not hoist) — not needed here (all imports already present).
 
+archived-with: 2026-07-08-hotel-master-catalog
 ---
 
 ### Task 1: Shared hotel contracts
@@ -150,6 +152,7 @@ git add packages/shared/src/hotels.ts packages/shared/src/hotels.spec.ts package
 git commit -m "feat(shared): hotel catalog schemas + package hotel DTO (hotel-master-catalog 1.1-1.3)"
 ```
 
+archived-with: 2026-07-08-hotel-master-catalog
 ---
 
 ### Task 2: DB schema — hotels table + package_hotels reshape
@@ -215,6 +218,7 @@ git add packages/db/src/schema/packages.ts
 git commit -m "feat(db): hotels catalog table + package_hotels as a link (hotel-master-catalog 2.1-2.2)"
 ```
 
+archived-with: 2026-07-08-hotel-master-catalog
 ---
 
 ### Task 3: Migration + demo seed
@@ -300,6 +304,7 @@ git add packages/db/drizzle packages/db/src/seed.ts
 git commit -m "feat(db): migration + demo seed for hotel catalog (hotel-master-catalog 2.3-2.4)"
 ```
 
+archived-with: 2026-07-08-hotel-master-catalog
 ---
 
 ### Task 4: API — HotelsModule (catalog CRUD)
@@ -658,6 +663,7 @@ git add apps/api/src/hotels apps/api/src/app.module.ts
 git commit -m "feat(api): hotels catalog module mirroring airlines (hotel-master-catalog 3.1-3.4)"
 ```
 
+archived-with: 2026-07-08-hotel-master-catalog
 ---
 
 ### Task 5: API — wire package attach/detach, DTO join, search, publish policy
@@ -822,6 +828,7 @@ git add apps/api/src/packages apps/api/src/search packages/shared/src/hotels.ts
 git commit -m "feat(api): attach/detach by hotelId, DTO+search join catalog (hotel-master-catalog 4.1-4.4)"
 ```
 
+archived-with: 2026-07-08-hotel-master-catalog
 ---
 
 ### Task 6: Web — hotel catalog admin
@@ -901,6 +908,7 @@ git add apps/web/src/hooks/use-hotels.ts apps/web/src/app/dashboard/settings/mas
 git commit -m "feat(web): hotel catalog admin under master data (hotel-master-catalog 5.1-5.2)"
 ```
 
+archived-with: 2026-07-08-hotel-master-catalog
 ---
 
 ### Task 7: Web — package form hotel picker + detach
@@ -963,6 +971,7 @@ git add apps/web/src/app/dashboard/packages apps/web/src/hooks
 git commit -m "feat(web): catalog hotel picker + confirm-gated detach (hotel-master-catalog 6.1-6.2)"
 ```
 
+archived-with: 2026-07-08-hotel-master-catalog
 ---
 
 ### Task 8: Full verify + manual smoke
@@ -987,6 +996,7 @@ Expected: PASS (hotels, packages, search).
 
 - [x] **Step 4: Tick tasks.md and run the build guard** (per the comet-build exit flow — do this in the coordinating session, not as a plan step).
 
+archived-with: 2026-07-08-hotel-master-catalog
 ---
 
 ## Self-Review

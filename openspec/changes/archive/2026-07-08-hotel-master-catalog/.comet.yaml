@@ -17,6 +17,6 @@ verification_report: docs/superpowers/reports/2026-07-08-hotel-master-catalog-ve
 branch_status: handled
 created_at: 2026-07-08
 verified_at: 2026-07-08
-archived: false
+archived: true
 handoff_context: openspec/changes/hotel-master-catalog/.comet/handoff/design-context.json
 handoff_hash: 40f9be0daba8fbe19c539e3488a798c6a07b1bc24efbd87a035ce73ff360fb4f

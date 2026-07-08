@@ -2,6 +2,8 @@
 comet_change: hotel-master-catalog
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-07-08-hotel-master-catalog
+status: final
 ---
 
 # Hotel Master Catalog — Technical Design
