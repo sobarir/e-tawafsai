@@ -2,6 +2,7 @@
 change: public-landing-and-kpi-dashboard
 design-doc: docs/superpowers/specs/2026-07-08-public-landing-and-kpi-dashboard-design.md
 base-ref: 6f1fc8fe2b8002d7d8af9dcf063d68c0578f8ad7
+archived-with: 2026-07-08-public-landing-and-kpi-dashboard
 ---
 
 # Public landing access + real KPI dashboard — Implementation Plan
@@ -38,6 +39,7 @@ Query + ky web, Zod 4 + shared TS types, Vitest (unit + integration), bun.
 - `bun run verify` (typecheck+lint+test) must pass before leaving build.
 - bun on bash PATH: `export PATH="/c/Users/rahma/.bun/bin:$PATH"`.
 
+archived-with: 2026-07-08-public-landing-and-kpi-dashboard
 ---
 
 ### Task 1.1: Shared `PublicPackageCardDto`
@@ -95,6 +97,7 @@ export interface DashboardSummaryDto {
 - [x] Step 3: typecheck shared → PASS.
 - [x] Step 4: Commit `feat(shared): add DashboardSummaryDto`.
 
+archived-with: 2026-07-08-public-landing-and-kpi-dashboard
 ---
 
 ### Task 2.1: Public packages service + mapper (unit-tested)
@@ -176,6 +179,7 @@ describe("toPublicPackageCardDto", () => {
 - [x] Step 5: Manual smoke: `curl -s -H 'X-Forwarded-Host: localhost:3000' http://localhost:3002/public/packages` → `200`, JSON array, no internal fields.
 - [x] Step 6: Commit `feat(api): unguarded GET /public/packages endpoint`.
 
+archived-with: 2026-07-08-public-landing-and-kpi-dashboard
 ---
 
 ### Task 3.1: Web hook `usePublicFeaturedPackages`
@@ -211,6 +215,7 @@ describe("toPublicPackageCardDto", () => {
   packages render, no redirect to `/login`.
 - [x] Step 5: Commit `feat(web): landing featured packages use public endpoint`.
 
+archived-with: 2026-07-08-public-landing-and-kpi-dashboard
 ---
 
 ### Task 4.1: Dashboard summary service (unit-tested shaping)
@@ -252,6 +257,7 @@ describe("toPublicPackageCardDto", () => {
   anonymous → `401`.
 - [x] Step 5: Commit `feat(api): admin GET /dashboard/summary endpoint`.
 
+archived-with: 2026-07-08-public-landing-and-kpi-dashboard
 ---
 
 ### Task 5.1: Web hook `useDashboardSummary`
@@ -286,6 +292,7 @@ describe("toPublicPackageCardDto", () => {
   (replace with a plain one-line description or nothing). Keep the table + create form.
 - [x] Step 2: typecheck/lint web → PASS. Commit `chore(web): remove starter-kit copy from users page`.
 
+archived-with: 2026-07-08-public-landing-and-kpi-dashboard
 ---
 
 ### Task 6.1: Integration — public endpoint
@@ -306,6 +313,7 @@ describe("toPublicPackageCardDto", () => {
   A's summary reflects only A's rows (counts + needs-push filtering by date/seats). Clean up.
 - [x] Step 2: `bun run --cwd apps/api test:int dashboard` → PASS. Commit.
 
+archived-with: 2026-07-08-public-landing-and-kpi-dashboard
 ---
 
 ### Task 7.1: Full verify + live smoke

@@ -2,6 +2,8 @@
 comet_change: public-landing-and-kpi-dashboard
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-07-08-public-landing-and-kpi-dashboard
+status: final
 ---
 
 # Public landing access + real KPI dashboard — Technical Design

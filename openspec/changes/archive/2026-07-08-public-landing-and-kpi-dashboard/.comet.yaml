@@ -17,7 +17,7 @@ verification_report: docs/superpowers/reports/2026-07-08-public-landing-and-kpi-
 branch_status: handled
 created_at: 2026-07-08
 verified_at: 2026-07-08
-archived: false
+archived: true
 handoff_context: openspec/changes/public-landing-and-kpi-dashboard/.comet/handoff/design-context.json
 handoff_hash: fb83f0920f3fde6f4624d0ddce6169e12032edaf2e611177b59f1df07b4eb0cf
 direct_override: true
