@@ -1,0 +1,14 @@
+{
+  "change": "package-inclusions-exclusions-lists",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "57aedcb5aad3d779f435b6b6eb049579032f497de6744b6de798984ffce9039c",
+  "files": [
+    { "path": "openspec/changes/package-inclusions-exclusions-lists/proposal.md", "sha256": "e4af1fdbd9848f7bea426da91840f4ebc97e614c24865877c7e02f92062c30ed" },
+    { "path": "openspec/changes/package-inclusions-exclusions-lists/design.md", "sha256": "4e5bb13d0f76147679eb7dc1ae6d6fdbfd36db3260eb2e417971d89769805fd4" },
+    { "path": "openspec/changes/package-inclusions-exclusions-lists/tasks.md", "sha256": "c35d93a164e33ea30755d169c43997f81cb5c73dc8061e796fc04b789250401d" },
+    { "path": "openspec/changes/package-inclusions-exclusions-lists/specs/package-catalog/spec.md", "sha256": "e99263da9127fe305d0779d0edf0668a8dfa051a748cfb2a86ea9fc6de85fcde" }
+  ]
+}
