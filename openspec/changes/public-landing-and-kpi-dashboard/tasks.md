@@ -29,7 +29,7 @@ next. A single `/code-review` runs only after ALL tasks are complete.
 
 - [x] 5.1 Add `useDashboardSummary()` hook calling `/dashboard/summary`.
 - [x] 5.2 Rebuild `dashboard/page.tsx` into a real home: KPI tiles, quick-action links (new package, providers, master data, search), recent-activity list — with `isPending`/`isError` states — removing all starter-kit copy (`reference code`, `/comet` card, `MISSION CONTROL`).
-- [ ] 5.3 Remove the "worked CRUD example / FEATURE_PATTERN.md" scaffolding copy from `users/page.tsx` (keep the functional table + create form).
+- [x] 5.3 Remove the "worked CRUD example / FEATURE_PATTERN.md" scaffolding copy from `users/page.tsx` (keep the functional table + create form).
 
 ## 6. Integration tests
 

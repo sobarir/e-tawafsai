@@ -114,8 +114,7 @@ export default function UsersPage() {
         Users
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        The worked CRUD example - see docs/FEATURE_PATTERN.md for the recipe
-        this feature follows.
+        Manage team accounts, roles, and access.
       </p>
 
       {error ? (
