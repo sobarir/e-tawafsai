@@ -1,0 +1,15 @@
+{
+  "change": "hotel-master-catalog",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "40f9be0daba8fbe19c539e3488a798c6a07b1bc24efbd87a035ce73ff360fb4f",
+  "files": [
+    { "path": "openspec/changes/hotel-master-catalog/proposal.md", "sha256": "e2a824f3d9435ad307c8bdcd420c31c31c84fd026f4561ecb14565d0be8655ce" },
+    { "path": "openspec/changes/hotel-master-catalog/design.md", "sha256": "be427039a27d74b01445f57771e17a615afc20481073267c884737e0c241b324" },
+    { "path": "openspec/changes/hotel-master-catalog/tasks.md", "sha256": "a294af75941277258640eda31f40b2ebc9f09b38be5036c9ae0babf8ba75f5b3" },
+    { "path": "openspec/changes/hotel-master-catalog/specs/hotel-master-catalog/spec.md", "sha256": "2474f711b253bfd91252770a468c061ac4279ab9b098b5a7a5ba7d30f9ab09d4" },
+    { "path": "openspec/changes/hotel-master-catalog/specs/package-catalog/spec.md", "sha256": "8ce0fe4e84e81a4d160d1a950ad597eede6acefaf700290e89816e32938a7121" }
+  ]
+}
