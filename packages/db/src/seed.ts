@@ -5,7 +5,7 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as bcrypt from "bcryptjs";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { ulid } from "ulid";
 import { DEFAULT_TENANT_SLUG, tenantInputSchema } from "@cometkit/shared";
 import { databaseUrl } from "../env";
@@ -263,6 +263,34 @@ async function main() {
         hasBeenPublished: true,
       })
       .onConflictDoNothing();
+
+    // Starter hotel catalog for the demo tenant only. Real tenants curate
+    // their own via the admin UI (the migration ships an empty catalog).
+    const STARTER_HOTELS: {
+      name: string; city: string; stars: number; distanceM: number | null; isPelataran: boolean;
+    }[] = [
+      { name: "Swissotel Al Maqam", city: "Makkah", stars: 5, distanceM: 50, isPelataran: true },
+      { name: "Hilton Makkah Convention", city: "Makkah", stars: 5, distanceM: 250, isPelataran: false },
+      { name: "Anwar Al Madinah Movenpick", city: "Madinah", stars: 5, distanceM: 100, isPelataran: false },
+    ];
+    for (const h of STARTER_HOTELS) {
+      await db.insert(schema.hotels)
+        .values({ id: ulid(), tenantId: tenant.id, ...h, isActive: true })
+        .onConflictDoNothing();
+    }
+    // Link a Makkah + a Madinah hotel to the demo package so it stays publishable.
+    const linkHotels = await db
+      .select({ id: schema.hotels.id })
+      .from(schema.hotels)
+      .where(and(
+        eq(schema.hotels.tenantId, tenant.id),
+        inArray(schema.hotels.name, ["Swissotel Al Maqam", "Anwar Al Madinah Movenpick"]),
+      ));
+    for (const h of linkHotels) {
+      await db.insert(schema.packageHotels)
+        .values({ id: ulid(), packageId, hotelId: h.id })
+        .onConflictDoNothing();
+    }
 
     // Seed mock departure (only once — a departure's sole unique key is its
     // id, so onConflictDoNothing cannot dedupe re-runs on its own).
