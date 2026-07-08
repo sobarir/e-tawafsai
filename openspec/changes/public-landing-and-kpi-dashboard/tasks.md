@@ -11,8 +11,8 @@ next. A single `/code-review` runs only after ALL tasks are complete.
 ## 2. Public catalog API (unauthenticated)
 
 - [x] 2.1 Add a service method that returns a tenant's `published` packages, ordered featured-first then recent (`isFeatured desc, createdAt desc`, limit N), mapped via a typed `toPublicPackageCardDto` mapper that exposes only marketing-safe fields.
-- [ ] 2.2 Add an unguarded public controller (e.g. `GET /public/packages`) — no `JwtAuthGuard` — relying on `TenantResolutionMiddleware` for host→tenant scoping; register its module in `app.module.ts`.
-- [ ] 2.3 Unit spec for the public mapper + ordering/fallback (pure logic; asserts no internal fields, featured-first, published-only).
+- [x] 2.2 Add an unguarded public controller (e.g. `GET /public/packages`) — no `JwtAuthGuard` — relying on `TenantResolutionMiddleware` for host→tenant scoping; register its module in `app.module.ts`.
+- [x] 2.3 Unit spec for the public mapper + ordering/fallback (pure logic; asserts no internal fields, featured-first, published-only).
 
 ## 3. Landing wiring (web)
 

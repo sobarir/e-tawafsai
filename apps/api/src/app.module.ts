@@ -21,6 +21,7 @@ import { DeparturesModule } from "./departures/departures.module";
 import { InclusionsModule } from "./inclusions/inclusions.module";
 import { ExclusionsModule } from "./exclusions/exclusions.module";
 import { SearchModule } from "./search/search.module";
+import { PublicModule } from "./public/public.module";
 
 @Module({
   imports: [
@@ -61,6 +62,7 @@ import { SearchModule } from "./search/search.module";
     InclusionsModule,
     ExclusionsModule,
     SearchModule,
+    PublicModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: AllExceptionsFilter }],
 })
