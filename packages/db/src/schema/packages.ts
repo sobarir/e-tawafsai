@@ -123,25 +123,49 @@ export const packageHotels = pgTable("package_hotels", {
   unique("package_hotels_package_hotel_idx").on(table.packageId, table.hotelId),
 ]);
 
-export const tags = pgTable("tags", {
+export const inclusions = pgTable("inclusions", {
   id: ulidPk(),
   ...tenantOwned(),
-  name: varchar("name", { length: 63 }).notNull(),
+  name: varchar("name", { length: 120 }).notNull(),
+  isActive: boolean("is_active").notNull().default(true),
   ...timestamps,
-}, (table) => [
-  unique("tags_tenant_name_idx").on(table.tenantId, table.name),
+}, (t) => [
+  uniqueIndex("inclusions_tenant_name_idx").on(t.tenantId, sql`lower(btrim(${t.name}))`),
 ]);
 
-export const packageTags = pgTable("package_tags", {
+export const exclusions = pgTable("exclusions", {
+  id: ulidPk(),
+  ...tenantOwned(),
+  name: varchar("name", { length: 120 }).notNull(),
+  isActive: boolean("is_active").notNull().default(true),
+  ...timestamps,
+}, (t) => [
+  uniqueIndex("exclusions_tenant_name_idx").on(t.tenantId, sql`lower(btrim(${t.name}))`),
+]);
+
+export const packageInclusions = pgTable("package_inclusions", {
   packageId: ulidRef("package_id")
     .notNull()
     .references(() => packages.id, { onDelete: "cascade" }),
-  tagId: ulidRef("tag_id")
+  inclusionId: ulidRef("inclusion_id")
     .notNull()
-    .references(() => tags.id, { onDelete: "cascade" }),
+    .references(() => inclusions.id, { onDelete: "cascade" }),
 }, (table) => [
   {
-    pk: primaryKey({ columns: [table.packageId, table.tagId] }),
+    pk: primaryKey({ columns: [table.packageId, table.inclusionId] }),
+  }
+]);
+
+export const packageExclusions = pgTable("package_exclusions", {
+  packageId: ulidRef("package_id")
+    .notNull()
+    .references(() => packages.id, { onDelete: "cascade" }),
+  exclusionId: ulidRef("exclusion_id")
+    .notNull()
+    .references(() => exclusions.id, { onDelete: "cascade" }),
+}, (table) => [
+  {
+    pk: primaryKey({ columns: [table.packageId, table.exclusionId] }),
   }
 ]);
 
@@ -160,8 +184,10 @@ export type NewDbPackage = typeof packages.$inferInsert;
 export type DbPackageHotel = typeof packageHotels.$inferSelect;
 export type NewDbPackageHotel = typeof packageHotels.$inferInsert;
 
-export type DbTag = typeof tags.$inferSelect;
-export type NewDbTag = typeof tags.$inferInsert;
+export type DbInclusion = typeof inclusions.$inferSelect;
+export type NewDbInclusion = typeof inclusions.$inferInsert;
+export type DbExclusion = typeof exclusions.$inferSelect;
+export type NewDbExclusion = typeof exclusions.$inferInsert;
 
 export type DbPackageFlyer = typeof packageFlyers.$inferSelect;
 export type NewDbPackageFlyer = typeof packageFlyers.$inferInsert;
