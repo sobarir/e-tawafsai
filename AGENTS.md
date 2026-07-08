@@ -186,3 +186,15 @@ task on its own, from any starting branch.
   `[resource, params]` (see `use-users.ts`), mutations invalidate the
   resource root. All HTTP via the shared `api` ky instance.
 - Copy: sentence case, plain verbs, buttons say what they do.
+- Destructive actions must confirm. Every delete, deactivate, or otherwise
+  irreversible mutation SHALL gate behind the shared confirm primitive before
+  firing — never a bare mutation on click, never native `window.confirm`, never
+  a bespoke per-page dialog. Use `const confirm = useConfirm()` (from
+  `@/hooks/use-confirm`) and bail early:
+  `if (!(await confirm({ title, description }))) return;`. Options are `title`,
+  `description?`, `confirmLabel?`, `cancelLabel?`, `destructive?` (defaults
+  `true`); the dialog is served app-wide by `ConfirmProvider`, so no per-page
+  wiring. This inherits by default — new destructive flows follow it without
+  re-litigating. (Shipped in the `confirm-dialog-and-session-redirect` change;
+  see `destructive-action-confirmation` spec and `dashboard/users/page.tsx` for
+  a worked example.)
