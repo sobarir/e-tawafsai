@@ -19,8 +19,8 @@
 
 ## 4. Frontend Implementation
 
-- [ ] 4.1 Create hooks `use-inclusions.ts` and `use-exclusions.ts` in `apps/web/src/hooks` and update package hooks.
-- [ ] 4.2 Revamp `/dashboard/settings/master-data` UI to manage inclusions and exclusions catalogs.
+- [x] 4.1 Create hooks `use-inclusions.ts` and `use-exclusions.ts` in `apps/web/src/hooks` and update package hooks.
+- [x] 4.2 Revamp `/dashboard/settings/master-data` UI to manage inclusions and exclusions catalogs.
 - [ ] 4.3 Revamp `/dashboard/packages/[id]` form to select inclusions and exclusions via separate checkbox grids.
 
 ## 5. Verification & Tests

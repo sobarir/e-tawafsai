@@ -13,7 +13,6 @@ export const packageKeys = {
   all: ["packages"] as const,
   list: () => ["packages"] as const,
   detail: (id: string) => ["packages", id] as const,
-  tags: () => ["packages", "tags"] as const,
 };
 
 export function usePackages() {
@@ -110,20 +109,3 @@ export function useUploadFlyer() {
   });
 }
 
-export function useTags() {
-  return useQuery<{ id: string; name: string }[]>({
-    queryKey: packageKeys.tags(),
-    queryFn: () => api.get("packages/tags").json<{ id: string; name: string }[]>(),
-  });
-}
-
-export function useCreateTag() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (name: string) =>
-      api.post("packages/tags", { json: { name } }).json<{ id: string; name: string }>(),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: packageKeys.tags() });
-    },
-  });
-}

@@ -25,6 +25,18 @@ import {
   useUpdateHotel,
   useDeleteHotel,
 } from "@/hooks/use-hotels";
+import {
+  useInclusions,
+  useCreateInclusion,
+  useUpdateInclusion,
+  useDeleteInclusion,
+} from "@/hooks/use-inclusions";
+import {
+  useExclusions,
+  useCreateExclusion,
+  useUpdateExclusion,
+  useDeleteExclusion,
+} from "@/hooks/use-exclusions";
 import type { CreateHotelInput, HotelDto } from "@cometkit/shared";
 import { readApiError } from "@/lib/api";
 import { useConfirm } from "@/hooks/use-confirm";
@@ -368,6 +380,16 @@ export default function MasterDataPage() {
   const updateHotel = useUpdateHotel();
   const deleteHotel = useDeleteHotel();
 
+  const inclusions = useInclusions();
+  const createInclusion = useCreateInclusion();
+  const updateInclusion = useUpdateInclusion();
+  const deleteInclusion = useDeleteInclusion();
+
+  const exclusions = useExclusions();
+  const createExclusion = useCreateExclusion();
+  const updateExclusion = useUpdateExclusion();
+  const deleteExclusion = useDeleteExclusion();
+
   if (me && me.role !== "admin") {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center gap-3 px-6">
@@ -387,7 +409,7 @@ export default function MasterDataPage() {
           <span className="font-mono text-xs uppercase tracking-[0.22em] text-muted-foreground">
             admin · settings · master data
           </span>
-          <h1 className="text-2xl font-bold tracking-tight">Airlines, Departure Cities & Hotels</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Master Data Catalogs</h1>
         </div>
         <div className="flex gap-2">
           <Button asChild variant="outline" size="sm">
@@ -430,6 +452,24 @@ export default function MasterDataPage() {
           onUpdate={(id, input) => updateHotel.mutateAsync({ id, ...input }).then(() => setError(null))}
           onToggle={(id, isActive) => updateHotel.mutateAsync({ id, isActive }).then(() => setError(null))}
           onDelete={(id) => deleteHotel.mutateAsync(id).then(() => setError(null))}
+          onError={setError}
+        />
+        <MasterList
+          title="Inclusions"
+          rows={inclusions.data}
+          onCreate={(name) => createInclusion.mutateAsync({ name }).then(() => setError(null))}
+          onRename={(id, name) => updateInclusion.mutateAsync({ id, name }).then(() => setError(null))}
+          onToggle={(id, isActive) => updateInclusion.mutateAsync({ id, isActive }).then(() => setError(null))}
+          onDelete={(id) => deleteInclusion.mutateAsync(id).then(() => setError(null))}
+          onError={setError}
+        />
+        <MasterList
+          title="Exclusions"
+          rows={exclusions.data}
+          onCreate={(name) => createExclusion.mutateAsync({ name }).then(() => setError(null))}
+          onRename={(id, name) => updateExclusion.mutateAsync({ id, name }).then(() => setError(null))}
+          onToggle={(id, isActive) => updateExclusion.mutateAsync({ id, isActive }).then(() => setError(null))}
+          onDelete={(id) => deleteExclusion.mutateAsync(id).then(() => setError(null))}
           onError={setError}
         />
       </div>
