@@ -15,6 +15,8 @@ export const createPackageSchema = z.object({
   flightRoute: z.string().max(255).nullable().optional(),
   departureCityId: z.string().length(26).nullable().optional(),
   isFeatured: z.boolean().default(false),
+  inclusions: z.array(z.string().length(26)).optional(),
+  exclusions: z.array(z.string().length(26)).optional(),
 });
 
 export const updatePackageSchema = createPackageSchema.partial();
@@ -28,6 +30,43 @@ export const publishPackageSchema = z.object({
 
 export type CreatePackageInput = z.input<typeof createPackageSchema>;
 export type UpdatePackageInput = z.input<typeof updatePackageSchema>;
+
+export const createInclusionSchema = z.object({
+  name: z.string().min(1).max(120),
+  isActive: z.boolean().default(true),
+});
+
+export const updateInclusionSchema = createInclusionSchema.partial();
+
+export const createExclusionSchema = z.object({
+  name: z.string().min(1).max(120),
+  isActive: z.boolean().default(true),
+});
+
+export const updateExclusionSchema = createExclusionSchema.partial();
+
+export type CreateInclusionInput = z.infer<typeof createInclusionSchema>;
+export type UpdateInclusionInput = z.infer<typeof updateInclusionSchema>;
+export type CreateExclusionInput = z.infer<typeof createExclusionSchema>;
+export type UpdateExclusionInput = z.infer<typeof updateExclusionSchema>;
+
+export interface InclusionDto {
+  id: string;
+  tenantId: string;
+  name: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ExclusionDto {
+  id: string;
+  tenantId: string;
+  name: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
 // Attach input: reference a catalog hotel by id.
 export interface HotelInput {
@@ -43,6 +82,18 @@ export interface PackageHotelDto {
   stars: number;
   distanceM: number | null;
   isPelataran: boolean;
+}
+
+export interface PackageInclusionDto {
+  inclusionId: string;
+  name: string;
+  isActive: boolean;
+}
+
+export interface PackageExclusionDto {
+  exclusionId: string;
+  name: string;
+  isActive: boolean;
 }
 
 export interface PackageDto {
@@ -66,7 +117,8 @@ export interface PackageDto {
   status: string;
   needsReview: boolean;
   hotels: PackageHotelDto[];
-  tags: string[];
+  inclusions: PackageInclusionDto[];
+  exclusions: PackageExclusionDto[];
   flyers: string[];
   createdAt: string;
   updatedAt: string;

@@ -6,8 +6,8 @@
 
 ## 2. Shared Types & Schemas
 
-- [ ] 2.1 Update `packages/shared/src/packages.ts` to include `createInclusionSchema`, `updateInclusionSchema`, `createExclusionSchema`, `updateExclusionSchema`, and updated package validation schemas/DTOs. Remove tag schemas.
-- [ ] 2.2 Rebuild packages or verify types check across the workspace.
+- [x] 2.1 Update `packages/shared/src/packages.ts` to include `createInclusionSchema`, `updateInclusionSchema`, `createExclusionSchema`, `updateExclusionSchema`, and updated package validation schemas/DTOs. Remove tag schemas.
+- [x] 2.2 Rebuild packages or verify types check across the workspace.
 
 ## 3. Backend API Implementation
 
