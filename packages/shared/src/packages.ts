@@ -29,11 +29,19 @@ export const publishPackageSchema = z.object({
 export type CreatePackageInput = z.input<typeof createPackageSchema>;
 export type UpdatePackageInput = z.input<typeof updatePackageSchema>;
 
+// Attach input: reference a catalog hotel by id.
 export interface HotelInput {
+  hotelId: string;
+}
+
+// A hotel as it appears on a package: the catalog attributes joined in,
+// plus the link id so a client can dedupe the picker and detach it.
+export interface PackageHotelDto {
+  hotelId: string;
   cityName: string;
   name: string;
   stars: number;
-  distanceM?: number | null;
+  distanceM: number | null;
   isPelataran: boolean;
 }
 
@@ -57,7 +65,7 @@ export interface PackageDto {
   isFeatured: boolean;
   status: string;
   needsReview: boolean;
-  hotels: HotelInput[];
+  hotels: PackageHotelDto[];
   tags: string[];
   flyers: string[];
   createdAt: string;

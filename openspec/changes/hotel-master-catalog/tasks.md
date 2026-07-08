@@ -1,8 +1,8 @@
 ## 1. Shared contracts (`packages/shared`)
 
-- [ ] 1.1 Add `createHotelSchema` / `updateHotelSchema` (Zod: `name`, `city`, `stars` 1–5, `distanceM` nullable, `isPelataran`, `isActive`) and export inferred input types
-- [ ] 1.2 Add `HotelDto` (`id, name, city, stars, distanceM, isPelataran, isActive`) and change `HotelInput` to `{ hotelId: string }`
-- [ ] 1.3 Extend `PackageDto.hotels[]` to include `hotelId` and `isPelataran` (keep `cityName`, `name`, `stars`, `distanceM`); update `search.ts` DTO type to match
+- [x] 1.1 Add `createHotelSchema` / `updateHotelSchema` (Zod: `name`, `city`, `stars` 1–5, `distanceM` nullable, `isPelataran`, `isActive`) and export inferred input types
+- [x] 1.2 Add `HotelDto` (`id, name, city, stars, distanceM, isPelataran, isActive`) and change `HotelInput` to `{ hotelId: string }`
+- [x] 1.3 Extend `PackageDto.hotels[]` to include `hotelId` and `isPelataran` (keep `cityName`, `name`, `stars`, `distanceM`); update `search.ts` DTO type to match
 
 ## 2. DB schema, migration & seed (`packages/db`)
 
