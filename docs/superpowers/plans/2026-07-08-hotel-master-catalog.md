@@ -36,7 +36,7 @@ base-ref: ebfcc2d0b46aff54056a7a9aa7df3d3670a25f72
 **Interfaces:**
 - Produces: `createHotelSchema`, `updateHotelSchema`, `CreateHotelInput`, `UpdateHotelInput`, `HotelDto`, `PackageHotelDto`; `HotelInput = { hotelId: string }`.
 
-- [ ] **Step 1: Write the failing test** — `packages/shared/src/hotels.spec.ts`
+- [x] **Step 1: Write the failing test** — `packages/shared/src/hotels.spec.ts`
 
 ```ts
 import { describe, it, expect } from "vitest";
@@ -62,12 +62,12 @@ describe("hotels schema", () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `cd packages/shared && bun run test -- hotels.spec` (or `bunx vitest run src/hotels.spec.ts`)
 Expected: FAIL — cannot find module `./hotels`.
 
-- [ ] **Step 3: Create `packages/shared/src/hotels.ts`**
+- [x] **Step 3: Create `packages/shared/src/hotels.ts`**
 
 ```ts
 import * as z from "zod";
@@ -107,7 +107,7 @@ export interface HotelDto {
 }
 ```
 
-- [ ] **Step 4: Wire exports and package DTO** — add to `packages/shared/src/index.ts` after the `master-data` export:
+- [x] **Step 4: Wire exports and package DTO** — add to `packages/shared/src/index.ts` after the `master-data` export:
 
 ```ts
 export * from "./hotels";
@@ -138,12 +138,12 @@ And change the `PackageDto.hotels` field type from `hotels: HotelInput[];` to:
   hotels: PackageHotelDto[];
 ```
 
-- [ ] **Step 5: Run tests to verify they pass**
+- [x] **Step 5: Run tests to verify they pass**
 
 Run: `cd packages/shared && bunx vitest run src/hotels.spec.ts`
 Expected: PASS (3 tests).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add packages/shared/src/hotels.ts packages/shared/src/hotels.spec.ts packages/shared/src/index.ts packages/shared/src/packages.ts
@@ -160,7 +160,7 @@ git commit -m "feat(shared): hotel catalog schemas + package hotel DTO (hotel-ma
 **Interfaces:**
 - Produces: `hotels` table, reshaped `packageHotels`, `DbHotel`/`NewDbHotel`, reshaped `DbPackageHotel`/`NewDbPackageHotel`.
 
-- [ ] **Step 1: Add the `hotels` table** in `packages/db/src/schema/packages.ts` (place next to the other master tables, after `departureCities`). It needs `tenantOwned`, `uniqueIndex`, `sql` — all already imported.
+- [x] **Step 1: Add the `hotels` table** in `packages/db/src/schema/packages.ts` (place next to the other master tables, after `departureCities`). It needs `tenantOwned`, `uniqueIndex`, `sql` — all already imported.
 
 ```ts
 export const hotels = pgTable("hotels", {
@@ -182,7 +182,7 @@ export type DbHotel = typeof hotels.$inferSelect;
 export type NewDbHotel = typeof hotels.$inferInsert;
 ```
 
-- [ ] **Step 2: Reshape `packageHotels`** — replace the whole existing `packageHotels` definition (the block with `cityName/name/stars/distanceM/isPelataran`) with the link table:
+- [x] **Step 2: Reshape `packageHotels`** — replace the whole existing `packageHotels` definition (the block with `cityName/name/stars/distanceM/isPelataran`) with the link table:
 
 ```ts
 export const packageHotels = pgTable("package_hotels", {
@@ -203,12 +203,12 @@ export const packageHotels = pgTable("package_hotels", {
 
 The `DbPackageHotel`/`NewDbPackageHotel` type exports at the bottom of the file stay as-is (they infer from the new shape automatically).
 
-- [ ] **Step 3: Typecheck the db package**
+- [x] **Step 3: Typecheck the db package**
 
 Run: `cd packages/db && bunx tsc --noEmit`
 Expected: PASS (schema compiles; `hotels` referenced before-or-after `packageHotels` is fine — Drizzle refs are lazy `() => hotels.id`).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add packages/db/src/schema/packages.ts
@@ -223,12 +223,12 @@ git commit -m "feat(db): hotels catalog table + package_hotels as a link (hotel-
 - Create: `packages/db/drizzle/<generated>.sql` (via `db:generate`, then hand-edit)
 - Modify: `packages/db/src/seed.ts` (starter hotels + demo package↔hotel links)
 
-- [ ] **Step 1: Generate the migration**
+- [x] **Step 1: Generate the migration**
 
 Run: `bun run db:generate`
 This creates a new SQL migration for the `hotels` table, the dropped `package_hotels` columns, and the new `hotel_id` FK + indexes.
 
-- [ ] **Step 2: Hand-verify / fix the generated SQL** — open the new file under `packages/db/drizzle/`. It MUST clear `package_hotels` BEFORE adding `hotel_id NOT NULL`, or the NOT NULL add fails on existing rows. Ensure the statement order is:
+- [x] **Step 2: Hand-verify / fix the generated SQL** — open the new file under `packages/db/drizzle/`. It MUST clear `package_hotels` BEFORE adding `hotel_id NOT NULL`, or the NOT NULL add fails on existing rows. Ensure the statement order is:
 
 ```sql
 CREATE TABLE "hotels" ( ... );
@@ -250,12 +250,12 @@ ALTER TABLE "package_hotels" ADD CONSTRAINT "package_hotels_hotel_id_hotels_id_f
 
 If drizzle omits the `DELETE FROM "package_hotels";`, add it manually before the `ADD COLUMN ... NOT NULL`. (drizzle-kit does not know rows must be cleared.)
 
-- [ ] **Step 3: Apply the migration**
+- [x] **Step 3: Apply the migration**
 
 Run: `bun run db:migrate`
 Expected: applies cleanly, no NOT NULL violation.
 
-- [ ] **Step 4: Seed starter hotels + link them to the demo package** — in `packages/db/src/seed.ts`, inside the demo-tenant block, AFTER the `demoAirline`/`demoCity` lookups and AFTER the `packages.insert(...).onConflictDoNothing()` that creates `packageId`, add:
+- [x] **Step 4: Seed starter hotels + link them to the demo package** — in `packages/db/src/seed.ts`, inside the demo-tenant block, AFTER the `demoAirline`/`demoCity` lookups and AFTER the `packages.insert(...).onConflictDoNothing()` that creates `packageId`, add:
 
 ```ts
 // Starter hotel catalog for the demo tenant only.
@@ -288,12 +288,12 @@ for (const h of linkHotels) {
 
 Ensure `inArray` is imported in `seed.ts` (add to the existing `drizzle-orm` import if missing: it currently imports `{ and, eq }`).
 
-- [ ] **Step 5: Run the seed and verify**
+- [x] **Step 5: Run the seed and verify**
 
 Run: `bun run db:seed`
 Then verify: `bun run --cwd packages/db exec psql "$DATABASE_URL" -c "select p.title, h.name, h.city from package_hotels ph join packages p on p.id=ph.package_id join hotels h on h.id=ph.hotel_id;"` (or a quick drizzle query) — expect the demo package linked to a Makkah + Madinah hotel.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add packages/db/drizzle packages/db/src/seed.ts
@@ -313,7 +313,7 @@ git commit -m "feat(db): migration + demo seed for hotel catalog (hotel-master-c
 - Consumes: `hotels`, `packages`, `DbHotel`, `Database` from `@cometkit/db`; `TenantScopedDb`; `HotelDto`, `CreateHotelInput`, `UpdateHotelInput`.
 - Produces: `HotelsService` (`list`, `findById`, `create`, `update`, `remove`), `toHotelDto`, `normalizeHotelName`.
 
-- [ ] **Step 1: Write the failing policy test** — `apps/api/src/hotels/hotels.policy.spec.ts`
+- [x] **Step 1: Write the failing policy test** — `apps/api/src/hotels/hotels.policy.spec.ts`
 
 ```ts
 import { describe, it, expect } from "vitest";
@@ -339,12 +339,12 @@ describe("hotels.policy", () => {
 });
 ```
 
-- [ ] **Step 2: Run it to verify it fails**
+- [x] **Step 2: Run it to verify it fails**
 
 Run: `cd apps/api && bunx vitest run src/hotels/hotels.policy.spec.ts`
 Expected: FAIL — cannot find `./hotels.policy`.
 
-- [ ] **Step 3: Create `hotels.policy.ts`**
+- [x] **Step 3: Create `hotels.policy.ts`**
 
 ```ts
 import type { DbHotel } from "@cometkit/db";
@@ -370,12 +370,12 @@ export function toHotelDto(row: DbHotel): HotelDto {
 }
 ```
 
-- [ ] **Step 4: Run policy test to verify it passes**
+- [x] **Step 4: Run policy test to verify it passes**
 
 Run: `cd apps/api && bunx vitest run src/hotels/hotels.policy.spec.ts`
 Expected: PASS (2 tests).
 
-- [ ] **Step 5: Create `hotels.service.ts`** (mirror `airlines.service.ts`; uniqueness on name+city).
+- [x] **Step 5: Create `hotels.service.ts`** (mirror `airlines.service.ts`; uniqueness on name+city).
 
 ```ts
 import { Inject, Injectable, ConflictException, NotFoundException } from "@nestjs/common";
@@ -479,7 +479,7 @@ export class HotelsService {
 }
 ```
 
-- [ ] **Step 6: Create `hotels.controller.ts`** (mirror `airlines.controller.ts`).
+- [x] **Step 6: Create `hotels.controller.ts`** (mirror `airlines.controller.ts`).
 
 ```ts
 import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from "@nestjs/common";
@@ -528,7 +528,7 @@ export class HotelsController {
 }
 ```
 
-- [ ] **Step 7: Create `hotels.module.ts`** and register it.
+- [x] **Step 7: Create `hotels.module.ts`** and register it.
 
 ```ts
 import { Module } from "@nestjs/common";
@@ -545,7 +545,7 @@ export class HotelsModule {}
 
 In `apps/api/src/app.module.ts`, import `HotelsModule` and add it to the `imports` array (next to `AirlinesModule`).
 
-- [ ] **Step 8: Write the integration spec** — `apps/api/src/hotels/hotels.service.int.spec.ts` (mirror `airlines.service.int.spec.ts`; cover create, duplicate name+city rejected, unreferenced delete, delete blocked when referenced). Use `packageHotels` for the reference case:
+- [x] **Step 8: Write the integration spec** — `apps/api/src/hotels/hotels.service.int.spec.ts` (mirror `airlines.service.int.spec.ts`; cover create, duplicate name+city rejected, unreferenced delete, delete blocked when referenced). Use `packageHotels` for the reference case:
 
 ```ts
 import { ConflictException } from "@nestjs/common";
@@ -646,12 +646,12 @@ describe("HotelsService (integration)", () => {
 });
 ```
 
-- [ ] **Step 9: Run the unit + int tests**
+- [x] **Step 9: Run the unit + int tests**
 
 Run: `cd apps/api && bunx vitest run src/hotels/hotels.policy.spec.ts` (PASS)
 Run (needs Postgres): `bun run test:int -- hotels` (PASS — all 5 int cases)
 
-- [ ] **Step 10: Commit**
+- [x] **Step 10: Commit**
 
 ```bash
 git add apps/api/src/hotels apps/api/src/app.module.ts
@@ -674,7 +674,7 @@ git commit -m "feat(api): hotels catalog module mirroring airlines (hotel-master
 - Consumes: `hotels`, `packageHotels` from `@cometkit/db`; `HotelInput = { hotelId }`.
 - Produces: `PackagesService.addHotel(packageId, { hotelId })`, `PackagesService.removeHotel(packageId, hotelId)`; `findOne().hotels` = `PackageHotelDto[]`.
 
-- [ ] **Step 1: Update the `findOne` hotels join** in `packages.service.ts`. Add `hotels` to the `@cometkit/db` import. Replace the current hotels fetch (`select().from(packageHotels).where(...)`) with a join, and replace the `hotels: hotels.map(...)` mapping in the return object:
+- [x] **Step 1: Update the `findOne` hotels join** in `packages.service.ts`. Add `hotels` to the `@cometkit/db` import. Replace the current hotels fetch (`select().from(packageHotels).where(...)`) with a join, and replace the `hotels: hotels.map(...)` mapping in the return object:
 
 ```ts
 // fetch (replaces the old select from packageHotels)
@@ -699,7 +699,7 @@ hotels: hotelRows,
 
 (The local `const hotels` name would now clash with the imported `hotels` table — rename the local to `hotelRows` as above. Verify no other reference to the old local `hotels` remains in `findOne`.)
 
-- [ ] **Step 2: Rewrite `addHotel` and add `removeHotel`** in `packages.service.ts`. Ensure `packages`, `hotels`, `packageHotels`, `BadRequestException`, `ConflictException`, `NotFoundException`, `and`, `eq`, `ulid` are imported.
+- [x] **Step 2: Rewrite `addHotel` and add `removeHotel`** in `packages.service.ts`. Ensure `packages`, `hotels`, `packageHotels`, `BadRequestException`, `ConflictException`, `NotFoundException`, `and`, `eq`, `ulid` are imported.
 
 ```ts
 async addHotel(packageId: string, input: HotelInput): Promise<DbPackageHotel> {
@@ -737,7 +737,7 @@ async removeHotel(packageId: string, hotelId: string): Promise<void> {
 }
 ```
 
-- [ ] **Step 3: Update the controller** in `packages.controller.ts` — the `addHotel` handler now validates the `{ hotelId }` body, and add a detach route. Import `createAttachHotelSchema`? No — keep it simple; validate inline with the existing `HotelInput` type + a small Zod schema. Add to shared `hotels.ts` an `attachHotelSchema` for the body:
+- [x] **Step 3: Update the controller** in `packages.controller.ts` — the `addHotel` handler now validates the `{ hotelId }` body, and add a detach route. Import `createAttachHotelSchema`? No — keep it simple; validate inline with the existing `HotelInput` type + a small Zod schema. Add to shared `hotels.ts` an `attachHotelSchema` for the body:
 
   In `packages/shared/src/hotels.ts` add:
   ```ts
@@ -765,7 +765,7 @@ async removeHotel(@Param("id") id: string, @Param("hotelId") hotelId: string): P
 
 Ensure `Delete` and `attachHotelSchema` are imported in the controller.
 
-- [ ] **Step 4: Update the search service** in `search.service.ts` — join `hotels` in the lateral and the two EXISTS subqueries. Replace the `hotelLateral` and the two hotel clauses in `filters`:
+- [x] **Step 4: Update the search service** in `search.service.ts` — join `hotels` in the lateral and the two EXISTS subqueries. Replace the `hotelLateral` and the two hotel clauses in `filters`:
 
 ```ts
 const hotelLateral = sql`
@@ -796,7 +796,7 @@ and the hotelCity EXISTS:
 
 The `hotels` local type on line 39 (`{ cityName; name; stars; distanceM }`) and `hotels: r.hotels` stay unchanged — output shape is identical.
 
-- [ ] **Step 5: Update the affected int specs.** In `search.service.int.spec.ts` and `search.benchmark.int.spec.ts`, the helper that inserts `packageHotels` with `cityName/name/stars/...` must instead create a catalog hotel and link it. Replace each `db.insert(packageHotels).values({ id, packageId, cityName, name, stars, distanceM, isPelataran })` with:
+- [x] **Step 5: Update the affected int specs.** In `search.service.int.spec.ts` and `search.benchmark.int.spec.ts`, the helper that inserts `packageHotels` with `cityName/name/stars/...` must instead create a catalog hotel and link it. Replace each `db.insert(packageHotels).values({ id, packageId, cityName, name, stars, distanceM, isPelataran })` with:
 
 ```ts
 const [h] = await db.insert(hotels).values({
@@ -808,14 +808,14 @@ await db.insert(packageHotels).values({ id: ulid(), packageId: id, hotelId: h!.i
 
 Add `hotels` to the `@cometkit/db` import and a `createdHotelIds` cleanup array (delete package_hotels first, then hotels, in `afterAll`/cleanup). Do the same for the `far3`/min-stars case (city Makkah, stars 3, distance 900). In `packages.service.int.spec.ts`, replace each `service.addHotel(pkg.id, { cityName, name, stars, distanceM, isPelataran })` call with: create a catalog hotel via the db (or a `HotelsService`), then `service.addHotel(pkg.id, { hotelId })`; add a case asserting duplicate attach throws `ConflictException` and a case asserting `removeHotel` detaches. The publish-flow case must attach a **Makkah** catalog hotel so publish passes.
 
-- [ ] **Step 6: `packages.policy.spec.ts`** — the Makkah check reads `h.cityName`; update the spec's fixture hotels to the new `PackageHotelDto` shape (`{ hotelId, cityName, name, stars, distanceM, isPelataran }`). The policy code itself (`packages.policy.ts`) needs no change — it already reads `cityName`.
+- [x] **Step 6: `packages.policy.spec.ts`** — the Makkah check reads `h.cityName`; update the spec's fixture hotels to the new `PackageHotelDto` shape (`{ hotelId, cityName, name, stars, distanceM, isPelataran }`). The policy code itself (`packages.policy.ts`) needs no change — it already reads `cityName`.
 
-- [ ] **Step 7: Run API tests**
+- [x] **Step 7: Run API tests**
 
 Run: `cd apps/api && bunx vitest run src/packages/packages.policy.spec.ts` (PASS)
 Run (Postgres): `bun run test:int` (PASS — packages, hotels, search)
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add apps/api/src/packages apps/api/src/search packages/shared/src/hotels.ts
@@ -834,7 +834,7 @@ git commit -m "feat(api): attach/detach by hotelId, DTO+search join catalog (hot
 - Consumes: `HotelDto`, `CreateHotelInput`, `UpdateHotelInput` from `@cometkit/shared`.
 - Produces: `useHotels`, `useCreateHotel`, `useUpdateHotel`, `useDeleteHotel`.
 
-- [ ] **Step 1: Create `use-hotels.ts`** (mirror `use-airlines.ts`):
+- [x] **Step 1: Create `use-hotels.ts`** (mirror `use-airlines.ts`):
 
 ```ts
 "use client";
@@ -878,7 +878,7 @@ export function useDeleteHotel() {
 }
 ```
 
-- [ ] **Step 2: Add a Hotels admin section** to `master-data/page.tsx`. Retitle the page header from "Airlines & Departure Cities" to "Airlines, Departure Cities & Hotels". Below the two `MasterList`s, add a `HotelList` component (a richer inline component in the same file, since a hotel has more than name+isActive). It provides: an add form (name; city = select `Makkah`/`Madinah`/`Transit…` where Transit reveals a free-text input; stars 1-5; distance; pelataran checkbox), a list with inline edit of those fields, `isActive` toggle, and delete behind `useConfirm`. Reuse the existing `guard(...)` + `readApiError` error pattern and the `confirm(...)` idiom already in the file. Wire it to `useHotels/useCreateHotel/useUpdateHotel/useDeleteHotel`. Key detail — the city control:
+- [x] **Step 2: Add a Hotels admin section** to `master-data/page.tsx`. Retitle the page header from "Airlines & Departure Cities" to "Airlines, Departure Cities & Hotels". Below the two `MasterList`s, add a `HotelList` component (a richer inline component in the same file, since a hotel has more than name+isActive). It provides: an add form (name; city = select `Makkah`/`Madinah`/`Transit…` where Transit reveals a free-text input; stars 1-5; distance; pelataran checkbox), a list with inline edit of those fields, `isActive` toggle, and delete behind `useConfirm`. Reuse the existing `guard(...)` + `readApiError` error pattern and the `confirm(...)` idiom already in the file. Wire it to `useHotels/useCreateHotel/useUpdateHotel/useDeleteHotel`. Key detail — the city control:
 
 ```tsx
 // city entry: canonical select + transit escape
@@ -889,12 +889,12 @@ const CANONICAL_CITIES = ["Makkah", "Madinah"] as const;
 
 Guard the whole section behind the existing `me.role === "admin"` check already at the top of the page.
 
-- [ ] **Step 3: Typecheck + lint web**
+- [x] **Step 3: Typecheck + lint web**
 
 Run: `cd apps/web && bunx tsc --noEmit && bun run lint`
 Expected: PASS.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add apps/web/src/hooks/use-hotels.ts apps/web/src/app/dashboard/settings/master-data/page.tsx
@@ -911,9 +911,9 @@ git commit -m "feat(web): hotel catalog admin under master data (hotel-master-ca
 **Interfaces:**
 - Consumes: `useHotels` (catalog), the package DTO `hotels: PackageHotelDto[]`, `useConfirm`.
 
-- [ ] **Step 1: Replace the "Add Hotel" free-text card** in `packages/[id]/page.tsx`. Keep the existing `city` select (Makkah / Madinah / `plusDestination`). Replace the name/stars/distance/pelataran inputs with a single hotel `<select>` populated from `useHotels()` filtered to `hotel.city === cityName && hotel.isActive`, minus hotels already attached (`pkg.hotels.some(h => h.hotelId === hotel.id)`). The submit handler calls `addHotel.mutateAsync({ id: pkg.id, hotelId: selectedHotelId })`. Update the `useAddHotel` hook call site so its input is `{ hotelId }` (the hook posts to `:id/hotels`).
+- [x] **Step 1: Replace the "Add Hotel" free-text card** in `packages/[id]/page.tsx`. Keep the existing `city` select (Makkah / Madinah / `plusDestination`). Replace the name/stars/distance/pelataran inputs with a single hotel `<select>` populated from `useHotels()` filtered to `hotel.city === cityName && hotel.isActive`, minus hotels already attached (`pkg.hotels.some(h => h.hotelId === hotel.id)`). The submit handler calls `addHotel.mutateAsync({ id: pkg.id, hotelId: selectedHotelId })`. Update the `useAddHotel` hook call site so its input is `{ hotelId }` (the hook posts to `:id/hotels`).
 
-- [ ] **Step 2: Update the attach hook + add a detach hook** — in the packages hooks file (where `useAddHotel` lives, `apps/web/src/hooks/use-packages.ts` or similar; find via the `useAddHotel` import at `[id]/page.tsx:15`). Change `useAddHotel`'s mutation input to `{ id: string; hotelId: string }` posting `{ hotelId }`. Add `useDetachHotel` posting `DELETE packages/${id}/hotels/${hotelId}`, invalidating the package query.
+- [x] **Step 2: Update the attach hook + add a detach hook** — in the packages hooks file (where `useAddHotel` lives, `apps/web/src/hooks/use-packages.ts` or similar; find via the `useAddHotel` import at `[id]/page.tsx:15`). Change `useAddHotel`'s mutation input to `{ id: string; hotelId: string }` posting `{ hotelId }`. Add `useDetachHotel` posting `DELETE packages/${id}/hotels/${hotelId}`, invalidating the package query.
 
 ```ts
 export function useDetachHotel() {
@@ -928,7 +928,7 @@ export function useDetachHotel() {
 
 (Match the existing query-key convention used by the package-detail query in that hooks file.)
 
-- [ ] **Step 3: Render attached hotels with a confirm-gated detach button.** The attached list already maps `pkg.hotels`; each row now has `h.hotelId`. Add a detach button:
+- [x] **Step 3: Render attached hotels with a confirm-gated detach button.** The attached list already maps `pkg.hotels`; each row now has `h.hotelId`. Add a detach button:
 
 ```tsx
 const confirm = useConfirm();
@@ -951,12 +951,12 @@ const confirm = useConfirm();
 
 Import `useConfirm` from `@/hooks/use-confirm` (already used elsewhere). Keep the whole hotel card admin-gated (`isAdmin`) as it is today.
 
-- [ ] **Step 4: Typecheck + lint web**
+- [x] **Step 4: Typecheck + lint web**
 
 Run: `cd apps/web && bunx tsc --noEmit && bun run lint`
 Expected: PASS.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/web/src/app/dashboard/packages apps/web/src/hooks
@@ -967,17 +967,17 @@ git commit -m "feat(web): catalog hotel picker + confirm-gated detach (hotel-mas
 
 ### Task 8: Full verify + manual smoke
 
-- [ ] **Step 1: Run the quality gate**
+- [x] **Step 1: Run the quality gate**
 
 Run: `bun run verify`
 Expected: typecheck + lint + test all PASS across packages.
 
-- [ ] **Step 2: Run integration tests**
+- [x] **Step 2: Run integration tests**
 
 Run (Postgres up, seeded): `cd apps/api && bun run test:int`
 Expected: PASS (hotels, packages, search).
 
-- [ ] **Step 3: Manual smoke** (with `bun run dev`, logged in as admin):
+- [x] **Step 3: Manual smoke** (with `bun run dev`, logged in as admin):
   1. Settings → master data: create a Makkah hotel → it appears; create a duplicate name+city → conflict error shown.
   2. Open a package form → city Makkah → the new hotel is in the picker → attach it → it shows in the attached list; the picker no longer offers it.
   3. Detach it → confirm dialog appears → confirm → it's removed and returns to the picker.
@@ -985,7 +985,7 @@ Expected: PASS (hotels, packages, search).
   5. Deactivate a hotel that a package uses → it's hidden from the picker but still shown on the using package; delete it → blocked ("in use").
   6. Search by hotel name / hotel city + min stars → results correct.
 
-- [ ] **Step 4: Tick tasks.md and run the build guard** (per the comet-build exit flow — do this in the coordinating session, not as a plan step).
+- [x] **Step 4: Tick tasks.md and run the build guard** (per the comet-build exit flow — do this in the coordinating session, not as a plan step).
 
 ---
 
