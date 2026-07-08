@@ -13,8 +13,8 @@ base_ref: fc59b9887b14d8e230c032dc65e980349df2e872
 design_doc: docs/superpowers/specs/2026-07-08-hotel-master-catalog-design.md
 plan: docs/superpowers/plans/2026-07-08-hotel-master-catalog.md
 verify_result: pending
-verification_report: null
-branch_status: pending
+verification_report: docs/superpowers/reports/2026-07-08-hotel-master-catalog-verify.md
+branch_status: handled
 created_at: 2026-07-08
 verified_at: null
 archived: false
