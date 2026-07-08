@@ -65,6 +65,17 @@ export function useAddHotel() {
   });
 }
 
+export function useDetachHotel() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ packageId, hotelId }: { packageId: string; hotelId: string }) =>
+      api.delete(`packages/${packageId}/hotels/${hotelId}`).json<{ ok: true }>(),
+    onSuccess: (_, variables) => {
+      void queryClient.invalidateQueries({ queryKey: packageKeys.detail(variables.packageId) });
+    },
+  });
+}
+
 export function usePublishPackage() {
   const queryClient = useQueryClient();
   return useMutation({

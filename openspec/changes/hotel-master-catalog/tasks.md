@@ -32,8 +32,8 @@
 
 ## 6. Web — package form hotel picker (`apps/web/.../packages/[id]`)
 
-- [ ] 6.1 Replace the free-text "Add Hotel" inputs with a city select → active-catalog-hotel dropdown (keep-assigned includes an attached-but-deactivated hotel); attach by `hotelId`
-- [ ] 6.2 Prevent duplicate attach client-side (filter already-attached hotels by `hotelId`); render attached hotels from the DTO (name, stars, distance/pelataran) each with a detach button gated by `useConfirm`
+- [x] 6.1 Replace the free-text "Add Hotel" inputs with a city select → active-catalog-hotel dropdown (keep-assigned includes an attached-but-deactivated hotel); attach by `hotelId`
+- [x] 6.2 Prevent duplicate attach client-side (filter already-attached hotels by `hotelId`); render attached hotels from the DTO (name, stars, distance/pelataran) each with a detach button gated by `useConfirm`
 
 ## 7. Verify
 

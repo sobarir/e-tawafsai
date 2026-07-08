@@ -13,12 +13,14 @@ import {
   useCreatePackage,
   useUpdatePackage,
   useAddHotel,
+  useDetachHotel,
   usePublishPackage,
   useUnpublishPackage,
   useUploadFlyer,
   useTags,
   useCreateTag,
 } from "@/hooks/use-packages";
+import { useHotels } from "@/hooks/use-hotels";
 import {
   useDepartures,
   useCreateDeparture,
@@ -47,6 +49,8 @@ export default function PackageDetailPage() {
   const createPackage = useCreatePackage();
   const updatePackage = useUpdatePackage();
   const addHotel = useAddHotel();
+  const detachHotel = useDetachHotel();
+  const { data: catalogHotels } = useHotels();
   const publishPackage = usePublishPackage();
   const unpublishPackage = useUnpublishPackage();
   const uploadFlyer = useUploadFlyer();
@@ -69,12 +73,9 @@ export default function PackageDetailPage() {
   // Flyer images state
   const [flyers, setFlyers] = useState<string[]>([]);
 
-  // Hotels state
+  // Hotels state: pick a catalog hotel for a city and attach it.
   const [cityName, setCityName] = useState("Makkah");
-  const [hotelName, setHotelName] = useState("");
-  const [stars, setStars] = useState(3);
-  const [distanceM, setDistanceM] = useState<number | "">("");
-  const [isPelataran, setIsPelataran] = useState(false);
+  const [selectedHotelId, setSelectedHotelId] = useState("");
 
   // Custom Tag input state
   const [newTagName, setNewTagName] = useState("");
@@ -219,26 +220,35 @@ export default function PackageDetailPage() {
     setError(null);
     setSuccess(null);
 
-    if (!hotelName.trim()) {
-      setError("Hotel name is required");
+    if (!selectedHotelId) {
+      setError("Select a hotel to attach");
       return;
     }
 
     try {
       await addHotel.mutateAsync({
         packageId: id,
-        hotel: {
-          cityName: cityName.trim(),
-          name: hotelName.trim(),
-          stars: Number(stars),
-          distanceM: distanceM === "" ? null : Number(distanceM),
-          isPelataran,
-        },
+        hotel: { hotelId: selectedHotelId },
       });
-      setHotelName("");
-      setDistanceM("");
-      setIsPelataran(false);
-      setSuccess("Hotel added successfully.");
+      setSelectedHotelId("");
+      setSuccess("Hotel attached successfully.");
+    } catch (err) {
+      setError(await readApiError(err));
+    }
+  };
+
+  const handleDetachHotel = async (hotelId: string, hotelLabel: string) => {
+    setError(null);
+    setSuccess(null);
+    const ok = await confirm({
+      title: "Remove this hotel?",
+      description: `“${hotelLabel}” will be detached from this package. You can re-attach it from the catalog.`,
+      confirmLabel: "Remove",
+    });
+    if (!ok) return;
+    try {
+      await detachHotel.mutateAsync({ packageId: id, hotelId });
+      setSuccess("Hotel removed.");
     } catch (err) {
       setError(await readApiError(err));
     }
@@ -687,17 +697,20 @@ export default function PackageDetailPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Add Hotel (One-to-Many)</CardTitle>
-                <CardDescription>Attach hotels for Makkah, Madinah or transit cities.</CardDescription>
+                <CardTitle>Hotels (One-to-Many)</CardTitle>
+                <CardDescription>Pick a hotel from the catalog for Makkah, Madinah or transit cities.</CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleAddHotel} className="space-y-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="city">City Name</Label>
+                    <Label htmlFor="city">City</Label>
                     <select
                       id="city"
                       value={cityName}
-                      onChange={(e) => setCityName(e.target.value)}
+                      onChange={(e) => {
+                        setCityName(e.target.value);
+                        setSelectedHotelId("");
+                      }}
                       disabled={!isAdmin}
                       className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                     >
@@ -708,58 +721,45 @@ export default function PackageDetailPage() {
                   </div>
 
                   <div className="grid gap-2">
-                    <Label htmlFor="hotelName">Hotel Name</Label>
-                    <Input
-                      id="hotelName"
-                      value={hotelName}
-                      onChange={(e) => setHotelName(e.target.value)}
-                      disabled={!isAdmin}
-                      required
-                    />
+                    <Label htmlFor="hotelPick">Hotel</Label>
+                    {(() => {
+                      const attachedIds = new Set((pkg?.hotels ?? []).map((h) => h.hotelId));
+                      const options = (catalogHotels ?? []).filter(
+                        (h) => h.isActive && h.city === cityName && !attachedIds.has(h.id),
+                      );
+                      return (
+                        <>
+                          <select
+                            id="hotelPick"
+                            value={selectedHotelId}
+                            onChange={(e) => setSelectedHotelId(e.target.value)}
+                            disabled={!isAdmin || options.length === 0}
+                            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                          >
+                            <option value="">Select a hotel…</option>
+                            {options.map((h) => (
+                              <option key={h.id} value={h.id}>
+                                {h.name} ({h.stars}★{h.isPelataran ? ", pelataran" : h.distanceM ? `, ${h.distanceM}m` : ""})
+                              </option>
+                            ))}
+                          </select>
+                          {options.length === 0 && (
+                            <p className="text-xs text-muted-foreground">
+                              No catalog hotels for {cityName}.{" "}
+                              <Link href="/dashboard/settings/master-data" className="underline">
+                                Add one under master data
+                              </Link>
+                              .
+                            </p>
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="stars">Stars (1-5)</Label>
-                      <Input
-                        id="stars"
-                        type="number"
-                        min="1"
-                        max="5"
-                        value={stars}
-                        onChange={(e) => setStars(Number(e.target.value))}
-                        disabled={!isAdmin}
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <Label htmlFor="distance">Distance (Meters)</Label>
-                      <Input
-                        id="distance"
-                        type="number"
-                        value={distanceM}
-                        onChange={(e) => setDistanceM(e.target.value === "" ? "" : Number(e.target.value))}
-                        disabled={!isAdmin}
-                      />
-                    </div>
-                  </div>
-
-                  {cityName === "Makkah" && (
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        id="pelataran"
-                        checked={isPelataran}
-                        onChange={(e) => setIsPelataran(e.target.checked)}
-                        disabled={!isAdmin}
-                        className="rounded border-input text-primary"
-                      />
-                      <Label htmlFor="pelataran">Haram Courtyard (Pelataran)</Label>
-                    </div>
-                  )}
 
                   {isAdmin && (
-                    <Button type="submit" size="sm" className="w-full">
-                      Add Hotel
+                    <Button type="submit" size="sm" className="w-full" disabled={!selectedHotelId}>
+                      Attach hotel
                     </Button>
                   )}
                 </form>
@@ -770,13 +770,26 @@ export default function PackageDetailPage() {
                       Attached Hotels
                     </span>
                     <ul className="text-xs space-y-1.5 font-medium">
-                      {pkg.hotels.map((h, idx) => (
-                        <li key={idx} className="flex justify-between border-b pb-1">
+                      {pkg.hotels.map((h) => (
+                        <li key={h.hotelId} className="flex items-center justify-between gap-2 border-b pb-1">
                           <span>
                             {h.cityName}: {h.name} ({h.stars}★)
                           </span>
-                          <span className="text-muted-foreground font-mono text-[10px]">
-                            {h.isPelataran ? "Pelataran" : h.distanceM ? `${h.distanceM}m` : ""}
+                          <span className="flex items-center gap-2">
+                            <span className="text-muted-foreground font-mono text-[10px]">
+                              {h.isPelataran ? "Pelataran" : h.distanceM ? `${h.distanceM}m` : ""}
+                            </span>
+                            {isAdmin && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 px-2 text-destructive hover:bg-destructive/10"
+                                onClick={() => handleDetachHotel(h.hotelId, `${h.cityName}: ${h.name}`)}
+                              >
+                                Remove
+                              </Button>
+                            )}
                           </span>
                         </li>
                       ))}
