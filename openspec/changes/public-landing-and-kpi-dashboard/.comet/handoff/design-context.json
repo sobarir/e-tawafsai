@@ -1,0 +1,15 @@
+{
+  "change": "public-landing-and-kpi-dashboard",
+  "phase": "design",
+  "mode": "compact",
+  "canonical_spec": "openspec",
+  "generated_by": "comet-handoff.sh",
+  "context_hash": "fb83f0920f3fde6f4624d0ddce6169e12032edaf2e611177b59f1df07b4eb0cf",
+  "files": [
+    { "path": "openspec/changes/public-landing-and-kpi-dashboard/proposal.md", "sha256": "b80f45e74964e5012bdd1dbc1e50d0c380a6ec97fe15b3d198e02a0e6baffefb" },
+    { "path": "openspec/changes/public-landing-and-kpi-dashboard/design.md", "sha256": "72058b5becacfb820bc3a253c01b18aebfb997c8d8f5f8dc5ddfcd6124c3036d" },
+    { "path": "openspec/changes/public-landing-and-kpi-dashboard/tasks.md", "sha256": "5d164802ece9f856b25e1d8a9f5f42390afd3856fbc8e67933458269f8998a2c" },
+    { "path": "openspec/changes/public-landing-and-kpi-dashboard/specs/admin-dashboard/spec.md", "sha256": "448b28f41e724dc4b7ea9cef10db05df8645162953ae3fd4a49c8cb0825a5678" },
+    { "path": "openspec/changes/public-landing-and-kpi-dashboard/specs/public-catalog/spec.md", "sha256": "fb5bf243db4ededd60eda3885d863089d17134486bff9de92f577a8df6ee523c" }
+  ]
+}
