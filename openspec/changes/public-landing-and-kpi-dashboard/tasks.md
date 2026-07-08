@@ -38,5 +38,5 @@ next. A single `/code-review` runs only after ALL tasks are complete.
 
 ## 7. Verify
 
-- [ ] 7.1 `bun run verify` (typecheck + lint + test) and `bun run test:int` green; live smoke: anonymous `/` renders featured packages with no login redirect, and admin `/dashboard` shows real KPI counts.
+- [x] 7.1 `bun run verify` (typecheck + lint + test) and `bun run test:int` green; live smoke: anonymous `/` renders featured packages with no login redirect, and admin `/dashboard` shows real KPI counts.
 - [ ] 7.2 Single `/code-review` pass over the whole change (manual-gating rule: only after all tasks complete).
