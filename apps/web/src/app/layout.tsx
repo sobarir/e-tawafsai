@@ -3,9 +3,24 @@ import { Providers } from "@/components/providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "e-tawafsai",
+  title: "e-tawafsai — Platform Umrah Terpercaya",
   description:
-    "Multi-tenant platform for umrah & hajj travel agents to manage providers, packages, departures, and leads.",
+    "Temukan paket umrah terbaik dari agen perjalanan terpercaya. Harga transparan, hotel bintang 5, bimbingan ibadah lengkap.",
+  keywords: [
+    "umrah",
+    "paket umrah",
+    "travel umrah",
+    "umrah murah",
+    "umrah 2026",
+    "haji",
+    "e-tawafsai",
+  ],
+  openGraph: {
+    title: "e-tawafsai — Platform Umrah Terpercaya",
+    description:
+      "Temukan paket umrah terbaik dari agen perjalanan terpercaya.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -14,12 +29,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="id">
       <head>
         {/*
           Fonts via <link> so builds never need network access.
-          Swap to next/font/local with committed font files if you
-          want self-hosting.
+          Playfair Display = elegant serif for headings.
+          Inter = clean sans-serif for body/UI.
+          IBM Plex Mono = prices, dates, IDs.
         */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -28,7 +44,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
           rel="stylesheet"
         />
       </head>
