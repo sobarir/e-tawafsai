@@ -6,8 +6,8 @@
 
 ## 2. DB schema, migration & seed (`packages/db`)
 
-- [ ] 2.1 Add `hotels` table (tenant-owned; `name`, `city`, `stars`, `distanceM?`, `isPelataran`, `isActive`) with unique index on `(tenantId, lower(btrim(name)), lower(btrim(city)))`; export `DbHotel`/`NewDbHotel`
-- [ ] 2.2 Reshape `packageHotels` to `{ packageId (cascade), hotelId → hotels }` with unique `(packageId, hotelId)` and an index on `hotel_id`; drop `cityName`, `name`, `stars`, `distanceM`, `isPelataran`
+- [x] 2.1 Add `hotels` table (tenant-owned; `name`, `city`, `stars`, `distanceM?`, `isPelataran`, `isActive`) with unique index on `(tenantId, lower(btrim(name)), lower(btrim(city)))`; export `DbHotel`/`NewDbHotel`
+- [x] 2.2 Reshape `packageHotels` to `{ packageId (cascade), hotelId → hotels }` with unique `(packageId, hotelId)` and an index on `hotel_id`; drop `cityName`, `name`, `stars`, `distanceM`, `isPelataran`
 - [ ] 2.3 `db:generate` the migration (create `hotels`, truncate `package_hotels`, drop columns, add FK/unique/index); review the generated SQL
 - [ ] 2.4 Update the seed to insert demo catalog hotels and link Makkah + Madinah hotels to demo packages; `db:migrate` then `db:seed` and confirm seeded packages still publish
 

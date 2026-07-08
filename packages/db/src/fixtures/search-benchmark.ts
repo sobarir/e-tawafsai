@@ -1,5 +1,5 @@
 import { ulid } from "ulid";
-import { packages, packageHotels, departures, providers, type Database } from "../index";
+import { packages, packageHotels, hotels, departures, providers, type Database } from "../index";
 
 /**
  * Seeds a deterministic 1,000-package / 5,000-departure volume fixture for one
@@ -8,7 +8,7 @@ import { packages, packageHotels, departures, providers, type Database } from ".
 export async function seedSearchBenchmark(
   db: Database,
   tenantId: string,
-): Promise<{ providerId: string; packageIds: string[] }> {
+): Promise<{ providerId: string; packageIds: string[]; hotelIds: string[] }> {
   const suffix = ulid().toLowerCase();
   const providerId = ulid();
   await db.insert(providers).values({
@@ -25,9 +25,14 @@ export async function seedSearchBenchmark(
   });
 
   const packageIds: string[] = [];
+  const hotelIds: string[] = [];
   const pkgRows: (typeof packages.$inferInsert)[] = [];
-  const hotelRows: (typeof packageHotels.$inferInsert)[] = [];
+  const hotelRows: (typeof hotels.$inferInsert)[] = [];
+  const linkRows: (typeof packageHotels.$inferInsert)[] = [];
   const depRows: (typeof departures.$inferInsert)[] = [];
+  // Catalog hotels are deduped by name+city (unique per tenant), so a name
+  // reused across packages (e.g. Fairmont) is one catalog row linked N times.
+  const hotelIdByName = new Map<string, string>();
   const statuses = ["open", "almost_full", "full", "departed", "cancelled"] as const;
 
   for (let i = 0; i < 1000; i++) {
@@ -47,15 +52,24 @@ export async function seedSearchBenchmark(
       status: "published",
       hasBeenPublished: true,
     });
-    hotelRows.push({
-      id: ulid(),
-      packageId: id,
-      cityName: "Makkah",
-      name: i % 50 === 0 ? `Fairmont Clock Tower ${suffix}` : `Hotel Makkah ${i}`,
-      stars: 3 + (i % 3),
-      distanceM: 100 + (i % 10) * 50,
-      isPelataran: false,
-    });
+    const hotelName = i % 50 === 0 ? `Fairmont Clock Tower ${suffix}` : `Hotel Makkah ${i}`;
+    let hotelId = hotelIdByName.get(hotelName);
+    if (!hotelId) {
+      hotelId = ulid();
+      hotelIdByName.set(hotelName, hotelId);
+      hotelIds.push(hotelId);
+      hotelRows.push({
+        id: hotelId,
+        tenantId,
+        name: hotelName,
+        city: "Makkah",
+        stars: 3 + (i % 3),
+        distanceM: 100 + (i % 10) * 50,
+        isPelataran: false,
+        isActive: true,
+      });
+    }
+    linkRows.push({ id: ulid(), packageId: id, hotelId });
 
     for (let d = 0; d < 5; d++) {
       const month = 8 + (d % 5); // Sep(8)..Jan of 2027 via Date rollover
@@ -87,8 +101,9 @@ export async function seedSearchBenchmark(
   const chunk = <T>(arr: T[], n: number): T[][] =>
     Array.from({ length: Math.ceil(arr.length / n) }, (_, k) => arr.slice(k * n, k * n + n));
   for (const c of chunk(pkgRows, 500)) await db.insert(packages).values(c);
-  for (const c of chunk(hotelRows, 500)) await db.insert(packageHotels).values(c);
+  for (const c of chunk(hotelRows, 500)) await db.insert(hotels).values(c);
+  for (const c of chunk(linkRows, 500)) await db.insert(packageHotels).values(c);
   for (const c of chunk(depRows, 500)) await db.insert(departures).values(c);
 
-  return { providerId, packageIds };
+  return { providerId, packageIds, hotelIds };
 }
