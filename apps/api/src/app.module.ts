@@ -22,6 +22,7 @@ import { InclusionsModule } from "./inclusions/inclusions.module";
 import { ExclusionsModule } from "./exclusions/exclusions.module";
 import { SearchModule } from "./search/search.module";
 import { PublicModule } from "./public/public.module";
+import { DashboardModule } from "./dashboard/dashboard.module";
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { PublicModule } from "./public/public.module";
     ExclusionsModule,
     SearchModule,
     PublicModule,
+    DashboardModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: AllExceptionsFilter }],
 })

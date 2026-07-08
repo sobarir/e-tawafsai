@@ -22,7 +22,7 @@ next. A single `/code-review` runs only after ALL tasks are complete.
 ## 4. Dashboard summary API (admin-guarded)
 
 - [x] 4.1 Add a dashboard service aggregating tenant-scoped counts (packages by status; upcoming/almost-full departures + open seats; providers total/active) and a bounded recent-packages list.
-- [ ] 4.2 Add `GET /dashboard/summary` controller guarded by `JwtAuthGuard` + `RolesGuard` (`@Roles("admin","staff")`); register the `dashboard` module in `app.module.ts`.
+- [x] 4.2 Add `GET /dashboard/summary` controller guarded by `JwtAuthGuard` + `RolesGuard` (`@Roles("admin","staff")`); register the `dashboard` module in `app.module.ts`.
 - [x] 4.3 Unit spec for the summary shaping (pure logic; counts/recent-list bounds).
 
 ## 5. Dashboard home + de-scaffold (web)
