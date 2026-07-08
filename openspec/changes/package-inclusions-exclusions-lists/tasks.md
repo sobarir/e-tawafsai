@@ -25,6 +25,6 @@
 
 ## 5. Verification & Tests
 
-- [ ] 5.1 Implement integration tests for inclusions/exclusions API.
-- [ ] 5.2 Implement package integration tests verifying inclusions/exclusions.
-- [ ] 5.3 Run `bun run verify` and ensure all quality checks pass.
+- [x] 5.1 Implement integration tests for inclusions/exclusions API.
+- [x] 5.2 Implement package integration tests verifying inclusions/exclusions.
+- [x] 5.3 Run `bun run verify` and ensure all quality checks pass.

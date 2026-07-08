@@ -14,6 +14,10 @@ import {
   hotels,
   airlines,
   departureCities,
+  inclusions,
+  exclusions,
+  packageInclusions,
+  packageExclusions,
   type Database,
 } from "@cometkit/db";
 import { eq, inArray } from "drizzle-orm";
@@ -42,6 +46,8 @@ describe("PackagesService (integration)", () => {
   const createdAirlineIds: string[] = [];
   const createdDepartureCityIds: string[] = [];
   const createdHotelIds: string[] = [];
+  const createdInclusionIds: string[] = [];
+  const createdExclusionIds: string[] = [];
   const suffix = ulid().toLowerCase();
 
   let makkahHotelSeq = 0;
@@ -72,6 +78,20 @@ describe("PackagesService (integration)", () => {
     const id = ulid();
     await db.insert(departureCities).values({ id, tenantId, name });
     createdDepartureCityIds.push(id);
+    return id;
+  }
+
+  async function createInclusion(name: string): Promise<string> {
+    const id = ulid();
+    await db.insert(inclusions).values({ id, tenantId, name, isActive: true });
+    createdInclusionIds.push(id);
+    return id;
+  }
+
+  async function createExclusion(name: string): Promise<string> {
+    const id = ulid();
+    await db.insert(exclusions).values({ id, tenantId, name, isActive: true });
+    createdExclusionIds.push(id);
     return id;
   }
 
@@ -132,14 +152,22 @@ describe("PackagesService (integration)", () => {
   });
 
   afterAll(async () => {
-    // package_hotels links reference both packages (cascade) and hotels —
-    // clear links first, then packages, then the catalog hotels.
+    // package_hotels/inclusions/exclusions links reference packages (cascade) —
+    // clear links first, then packages, then the catalog hotels/inclusions/exclusions.
     if (createdPackageIds.length > 0) {
       await db.delete(packageHotels).where(inArray(packageHotels.packageId, createdPackageIds));
+      await db.delete(packageInclusions).where(inArray(packageInclusions.packageId, createdPackageIds));
+      await db.delete(packageExclusions).where(inArray(packageExclusions.packageId, createdPackageIds));
       await db.delete(packages).where(inArray(packages.id, createdPackageIds));
     }
     if (createdHotelIds.length > 0) {
       await db.delete(hotels).where(inArray(hotels.id, createdHotelIds));
+    }
+    if (createdInclusionIds.length > 0) {
+      await db.delete(inclusions).where(inArray(inclusions.id, createdInclusionIds));
+    }
+    if (createdExclusionIds.length > 0) {
+      await db.delete(exclusions).where(inArray(exclusions.id, createdExclusionIds));
     }
     if (createdCategoryIds.length > 0) {
       await db.delete(packageCategories).where(inArray(packageCategories.id, createdCategoryIds));
@@ -426,5 +454,47 @@ describe("PackagesService (integration)", () => {
     expect(afterDetach.hotels).toHaveLength(0);
     const [stillInCatalog] = await db.select().from(hotels).where(eq(hotels.id, hotelId));
     expect(stillInCatalog).toBeDefined();
+  });
+
+  it("saves and retrieves package inclusions and exclusions atomically", async () => {
+    const incId1 = await createInclusion(`Inc A ${suffix}`);
+    const incId2 = await createInclusion(`Inc B ${suffix}`);
+    const excId1 = await createExclusion(`Exc A ${suffix}`);
+    const excId2 = await createExclusion(`Exc B ${suffix}`);
+
+    // Create package with inclusions and exclusions
+    const pkg = await service.create({
+      title: "Promo Inclusions Pack",
+      providerId,
+      productType: "umrah",
+      inclusions: [incId1, incId2],
+      exclusions: [excId1],
+    });
+    createdPackageIds.push(pkg.id);
+
+    const detail = await service.findOne(pkg.id);
+    expect(detail.inclusions).toHaveLength(2);
+    expect(detail.inclusions.map((i) => i.inclusionId)).toContain(incId1);
+    expect(detail.inclusions.map((i) => i.inclusionId)).toContain(incId2);
+    expect(detail.exclusions).toHaveLength(1);
+    expect(detail.exclusions[0]?.exclusionId).toBe(excId1);
+
+    // Update exclusions to include excId2 and remove excId1
+    await service.update(pkg.id, {
+      exclusions: [excId2],
+    });
+
+    const updatedDetail = await service.findOne(pkg.id);
+    expect(updatedDetail.inclusions).toHaveLength(2); // inclusions untouched
+    expect(updatedDetail.exclusions).toHaveLength(1);
+    expect(updatedDetail.exclusions[0]?.exclusionId).toBe(excId2);
+
+    // Empty inclusions
+    await service.update(pkg.id, {
+      inclusions: [],
+    });
+    const finalDetail = await service.findOne(pkg.id);
+    expect(finalDetail.inclusions).toHaveLength(0);
+    expect(finalDetail.exclusions).toHaveLength(1);
   });
 });
