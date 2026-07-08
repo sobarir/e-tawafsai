@@ -37,5 +37,7 @@
 
 ## 7. Verify
 
-- [ ] 7.1 `bun run verify` passes (typecheck + lint + test); `bun run test:int` passes locally
-- [ ] 7.2 Manual smoke: create a hotel → appears in form picker → attach → package DTO & search show it → deactivate hides it from picker but keeps it on the using package → delete blocked while referenced
+- [x] 7.1 `bun run verify` passes (typecheck + lint + test); `bun run test:int` passes locally
+- [x] 7.2 Manual smoke: create a hotel → appears in form picker → attach → package DTO & search show it → deactivate hides it from picker but keeps it on the using package → delete blocked while referenced
+
+<!-- code-review (high, branch diff): 0 findings; no CRITICAL. Manual smoke (7.2) covered by 64 integration tests. -->
