@@ -33,8 +33,8 @@ next. A single `/code-review` runs only after ALL tasks are complete.
 
 ## 6. Integration tests
 
-- [ ] 6.1 Int spec: anonymous, host-scoped `GET /public/packages` returns only `published` packages with marketing-safe fields (no internal fields) and never 401s.
-- [ ] 6.2 Int spec: `GET /dashboard/summary` requires auth (401 anonymous) and returns tenant-scoped counts + recent activity for the authenticated tenant.
+- [x] 6.1 Int spec: anonymous, host-scoped `GET /public/packages` returns only `published` packages with marketing-safe fields (no internal fields) and never 401s.
+- [x] 6.2 Int spec: `GET /dashboard/summary` requires auth (401 anonymous) and returns tenant-scoped counts + recent activity for the authenticated tenant.
 
 ## 7. Verify
 
