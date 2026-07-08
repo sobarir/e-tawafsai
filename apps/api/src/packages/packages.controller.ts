@@ -29,7 +29,7 @@ import {
 import { PackagesService } from "./packages.service";
 import { StorageService } from "../storage/storage.service";
 import { TenantScopedDb } from "../tenancy/tenant-scoped-db";
-import { tags, type Database } from "@cometkit/db";
+import { type Database } from "@cometkit/db";
 import { eq, and } from "drizzle-orm";
 import { ulid } from "ulid";
 import { DB } from "../database/database.module";
@@ -56,45 +56,6 @@ export class PackagesController {
   @Get()
   async list(): Promise<PackageDto[]> {
     return this.packagesService.findAll();
-  }
-
-  @Get("tags")
-  async listTags() {
-    const list = await this.db
-      .select()
-      .from(tags)
-      .where(eq(tags.tenantId, this.tenantDb.tenantId));
-    return list;
-  }
-
-  @Post("tags")
-  @Roles("admin")
-  async createTag(
-    @Body() body: { name: string },
-  ) {
-    if (!body.name) {
-      throw new BadRequestException("Tag name is required");
-    }
-    const [existing] = await this.db
-      .select()
-      .from(tags)
-      .where(and(eq(tags.tenantId, this.tenantDb.tenantId), eq(tags.name, body.name)))
-      .limit(1);
-
-    if (existing) {
-      return existing;
-    }
-
-    const [created] = await this.db
-      .insert(tags)
-      .values({
-        id: ulid(),
-        tenantId: this.tenantDb.tenantId,
-        name: body.name,
-      })
-      .returning();
-
-    return created;
   }
 
   @Get(":id")

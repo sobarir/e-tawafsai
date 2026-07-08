@@ -9,8 +9,10 @@ import {
   airlines,
   departureCities,
   hotels,
-  tags,
-  packageTags,
+  inclusions,
+  exclusions,
+  packageInclusions,
+  packageExclusions,
   packageFlyers,
   providers,
   departures,
@@ -24,6 +26,8 @@ import {
   type UpdatePackageInput,
   type PackageDto,
   type HotelInput,
+  type PackageInclusionDto,
+  type PackageExclusionDto,
 } from "@cometkit/shared";
 import { TenantScopedDb } from "../tenancy/tenant-scoped-db";
 import { PackagesPolicy } from "./packages.policy";
@@ -65,31 +69,53 @@ export class PackagesService {
     if (input.airlineId) await this.assertAirlineOwned(input.airlineId);
     if (input.departureCityId) await this.assertDepartureCityOwned(input.departureCityId);
 
-    const [created] = await this.db
-      .insert(packages)
-      .values({
-        id,
-        tenantId: this.tenantDb.tenantId,
-        providerId: input.providerId,
-        productType,
-        title: input.title,
-        slug,
-        categoryId,
-        plusDestination: input.plusDestination ?? null,
-        durationDays: input.durationDays ?? null,
-        description: input.description ?? null,
-        airlineId: input.airlineId ?? null,
-        flightRoute: input.flightRoute ?? null,
-        departureCityId: input.departureCityId ?? null,
-        isFeatured: input.isFeatured ?? false,
-        status: "draft",
-        hasBeenPublished: false,
-      })
-      .returning();
+    const created = await this.db.transaction(async (tx) => {
+      const [newPkg] = await tx
+        .insert(packages)
+        .values({
+          id,
+          tenantId: this.tenantDb.tenantId,
+          providerId: input.providerId,
+          productType,
+          title: input.title,
+          slug,
+          categoryId,
+          plusDestination: input.plusDestination ?? null,
+          durationDays: input.durationDays ?? null,
+          description: input.description ?? null,
+          airlineId: input.airlineId ?? null,
+          flightRoute: input.flightRoute ?? null,
+          departureCityId: input.departureCityId ?? null,
+          isFeatured: input.isFeatured ?? false,
+          status: "draft",
+          hasBeenPublished: false,
+        })
+        .returning();
 
-    if (!created) {
-      throw new Error("Insert returned no package");
-    }
+      if (!newPkg) {
+        throw new Error("Insert returned no package");
+      }
+
+      if (input.inclusions && input.inclusions.length > 0) {
+        await tx.insert(packageInclusions).values(
+          input.inclusions.map((inclusionId) => ({
+            packageId: id,
+            inclusionId,
+          }))
+        );
+      }
+
+      if (input.exclusions && input.exclusions.length > 0) {
+        await tx.insert(packageExclusions).values(
+          input.exclusions.map((exclusionId) => ({
+            packageId: id,
+            exclusionId,
+          }))
+        );
+      }
+
+      return newPkg;
+    });
 
     this.logger.info({ packageId: id }, "package.created");
     return created;
@@ -124,11 +150,25 @@ export class PackagesService {
       .from(packageFlyers)
       .where(eq(packageFlyers.packageId, id));
 
-    const tagRecords = await this.db
-      .select({ name: tags.name })
-      .from(packageTags)
-      .innerJoin(tags, eq(packageTags.tagId, tags.id))
-      .where(eq(packageTags.packageId, id));
+    const inclusionRecords = await this.db
+      .select({
+        inclusionId: inclusions.id,
+        name: inclusions.name,
+        isActive: inclusions.isActive,
+      })
+      .from(packageInclusions)
+      .innerJoin(inclusions, eq(packageInclusions.inclusionId, inclusions.id))
+      .where(eq(packageInclusions.packageId, id));
+
+    const exclusionRecords = await this.db
+      .select({
+        exclusionId: exclusions.id,
+        name: exclusions.name,
+        isActive: exclusions.isActive,
+      })
+      .from(packageExclusions)
+      .innerJoin(exclusions, eq(packageExclusions.exclusionId, exclusions.id))
+      .where(eq(packageExclusions.packageId, id));
 
     const deps = await this.db
       .select()
@@ -185,7 +225,8 @@ export class PackagesService {
       needsReview,
       hotels: hotelRows,
       flyers: flyerRecords.map((f) => f.url),
-      tags: tagRecords.map((t) => t.name),
+      inclusions: inclusionRecords,
+      exclusions: exclusionRecords,
       createdAt: pkg.createdAt.toISOString(),
       updatedAt: pkg.updatedAt.toISOString(),
     };
@@ -236,6 +277,10 @@ export class PackagesService {
       updatedAt: new Date(),
     };
 
+    // Remove relations fields from the packages table update input
+    delete (updateData as any).inclusions;
+    delete (updateData as any).exclusions;
+
     // Slug immutability check
     if (input.title && input.title !== existing.title) {
       if (existing.hasBeenPublished) {
@@ -246,15 +291,43 @@ export class PackagesService {
       }
     }
 
-    const [updated] = await this.db
-      .update(packages)
-      .set(updateData)
-      .where(eq(packages.id, id))
-      .returning();
+    const updated = await this.db.transaction(async (tx) => {
+      const [updatedPkg] = await tx
+        .update(packages)
+        .set(updateData)
+        .where(eq(packages.id, id))
+        .returning();
 
-    if (!updated) {
-      throw new Error("Update returned no package");
-    }
+      if (!updatedPkg) {
+        throw new Error("Update returned no package");
+      }
+
+      if (input.inclusions !== undefined) {
+        await tx.delete(packageInclusions).where(eq(packageInclusions.packageId, id));
+        if (input.inclusions.length > 0) {
+          await tx.insert(packageInclusions).values(
+            input.inclusions.map((inclusionId) => ({
+              packageId: id,
+              inclusionId,
+            }))
+          );
+        }
+      }
+
+      if (input.exclusions !== undefined) {
+        await tx.delete(packageExclusions).where(eq(packageExclusions.packageId, id));
+        if (input.exclusions.length > 0) {
+          await tx.insert(packageExclusions).values(
+            input.exclusions.map((exclusionId) => ({
+              packageId: id,
+              exclusionId,
+            }))
+          );
+        }
+      }
+
+      return updatedPkg;
+    });
 
     this.logger.info({ packageId: id }, "package.updated");
     return updated;
