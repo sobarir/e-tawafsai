@@ -17,9 +17,9 @@ import {
   usePublishPackage,
   useUnpublishPackage,
   useUploadFlyer,
-  useTags,
-  useCreateTag,
 } from "@/hooks/use-packages";
+import { useInclusions } from "@/hooks/use-inclusions";
+import { useExclusions } from "@/hooks/use-exclusions";
 import { useHotels } from "@/hooks/use-hotels";
 import {
   useDepartures,
@@ -44,7 +44,8 @@ export default function PackageDetailPage() {
   const { data: me } = useMe();
   const { data: pkg, isPending: isPackagePending } = usePackage(id);
   const { data: providersList } = useProviders(1, 100);
-  const { data: tagsList } = useTags();
+  const { data: inclusionsList } = useInclusions();
+  const { data: exclusionsList } = useExclusions();
 
   const createPackage = useCreatePackage();
   const updatePackage = useUpdatePackage();
@@ -55,7 +56,6 @@ export default function PackageDetailPage() {
   const unpublishPackage = useUnpublishPackage();
   const uploadFlyer = useUploadFlyer();
   const confirm = useConfirm();
-  const createTag = useCreateTag();
 
   const [title, setTitle] = useState("");
   const [providerId, setProviderId] = useState("");
@@ -77,9 +77,9 @@ export default function PackageDetailPage() {
   const [cityName, setCityName] = useState("Makkah");
   const [selectedHotelId, setSelectedHotelId] = useState("");
 
-  // Custom Tag input state
-  const [newTagName, setNewTagName] = useState("");
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  // Custom Inclusions & Exclusions selection state
+  const [selectedInclusions, setSelectedInclusions] = useState<string[]>([]);
+  const [selectedExclusions, setSelectedExclusions] = useState<string[]>([]);
 
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -104,7 +104,8 @@ export default function PackageDetailPage() {
       setIsFeatured(pkg.isFeatured);
       setSlug(pkg.slug);
       setFlyers(pkg.flyers);
-      setSelectedTags(pkg.tags);
+      setSelectedInclusions(pkg.inclusions.map((i) => i.inclusionId));
+      setSelectedExclusions(pkg.exclusions.map((e) => e.exclusionId));
     }
   }, [pkg]);
 
@@ -196,10 +197,6 @@ export default function PackageDetailPage() {
         for (const fUrl of flyers) {
           await api.post(`packages/${created.id}/flyer`, { json: { url: fUrl } });
         }
-        // Save selected tags
-        for (const tName of selectedTags) {
-          await api.post("packages/tags", { json: { name: tName } });
-        }
         // Optional inline first departure: skip cleanly when no date was entered.
         const departurePayload = inlineDepartureRef.current?.buildPayload();
         if (departurePayload) {
@@ -282,35 +279,32 @@ export default function PackageDetailPage() {
     }
   };
 
-  const handleAddCustomTag = async () => {
+  const toggleInclusion = async (inclusionId: string) => {
     setError(null);
-    if (!newTagName.trim()) return;
+    const nextInclusions = selectedInclusions.includes(inclusionId)
+      ? selectedInclusions.filter((id) => id !== inclusionId)
+      : [...selectedInclusions, inclusionId];
 
-    try {
-      const created = await createTag.mutateAsync(newTagName.trim());
-      if (!selectedTags.includes(created.name)) {
-        const nextTags = [...selectedTags, created.name];
-        setSelectedTags(nextTags);
-        if (!isNew) {
-          await api.patch(`packages/${id}`, { json: { tags: nextTags } });
-        }
+    setSelectedInclusions(nextInclusions);
+    if (!isNew) {
+      try {
+        await updatePackage.mutateAsync({ id, inclusions: nextInclusions });
+      } catch (err) {
+        setError(await readApiError(err));
       }
-      setNewTagName("");
-    } catch (err) {
-      setError(await readApiError(err));
     }
   };
 
-  const toggleTag = async (tagName: string) => {
+  const toggleExclusion = async (exclusionId: string) => {
     setError(null);
-    const nextTags = selectedTags.includes(tagName)
-      ? selectedTags.filter((t) => t !== tagName)
-      : [...selectedTags, tagName];
+    const nextExclusions = selectedExclusions.includes(exclusionId)
+      ? selectedExclusions.filter((id) => id !== exclusionId)
+      : [...selectedExclusions, exclusionId];
 
-    setSelectedTags(nextTags);
+    setSelectedExclusions(nextExclusions);
     if (!isNew) {
       try {
-        await api.patch(`packages/${id}`, { json: { tags: nextTags } });
+        await updatePackage.mutateAsync({ id, exclusions: nextExclusions });
       } catch (err) {
         setError(await readApiError(err));
       }
@@ -583,43 +577,81 @@ export default function PackageDetailPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Inclusions & Exclusions</CardTitle>
-                <CardDescription>Select seeded package tags or add custom tags.</CardDescription>
+                <CardTitle>Inclusions</CardTitle>
+                <CardDescription>Select features included in this package.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex flex-wrap gap-1.5">
-                  {tagsList?.map((tag) => {
-                    const isSelected = selectedTags.includes(tag.name);
-                    return (
-                      <button
-                        key={tag.id}
-                        type="button"
-                        onClick={() => toggleTag(tag.name)}
-                        className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset ${
-                          isSelected
-                            ? "bg-primary text-primary-foreground ring-primary"
-                            : "bg-muted text-muted-foreground ring-muted-foreground/20 hover:bg-muted/80"
-                        }`}
-                      >
-                        {tag.name}
-                      </button>
-                    );
-                  })}
+                  {(inclusionsList ?? [])
+                    .filter((inc) => inc.isActive || selectedInclusions.includes(inc.id))
+                    .map((inc) => {
+                      const isSelected = selectedInclusions.includes(inc.id);
+                      return (
+                        <button
+                          key={inc.id}
+                          type="button"
+                          disabled={!isAdmin}
+                          onClick={() => toggleInclusion(inc.id)}
+                          className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset transition-colors ${
+                            isSelected
+                              ? "bg-primary text-primary-foreground ring-primary"
+                              : "bg-muted text-muted-foreground ring-muted-foreground/20 hover:bg-muted/80"
+                          } disabled:cursor-not-allowed`}
+                        >
+                          {inc.name}
+                        </button>
+                      );
+                    })}
+                  {(inclusionsList ?? []).length === 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      No active inclusions found.{" "}
+                      <Link href="/dashboard/settings/master-data" className="underline">
+                        Add one under settings
+                      </Link>
+                      .
+                    </p>
+                  )}
                 </div>
+              </CardContent>
+            </Card>
 
-                {isAdmin && (
-                  <div className="flex gap-2 pt-2 border-t">
-                    <Input
-                      value={newTagName}
-                      onChange={(e) => setNewTagName(e.target.value)}
-                      placeholder="Add custom tag (e.g. VIP Lounge)"
-                      className="max-w-xs"
-                    />
-                    <Button type="button" size="sm" onClick={handleAddCustomTag}>
-                      Add Tag
-                    </Button>
-                  </div>
-                )}
+            <Card>
+              <CardHeader>
+                <CardTitle>Exclusions</CardTitle>
+                <CardDescription>Select items excluded from this package.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex flex-wrap gap-1.5">
+                  {(exclusionsList ?? [])
+                    .filter((exc) => exc.isActive || selectedExclusions.includes(exc.id))
+                    .map((exc) => {
+                      const isSelected = selectedExclusions.includes(exc.id);
+                      return (
+                        <button
+                          key={exc.id}
+                          type="button"
+                          disabled={!isAdmin}
+                          onClick={() => toggleExclusion(exc.id)}
+                          className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset transition-colors ${
+                            isSelected
+                              ? "bg-primary text-primary-foreground ring-primary"
+                              : "bg-muted text-muted-foreground ring-muted-foreground/20 hover:bg-muted/80"
+                          } disabled:cursor-not-allowed`}
+                        >
+                          {exc.name}
+                        </button>
+                      );
+                    })}
+                  {(exclusionsList ?? []).length === 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      No active exclusions found.{" "}
+                      <Link href="/dashboard/settings/master-data" className="underline">
+                        Add one under settings
+                      </Link>
+                      .
+                    </p>
+                  )}
+                </div>
               </CardContent>
             </Card>
 

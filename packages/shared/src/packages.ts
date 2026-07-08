@@ -45,10 +45,10 @@ export const createExclusionSchema = z.object({
 
 export const updateExclusionSchema = createExclusionSchema.partial();
 
-export type CreateInclusionInput = z.infer<typeof createInclusionSchema>;
-export type UpdateInclusionInput = z.infer<typeof updateInclusionSchema>;
-export type CreateExclusionInput = z.infer<typeof createExclusionSchema>;
-export type UpdateExclusionInput = z.infer<typeof updateExclusionSchema>;
+export type CreateInclusionInput = z.input<typeof createInclusionSchema>;
+export type UpdateInclusionInput = z.input<typeof updateInclusionSchema>;
+export type CreateExclusionInput = z.input<typeof createExclusionSchema>;
+export type UpdateExclusionInput = z.input<typeof updateExclusionSchema>;
 
 export interface InclusionDto {
   id: string;
