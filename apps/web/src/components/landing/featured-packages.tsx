@@ -1,10 +1,10 @@
 "use client";
 
-import { useSearchPackages } from "@/hooks/use-search";
+import { usePublicFeaturedPackages } from "@/hooks/use-public-packages";
 import { PackageCard } from "./package-card";
 
 export function FeaturedPackages() {
-  const { data, isPending } = useSearchPackages({ page: 1, pageSize: 6 });
+  const { data, isPending } = usePublicFeaturedPackages();
 
   return (
     <section id="paket" className="section-spacing">
@@ -56,10 +56,10 @@ export function FeaturedPackages() {
                 </div>
               </div>
             ))
-          ) : data?.data && data.data.length > 0 ? (
-            data.data.map((result) => (
+          ) : data && data.length > 0 ? (
+            data.map((result) => (
               <PackageCard
-                key={result.id}
+                key={result.slug}
                 result={result}
                 whatsappPhone="6281234567890"
               />

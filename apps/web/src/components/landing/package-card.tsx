@@ -1,4 +1,4 @@
-import type { SearchResultDto } from "@cometkit/shared";
+import type { PublicPackageCardDto } from "@cometkit/shared";
 
 /** Format price as Indonesian Rupiah */
 function formatRupiah(amount: number): string {
@@ -14,10 +14,11 @@ function formatRupiah(amount: number): string {
 function buildWhatsAppUrl(
   phone: string,
   packageName: string,
-  price: number,
+  price: number | null,
 ): string {
+  const priceSuffix = price != null ? ` - ${formatRupiah(price)}` : "";
   const text = encodeURIComponent(
-    `Assalamu'alaikum, saya tertarik dengan paket Umrah ${packageName} - ${formatRupiah(price)}`,
+    `Assalamu'alaikum, saya tertarik dengan paket Umrah ${packageName}${priceSuffix}`,
   );
   const cleanPhone = phone.replace(/\D/g, "");
   return `https://wa.me/${cleanPhone}?text=${text}`;
@@ -42,7 +43,7 @@ function Stars({ count }: { count: number }) {
 }
 
 interface PackageCardProps {
-  result: SearchResultDto;
+  result: PublicPackageCardDto;
   whatsappPhone?: string;
   /** Inclusions/exclusions come from the full PackageDto, not search results.
    *  When available, pass them through. */
@@ -57,7 +58,7 @@ export function PackageCard({
   exclusions,
 }: PackageCardProps) {
   const waUrl = whatsappPhone
-    ? buildWhatsAppUrl(whatsappPhone, result.title, result.priceFrom)
+    ? buildWhatsAppUrl(whatsappPhone, result.title, result.startingPriceIdr)
     : "#";
 
   return (
@@ -75,9 +76,9 @@ export function PackageCard({
           ) : (
             <span />
           )}
-          {result.seatsLeft > 0 && (
+          {result.seatsAvailable > 0 && (
             <span className="text-xs font-medium text-accent">
-              {result.seatsLeft} kursi tersisa
+              {result.seatsAvailable} kursi tersisa
             </span>
           )}
         </div>
@@ -137,7 +138,7 @@ export function PackageCard({
               {result.airline}
             </span>
           )}
-          {result.nextDepartureDate && (
+          {result.nearestDepartureDate && (
             <span className="flex items-center gap-1.5">
               <svg
                 className="h-4 w-4"
@@ -152,7 +153,7 @@ export function PackageCard({
                   d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"
                 />
               </svg>
-              {new Date(result.nextDepartureDate).toLocaleDateString("id-ID", {
+              {new Date(result.nearestDepartureDate).toLocaleDateString("id-ID", {
                 day: "numeric",
                 month: "long",
                 year: "numeric",
@@ -208,11 +209,15 @@ export function PackageCard({
             <div>
               <div className="text-xs text-muted-foreground">Mulai dari</div>
               <div className="font-display text-2xl font-bold text-foreground">
-                {formatRupiah(result.priceFrom)}
+                {result.startingPriceIdr != null
+                  ? formatRupiah(result.startingPriceIdr)
+                  : "Hubungi kami"}
               </div>
-              <div className="text-[10px] text-muted-foreground">
-                /orang
-              </div>
+              {result.startingPriceIdr != null && (
+                <div className="text-[10px] text-muted-foreground">
+                  /orang
+                </div>
+              )}
             </div>
             <a
               href={waUrl}

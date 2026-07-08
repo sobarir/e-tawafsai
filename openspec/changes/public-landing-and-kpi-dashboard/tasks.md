@@ -16,8 +16,8 @@ next. A single `/code-review` runs only after ALL tasks are complete.
 
 ## 3. Landing wiring (web)
 
-- [ ] 3.1 Add `usePublicFeaturedPackages()` hook calling `/public/packages` via the shared `api` instance.
-- [ ] 3.2 Repoint `FeaturedPackages` from `useSearchPackages` to the public hook and adapt `PackageCard` to render `PublicPackageCardDto` (keep the existing card layout + WhatsApp CTA).
+- [x] 3.1 Add `usePublicFeaturedPackages()` hook calling `/public/packages` via the shared `api` instance.
+- [x] 3.2 Repoint `FeaturedPackages` from `useSearchPackages` to the public hook and adapt `PackageCard` to render `PublicPackageCardDto` (keep the existing card layout + WhatsApp CTA).
 
 ## 4. Dashboard summary API (admin-guarded)
 
