@@ -51,57 +51,61 @@ export class DashboardService {
   async summary(): Promise<DashboardSummaryDto> {
     const tenantId = this.tenantDb.tenantId;
 
-    const [pkgCounts] = (await this.db.execute(sql`
-      select count(*)::int as total,
-             count(*) filter (where status = 'published')::int as published,
-             count(*) filter (where status = 'draft')::int as draft
-      from packages where tenant_id = ${tenantId}`)) as unknown as {
-      total: number; published: number; draft: number;
-    }[];
+    // The six aggregates are independent — run them concurrently (this endpoint
+    // loads on every admin dashboard visit).
+    const [pkgCountsRows, depCountsRows, provCountsRows, urgentRows, needsPushRows, recentRows] =
+      await Promise.all([
+        this.db.execute(sql`
+          select count(*)::int as total,
+                 count(*) filter (where status = 'published')::int as published,
+                 count(*) filter (where status = 'draft')::int as draft
+          from packages where tenant_id = ${tenantId}`) as unknown as Promise<{
+          total: number; published: number; draft: number;
+        }[]>,
+        this.db.execute(sql`
+          select
+            count(*) filter (where status in ('open','almost_full') and departure_date >= now())::int as upcoming,
+            count(*) filter (where status = 'almost_full')::int as almost_full,
+            coalesce(sum(seat_total - seat_booked - seat_held)
+              filter (where status in ('open','almost_full') and departure_date >= now()), 0)::int as open_seats
+          from departures where tenant_id = ${tenantId}`) as unknown as Promise<{
+          upcoming: number; almost_full: number; open_seats: number;
+        }[]>,
+        this.db.execute(sql`
+          select count(*)::int as total, count(*) filter (where is_active)::int as active
+          from providers where tenant_id = ${tenantId}`) as unknown as Promise<{
+          total: number; active: number;
+        }[]>,
+        this.db.execute(sql`
+          select d.id as departure_id, p.id as package_id, p.title as package_title,
+                 d.departure_date, (d.seat_total - d.seat_booked - d.seat_held) as seats_left
+          from departures d join packages p on p.id = d.package_id
+          where d.tenant_id = ${tenantId} and d.status = 'almost_full'
+          order by d.departure_date asc
+          limit 10`) as unknown as Promise<DepartureRow[]>,
+        this.db.execute(sql`
+          select d.id as departure_id, p.id as package_id, p.title as package_title,
+                 d.departure_date, (d.seat_total - d.seat_booked - d.seat_held) as seats_left
+          from departures d join packages p on p.id = d.package_id
+          where d.tenant_id = ${tenantId}
+            and d.status in ('open','almost_full')
+            and d.departure_date >= now()
+            and d.departure_date <= now() + interval '45 days'
+            and (d.seat_total - d.seat_booked - d.seat_held) > 0
+          order by d.departure_date asc
+          limit 10`) as unknown as Promise<DepartureRow[]>,
+        this.db.execute(sql`
+          select id, title, status, updated_at
+          from packages where tenant_id = ${tenantId}
+          order by updated_at desc
+          limit 5`) as unknown as Promise<{
+          id: string; title: string; status: string; updated_at: string | Date;
+        }[]>,
+      ]);
 
-    const [depCounts] = (await this.db.execute(sql`
-      select
-        count(*) filter (where status in ('open','almost_full') and departure_date >= now())::int as upcoming,
-        count(*) filter (where status = 'almost_full')::int as almost_full,
-        coalesce(sum(seat_total - seat_booked - seat_held)
-          filter (where status in ('open','almost_full') and departure_date >= now()), 0)::int as open_seats
-      from departures where tenant_id = ${tenantId}`)) as unknown as {
-      upcoming: number; almost_full: number; open_seats: number;
-    }[];
-
-    const [provCounts] = (await this.db.execute(sql`
-      select count(*)::int as total, count(*) filter (where is_active)::int as active
-      from providers where tenant_id = ${tenantId}`)) as unknown as {
-      total: number; active: number;
-    }[];
-
-    const urgentRows = (await this.db.execute(sql`
-      select d.id as departure_id, p.id as package_id, p.title as package_title,
-             d.departure_date, (d.seat_total - d.seat_booked - d.seat_held) as seats_left
-      from departures d join packages p on p.id = d.package_id
-      where d.tenant_id = ${tenantId} and d.status = 'almost_full'
-      order by d.departure_date asc
-      limit 10`)) as unknown as DepartureRow[];
-
-    const needsPushRows = (await this.db.execute(sql`
-      select d.id as departure_id, p.id as package_id, p.title as package_title,
-             d.departure_date, (d.seat_total - d.seat_booked - d.seat_held) as seats_left
-      from departures d join packages p on p.id = d.package_id
-      where d.tenant_id = ${tenantId}
-        and d.status in ('open','almost_full')
-        and d.departure_date >= now()
-        and d.departure_date <= now() + interval '45 days'
-        and (d.seat_total - d.seat_booked - d.seat_held) > 0
-      order by d.departure_date asc
-      limit 10`)) as unknown as DepartureRow[];
-
-    const recentRows = (await this.db.execute(sql`
-      select id, title, status, updated_at
-      from packages where tenant_id = ${tenantId}
-      order by updated_at desc
-      limit 5`)) as unknown as {
-      id: string; title: string; status: string; updated_at: string | Date;
-    }[];
+    const [pkgCounts] = pkgCountsRows;
+    const [depCounts] = depCountsRows;
+    const [provCounts] = provCountsRows;
 
     const now = new Date();
     const summary: DashboardSummaryDto = {
