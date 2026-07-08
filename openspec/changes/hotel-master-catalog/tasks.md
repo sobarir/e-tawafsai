@@ -13,10 +13,10 @@
 
 ## 3. API — hotels catalog module (`apps/api/src/hotels`)
 
-- [ ] 3.1 Scaffold `HotelsModule` (controller/service/policy) modeled on `airlines`: tenant-scoped list/create/update/delete, `@UseGuards(JwtAuthGuard, RolesGuard)` + `@Roles("admin")`, structured `hotel.*` logging
-- [ ] 3.2 Enforce normalized name+city uniqueness (`ConflictException`) and block delete when referenced by any package (explanatory error); register module in `app.module.ts`
-- [ ] 3.3 Unit specs: hotels policy/service boundary (duplicate rejected, delete-when-referenced blocked, non-admin forbidden)
-- [ ] 3.4 Integration spec: hotels CRUD against Postgres, cleaning up its own rows
+- [x] 3.1 Scaffold `HotelsModule` (controller/service/policy) modeled on `airlines`: tenant-scoped list/create/update/delete, `@UseGuards(JwtAuthGuard, RolesGuard)` + `@Roles("admin")`, structured `hotel.*` logging
+- [x] 3.2 Enforce normalized name+city uniqueness (`ConflictException`) and block delete when referenced by any package (explanatory error); register module in `app.module.ts`
+- [x] 3.3 Unit specs: hotels policy/service boundary (duplicate rejected, delete-when-referenced blocked, non-admin forbidden)
+- [x] 3.4 Integration spec: hotels CRUD against Postgres, cleaning up its own rows
 
 ## 4. API — wire packages, search & publish policy
 
