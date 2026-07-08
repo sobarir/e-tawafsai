@@ -45,13 +45,6 @@ The create flow SHALL start with flyer image upload step (multi-image, drag-drop
 - **WHEN** flyer upload fails
 - **THEN** the form remains usable and the package can be saved as draft without images
 
-### Requirement: Inclusions and exclusions as seeded tag multi-selects
-Inclusions/exclusions SHALL be tag-style multi-selects seeded per tenant with common values (visa, tiket PP, hotel, makan 3x, bus AC, muthawif, perlengkapan umrah, asuransi, handling, airport tax, kereta cepat Haramain) and SHALL allow free-text additions that become tenant tags.
-
-#### Scenario: Free-text tag added
-- **WHEN** the agent types a new inclusion not in the seeded list
-- **THEN** it is saved as a tenant tag and offered in future selections
-
 ### Requirement: Slug generation and immutability
 Slugs SHALL be auto-generated from the title (kebab-case), editable while never-published, unique per tenant (collision gets a suffix), and immutable after first publish.
 
@@ -107,4 +100,41 @@ new package, the default-selected provider SHALL be the first active provider.
 - **WHEN** an admin opens the create package form and every provider is inactive
 - **THEN** the Licensed Provider dropdown offers no provider options
 - **AND** no inactive provider is auto-selected
+
+### Requirement: Package Inclusions and Package Exclusions as tenant-global master catalogs
+The system SHALL provide separate, tenant-global master catalogs for Package Inclusions and Package Exclusions. Admins SHALL be able to perform CRUD operations (create, rename, toggle active status, and delete) on inclusions and exclusions via settings master-data.
+
+#### Scenario: Admin creates inclusion
+- **WHEN** an admin adds a new inclusion with a unique name
+- **THEN** it is saved to the tenant's inclusions master catalog
+
+#### Scenario: Admin creates exclusion
+- **WHEN** an admin adds a new exclusion with a unique name
+- **THEN** it is saved to the tenant's exclusions master catalog
+
+#### Scenario: Unique constraint on name per tenant
+- **WHEN** an admin tries to create an inclusion or exclusion with a name that already exists in that tenant (case-insensitive, trimmed)
+- **THEN** the request is rejected with a conflict error
+
+### Requirement: Package creation and editing with separate inclusions and exclusions selections
+During package creation and editing, the admin user SHALL be able to select multiple active inclusions and exclusions from the respective tenant-global master catalogs. These selections SHALL be saved atomically with the package. Free-text additions during package creation/editing SHALL NOT be allowed.
+
+#### Scenario: Save inclusions and exclusions on package create
+- **WHEN** an admin creates a package and selects active inclusions and exclusions
+- **THEN** the package is created and successfully linked to those inclusions and exclusions
+
+#### Scenario: Update inclusions and exclusions on package edit
+- **WHEN** an admin updates a package's inclusions and exclusions selections
+- **THEN** the links are updated to match the new selections
+
+### Requirement: Cascade delete guard on inclusions and exclusions
+An inclusion or exclusion that is currently linked to one or more packages SHALL NOT be deleted. The system SHALL reject deletion requests and recommend deactivation instead.
+
+#### Scenario: Prevent deletion of linked inclusion
+- **WHEN** an admin attempts to delete an inclusion that is linked to a package
+- **THEN** the delete request is rejected with a conflict error
+
+#### Scenario: Prevent deletion of linked exclusion
+- **WHEN** an admin attempts to delete an exclusion that is linked to a package
+- **THEN** the delete request is rejected with a conflict error
 

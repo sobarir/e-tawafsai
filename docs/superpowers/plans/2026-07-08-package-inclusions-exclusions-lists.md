@@ -2,6 +2,7 @@
 change: package-inclusions-exclusions-lists
 design-doc: docs/superpowers/specs/2026-07-08-package-inclusions-exclusions-lists-design.md
 base-ref: 0923ece4f270b6ac47b7412f9edd6efc6f7117b4
+archived-with: 2026-07-08-package-inclusions-exclusions-lists
 ---
 
 # Package Inclusions and Exclusions Catalogs Implementation Plan
@@ -21,6 +22,7 @@ base-ref: 0923ece4f270b6ac47b7412f9edd6efc6f7117b4
 - Form submissions must update link relations atomically inside database transactions.
 - Quality gates (`bun run verify`) must pass completely at the end.
 
+archived-with: 2026-07-08-package-inclusions-exclusions-lists
 ---
 
 ## 1. Database Schema & Migration
@@ -42,6 +44,7 @@ git add packages/db/src/schema/packages.ts packages/db/src/seed.ts
 git commit -m "db: update schema to replace tags with inclusions and exclusions"
 ```
 
+archived-with: 2026-07-08-package-inclusions-exclusions-lists
 ---
 
 ## 2. Shared Types & Schemas
@@ -60,6 +63,7 @@ git add packages/shared/src/packages.ts
 git commit -m "shared: update package schemas and DTOs for inclusions/exclusions"
 ```
 
+archived-with: 2026-07-08-package-inclusions-exclusions-lists
 ---
 
 ## 3. Backend API Implementation
@@ -103,6 +107,7 @@ git add apps/api/src/packages/packages.service.ts apps/api/src/packages/packages
 git commit -m "feat(api): update packages service and controller for relational inclusions/exclusions"
 ```
 
+archived-with: 2026-07-08-package-inclusions-exclusions-lists
 ---
 
 ## 4. Frontend Implementation
@@ -139,6 +144,7 @@ git add apps/web/src/app/dashboard/packages/[id]/page.tsx
 git commit -m "fe: revamp package details form to show separate inclusions and exclusions pill grids"
 ```
 
+archived-with: 2026-07-08-package-inclusions-exclusions-lists
 ---
 
 ## 5. Verification & Tests

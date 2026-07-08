@@ -2,6 +2,8 @@
 comet_change: package-inclusions-exclusions-lists
 role: technical-design
 canonical_spec: openspec
+archived-with: 2026-07-08-package-inclusions-exclusions-lists
+status: final
 ---
 
 # Technical Design: Package Inclusions and Package Exclusions Catalogs

@@ -30,8 +30,6 @@ import { PackagesService } from "./packages.service";
 import { StorageService } from "../storage/storage.service";
 import { TenantScopedDb } from "../tenancy/tenant-scoped-db";
 import { type Database } from "@cometkit/db";
-import { eq, and } from "drizzle-orm";
-import { ulid } from "ulid";
 import { DB } from "../database/database.module";
 
 @Controller("packages")

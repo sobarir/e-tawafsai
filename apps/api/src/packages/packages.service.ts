@@ -26,8 +26,6 @@ import {
   type UpdatePackageInput,
   type PackageDto,
   type HotelInput,
-  type PackageInclusionDto,
-  type PackageExclusionDto,
 } from "@cometkit/shared";
 import { TenantScopedDb } from "../tenancy/tenant-scoped-db";
 import { PackagesPolicy } from "./packages.policy";
@@ -272,14 +270,14 @@ export class PackagesService {
     if (input.airlineId) await this.assertAirlineOwned(input.airlineId);
     if (input.departureCityId) await this.assertDepartureCityOwned(input.departureCityId);
 
-    const updateData: Partial<DbPackage> = {
+    const updateData: Record<string, unknown> = {
       ...input,
       updatedAt: new Date(),
     };
 
     // Remove relations fields from the packages table update input
-    delete (updateData as any).inclusions;
-    delete (updateData as any).exclusions;
+    delete updateData.inclusions;
+    delete updateData.exclusions;
 
     // Slug immutability check
     if (input.title && input.title !== existing.title) {
@@ -294,7 +292,7 @@ export class PackagesService {
     const updated = await this.db.transaction(async (tx) => {
       const [updatedPkg] = await tx
         .update(packages)
-        .set(updateData)
+        .set(updateData as Partial<DbPackage>)
         .where(eq(packages.id, id))
         .returning();
 
