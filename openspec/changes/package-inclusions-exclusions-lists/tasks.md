@@ -11,7 +11,7 @@
 
 ## 3. Backend API Implementation
 
-- [ ] 3.1 Implement inclusions controller, service, module, and policy under `apps/api/src/inclusions`.
+- [x] 3.1 Implement inclusions controller, service, module, and policy under `apps/api/src/inclusions`.
 - [ ] 3.2 Implement exclusions controller, service, module, and policy under `apps/api/src/exclusions`.
 - [ ] 3.3 Register new modules in `apps/api/src/app.module.ts`.
 - [ ] 3.4 Update `PackagesService` to save inclusions and exclusions atomically using `this.db.transaction` in create/update methods.
