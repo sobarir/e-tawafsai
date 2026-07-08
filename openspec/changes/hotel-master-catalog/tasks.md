@@ -27,8 +27,8 @@
 
 ## 5. Web — hotel catalog admin (`apps/web`)
 
-- [ ] 5.1 Add `use-hotels` TanStack Query hooks (keys `["hotels", params]`; mutations invalidate the resource root) over the shared `api` instance
-- [ ] 5.2 Add a Hotels admin section to the master-data page (retitle the header): richer create/edit form (name; city = canonical Makkah/Madinah select + transit/other free-text escape; stars; distance; pelataran; active), `isActive` toggle, delete behind `useConfirm`, admin-gated
+- [x] 5.1 Add `use-hotels` TanStack Query hooks (keys `["hotels", params]`; mutations invalidate the resource root) over the shared `api` instance
+- [x] 5.2 Add a Hotels admin section to the master-data page (retitle the header): richer create/edit form (name; city = canonical Makkah/Madinah select + transit/other free-text escape; stars; distance; pelataran; active), `isActive` toggle, delete behind `useConfirm`, admin-gated
 
 ## 6. Web — package form hotel picker (`apps/web/.../packages/[id]`)
 
