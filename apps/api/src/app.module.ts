@@ -18,6 +18,8 @@ import { AirlinesModule } from "./airlines/airlines.module";
 import { HotelsModule } from "./hotels/hotels.module";
 import { DepartureCitiesModule } from "./departure-cities/departure-cities.module";
 import { DeparturesModule } from "./departures/departures.module";
+import { InclusionsModule } from "./inclusions/inclusions.module";
+import { ExclusionsModule } from "./exclusions/exclusions.module";
 import { SearchModule } from "./search/search.module";
 
 @Module({
@@ -56,6 +58,8 @@ import { SearchModule } from "./search/search.module";
     HotelsModule,
     DepartureCitiesModule,
     DeparturesModule,
+    InclusionsModule,
+    ExclusionsModule,
     SearchModule,
   ],
   providers: [{ provide: APP_FILTER, useClass: AllExceptionsFilter }],
