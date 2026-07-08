@@ -132,7 +132,13 @@ guess from recent files. Reconstruct state from disk, in this order:
 2. `openspec/changes/` — active change folders; each `tasks.md` shows
    exactly which tasks are done (checked) and which remain. Archived
    changes live under `openspec/changes/archive/` — that is the "done"
-   list; there is no separate roadmap file.
+   list.
+   - `openspec/BACKLOG.md` — the shared roadmap of work **planned but not
+     yet opened** as a change. Read it to answer "what's next?"; it is the
+     cross-tool source of truth for future work (both Claude Code and
+     Antigravity read it). Active/done changes are NOT listed there — only
+     not-yet-opened work. When you open a backlog item via `/comet-open`,
+     remove it from `BACKLOG.md`; when new future work comes up, add it.
 3. `git status` + current branch + recent log — uncommitted work and
    the change branch you are on.
 
