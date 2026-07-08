@@ -8,7 +8,7 @@ base-ref: 6f1fc8fe2b8002d7d8af9dcf063d68c0578f8ad7
 
 > **For agentic workers:** This plan is executed under Comet `build_mode: direct` with
 > manual gating — one task per commit, stop after each task and wait for approval. Steps
-> use checkbox (`- [ ]`) syntax for tracking. Canonical requirements:
+> use checkbox syntax for tracking. Canonical requirements:
 > `openspec/changes/public-landing-and-kpi-dashboard/specs/{public-catalog,admin-dashboard}/spec.md`.
 
 **Goal:** Make the consumer landing page reachable by anonymous visitors (via a public,
