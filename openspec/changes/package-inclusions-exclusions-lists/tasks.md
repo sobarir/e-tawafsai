@@ -1,8 +1,8 @@
 ## 1. Database Schema & Migration
 
 - [x] 1.1 Modify `packages/db/src/schema/packages.ts` to define `inclusions`, `exclusions`, `packageInclusions`, and `packageExclusions` tables, and remove `tags` and `packageTags` tables.
-- [ ] 1.2 Generate database migrations using `bun run db:generate`.
-- [ ] 1.3 Apply database migrations using `bun run db:migrate`.
+- [x] 1.2 Generate database migrations using `bun run db:generate`.
+- [x] 1.3 Apply database migrations using `bun run db:migrate`.
 
 ## 2. Shared Types & Schemas
 

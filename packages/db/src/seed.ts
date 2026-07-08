@@ -137,27 +137,51 @@ async function main() {
       });
   }
 
-  const starterTags = [
-    "visa",
-    "tiket PP",
-    "hotel",
-    "makan 3x",
-    "bus AC",
-    "muthawif",
-    "perlengkapan umrah",
-    "asuransi",
-    "handling",
-    "airport tax",
-    "kereta cepat Haramain",
+  const starterInclusions = [
+    "Visa",
+    "Tiket Pesawat PP",
+    "Hotel Makkah & Madinah",
+    "Makan 3x",
+    "Bus AC",
+    "Muthawif (Guide)",
+    "Perlengkapan Umrah",
+    "Asuransi",
+    "Handling & Airport Tax",
+    "Kereta Cepat Haramain",
   ];
 
-  for (const tagName of starterTags) {
+  const starterExclusions = [
+    "Pembuatan Paspor",
+    "Vaksin Meningitis",
+    "Pengeluaran Pribadi",
+    "Laundry",
+    "Kelebihan Bagasi",
+    "Tips Driver & Guide",
+    "Surcharge Kamar (Double/Triple)",
+  ];
+
+  for (const name of starterInclusions) {
     await db
-      .insert(schema.tags)
+      .insert(schema.inclusions)
       .values({
         id: ulid(),
         tenantId: tenant.id,
-        name: tagName,
+        name,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .onConflictDoNothing();
+  }
+
+  for (const name of starterExclusions) {
+    await db
+      .insert(schema.exclusions)
+      .values({
+        id: ulid(),
+        tenantId: tenant.id,
+        name,
+        isActive: true,
         createdAt: new Date(),
         updatedAt: new Date(),
       })

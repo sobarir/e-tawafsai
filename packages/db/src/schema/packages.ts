@@ -151,9 +151,7 @@ export const packageInclusions = pgTable("package_inclusions", {
     .notNull()
     .references(() => inclusions.id, { onDelete: "cascade" }),
 }, (table) => [
-  {
-    pk: primaryKey({ columns: [table.packageId, table.inclusionId] }),
-  }
+  primaryKey({ columns: [table.packageId, table.inclusionId] }),
 ]);
 
 export const packageExclusions = pgTable("package_exclusions", {
@@ -164,9 +162,7 @@ export const packageExclusions = pgTable("package_exclusions", {
     .notNull()
     .references(() => exclusions.id, { onDelete: "cascade" }),
 }, (table) => [
-  {
-    pk: primaryKey({ columns: [table.packageId, table.exclusionId] }),
-  }
+  primaryKey({ columns: [table.packageId, table.exclusionId] }),
 ]);
 
 export const packageFlyers = pgTable("package_flyers", {

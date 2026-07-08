@@ -141,6 +141,20 @@
       "when": 1783491477610,
       "tag": "0019_chubby_swordsman",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1783499308023,
+      "tag": "0020_clean_greymalkin",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1783499324925,
+      "tag": "0021_naive_blonde_phantom",
+      "breakpoints": true
     }
   ]
 }
