@@ -6,7 +6,7 @@ next. A single `/code-review` runs only after ALL tasks are complete.
 ## 1. Shared contracts
 
 - [x] 1.1 Add `PublicPackageCardDto` (marketing-safe: title, slug, hotels[{cityName,name,stars,distanceM,isPelataran}], airlineName, nearestDepartureDate, startingPriceIdr, seatsAvailable) and its response type to `packages/shared`.
-- [ ] 1.2 Add `DashboardSummaryDto` (`packages:{total,published,draft}`, `departures:{upcoming,almostFull,openSeats}`, `providers:{total,active}`, `recentPackages:[{id,title,status,updatedAt}]`) to `packages/shared`.
+- [x] 1.2 Add `DashboardSummaryDto` (`packages:{total,published,draft}`, `departures:{upcoming,almostFull,openSeats}`, `providers:{total,active}`, `recentPackages:[{id,title,status,updatedAt}]`) to `packages/shared`.
 
 ## 2. Public catalog API (unauthenticated)
 

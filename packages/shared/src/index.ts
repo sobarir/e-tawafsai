@@ -14,6 +14,7 @@ export * from "./hotels";
 export * from "./departures";
 export * from "./search";
 export * from "./public-catalog";
+export * from "./dashboard";
 
 
 
