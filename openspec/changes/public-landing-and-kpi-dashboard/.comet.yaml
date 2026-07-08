@@ -1,5 +1,5 @@
 workflow: full
-phase: verify
+phase: archive
 context_compression: off
 build_mode: direct
 build_pause: null
@@ -12,11 +12,11 @@ auto_transition: false
 base_ref: 6f1fc8fe2b8002d7d8af9dcf063d68c0578f8ad7
 design_doc: docs/superpowers/specs/2026-07-08-public-landing-and-kpi-dashboard-design.md
 plan: docs/superpowers/plans/2026-07-08-public-landing-and-kpi-dashboard.md
-verify_result: pending
+verify_result: pass
 verification_report: docs/superpowers/reports/2026-07-08-public-landing-and-kpi-dashboard-verify.md
-branch_status: pending
+branch_status: handled
 created_at: 2026-07-08
-verified_at: null
+verified_at: 2026-07-08
 archived: false
 handoff_context: openspec/changes/public-landing-and-kpi-dashboard/.comet/handoff/design-context.json
 handoff_hash: fb83f0920f3fde6f4624d0ddce6169e12032edaf2e611177b59f1df07b4eb0cf
