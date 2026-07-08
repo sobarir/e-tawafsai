@@ -9,6 +9,7 @@ import {
   providers,
   packages,
   packageHotels,
+  hotels,
   departures,
   seedSearchBenchmark,
   type Database,
@@ -26,7 +27,7 @@ describe("SearchService benchmark (integration)", () => {
   let db: Database;
   let service: SearchService;
   let tenantId: string;
-  let seeded: { providerId: string; packageIds: string[] };
+  let seeded: { providerId: string; packageIds: string[]; hotelIds: string[] };
 
   beforeAll(async () => {
     const url = process.env.DATABASE_URL;
@@ -46,6 +47,7 @@ describe("SearchService benchmark (integration)", () => {
     await db.delete(departures).where(inArray(departures.packageId, seeded.packageIds));
     await db.delete(packageHotels).where(inArray(packageHotels.packageId, seeded.packageIds));
     await db.delete(packages).where(inArray(packages.id, seeded.packageIds));
+    await db.delete(hotels).where(inArray(hotels.id, seeded.hotelIds));
     await db.delete(providers).where(eq(providers.id, seeded.providerId));
   });
 

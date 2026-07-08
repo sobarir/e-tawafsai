@@ -20,10 +20,10 @@
 
 ## 4. API — wire packages, search & publish policy
 
-- [ ] 4.1 Change `addHotel` to accept `{ hotelId }` (validate tenant ownership, insert link, reject cross-tenant + duplicate); add `DELETE /packages/:id/hotels/:hotelId` detach that removes only the link
-- [ ] 4.2 Update `toHotelDto` / package DTO mapping to join `package_hotels → hotels` and map `hotel.city → cityName` (+ `isPelataran`)
-- [ ] 4.3 Update `search` service hotels lateral (`json_agg`) and hotel-name `EXISTS` / `hotelCity` filters to join through `hotels`; confirm DTO output unchanged
-- [ ] 4.4 Confirm publish policy "≥1 Makkah hotel" reads the joined `cityName`; update/extend `packages.policy.spec` and `packages.service.int.spec` for the new attach shape
+- [x] 4.1 Change `addHotel` to accept `{ hotelId }` (validate tenant ownership, insert link, reject cross-tenant + duplicate); add `DELETE /packages/:id/hotels/:hotelId` detach that removes only the link
+- [x] 4.2 Update `toHotelDto` / package DTO mapping to join `package_hotels → hotels` and map `hotel.city → cityName` (+ `isPelataran`)
+- [x] 4.3 Update `search` service hotels lateral (`json_agg`) and hotel-name `EXISTS` / `hotelCity` filters to join through `hotels`; confirm DTO output unchanged
+- [x] 4.4 Confirm publish policy "≥1 Makkah hotel" reads the joined `cityName`; update/extend `packages.policy.spec` and `packages.service.int.spec` for the new attach shape
 
 ## 5. Web — hotel catalog admin (`apps/web`)
 
